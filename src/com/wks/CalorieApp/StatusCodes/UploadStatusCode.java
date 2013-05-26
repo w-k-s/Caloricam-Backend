@@ -1,6 +1,6 @@
-package com.wks.CalorieApp.Codes;
+package com.wks.CalorieApp.StatusCodes;
 
-public enum UploadCode {
+public enum UploadStatusCode {
 	UPLOAD_SUCCESSFUL("File uploaded successfully."),
 	UPLOAD_FAILED("Upload failed."),
 	NO_FILE_PROVIDED("No file to uplaod."),
@@ -9,7 +9,7 @@ public enum UploadCode {
 	
 	private final String description;
 	
-	private UploadCode(String description)
+	private UploadStatusCode(String description)
 	{
 		this.description = description;
 	}

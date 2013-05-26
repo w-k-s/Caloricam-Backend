@@ -13,7 +13,7 @@ import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.json.simple.JSONObject;
 
-import com.wks.CalorieApp.Codes.UploadCode;
+import com.wks.CalorieApp.StatusCodes.UploadStatusCode;
 import com.wks.CalorieApp.Utils.FileUpload;
 import com.wks.CalorieApp.Utils.Environment;
 
@@ -47,7 +47,7 @@ public class Upload extends HttpServlet {
 		boolean isMultipart = ServletFileUpload.isMultipartContent(req);
 		if (!isMultipart)
 		{
-			outputJSON(out, false, UploadCode.FILE_NOT_FOUND.toString());
+			outputJSON(out, false, UploadStatusCode.FILE_NOT_FOUND.toString());
 			return;
 		}
 
@@ -71,7 +71,7 @@ public class Upload extends HttpServlet {
 					if (!extension.equals(EXTENSION_JPEG)
 							&& !extension.equals(EXTENSION_JPG))
 					{
-						outputJSON(out, false, UploadCode.INVALID_TYPE + ": "
+						outputJSON(out, false, UploadStatusCode.INVALID_TYPE + ": "
 								+ extension);
 						return;
 					}
@@ -88,12 +88,12 @@ public class Upload extends HttpServlet {
 						indexer.forward(req, resp);
 					} else
 						outputJSON(out, false,
-								UploadCode.UPLOAD_FAILED.getDescription());
+								UploadStatusCode.UPLOAD_FAILED.getDescription());
 				}
 			}
 
 		} catch (FileUploadException fue) {
-			outputJSON(out, false, UploadCode.FILE_NOT_FOUND.getDescription());
+			outputJSON(out, false, UploadStatusCode.FILE_NOT_FOUND.getDescription());
 		} catch (IOException ioe) {
 			outputJSON(out, false, ioe.getMessage());
 		}

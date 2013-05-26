@@ -14,8 +14,8 @@ import net.semanticmetadata.lire.ImageSearcherFactory;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
-import com.wks.CalorieApp.Codes.IndexerCodes;
-import com.wks.CalorieApp.Models.Searcher;
+import com.wks.CalorieApp.Models.Identifier;
+import com.wks.CalorieApp.StatusCodes.IndexStatusCodes;
 import com.wks.CalorieApp.Utils.Environment;
 
 /*
@@ -38,6 +38,7 @@ public class Identify extends HttpServlet {
 		doPost(req, resp);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
@@ -56,7 +57,7 @@ public class Identify extends HttpServlet {
 
 		if (parameters.length < 2) {
 			// TODO
-			outputJSON(out, false, IndexerCodes.TOO_FEW_ARGS.getDescription());
+			outputJSON(out, false, IndexStatusCodes.TOO_FEW_ARGS.getDescription());
 			return;
 		}
 		if (parameters.length > 2) {
@@ -66,7 +67,7 @@ public class Identify extends HttpServlet {
 			} catch (NumberFormatException nfe) {
 				// TODO
 				outputJSON(out, false,
-						IndexerCodes.TOO_FEW_ARGS.getDescription());
+						IndexStatusCodes.TOO_FEW_ARGS.getDescription());
 				return;
 			}
 		}
@@ -76,7 +77,7 @@ public class Identify extends HttpServlet {
 
 		ImageSearcher searcher = ImageSearcherFactory
 				.createAutoColorCorrelogramImageSearcher(maximumHits);
-		Searcher srchr = new Searcher(searcher);
+		Identifier srchr = new Identifier(searcher);
 
 		try {
 			String[] similarImages = srchr.findSimilarImages(fileURI,
@@ -88,11 +89,12 @@ public class Identify extends HttpServlet {
 			outputJSON(out, true, similarImagesJSON.toJSONString());
 		} catch (IOException e) {
 			// TODO create indexer codes
-			outputJSON(out, false, IndexerCodes.IO_ERROR.getDescription());
+			outputJSON(out, false, IndexStatusCodes.IO_ERROR.getDescription());
 			e.printStackTrace();
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	private void outputJSON(PrintWriter out, boolean success, String message) {
 		JSONObject json = new JSONObject();
 		json.put("message", message);

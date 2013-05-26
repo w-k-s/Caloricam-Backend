@@ -17,8 +17,6 @@ import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.Version;
 
-import com.wks.CalorieApp.Codes.IndexerCodes;
-
 import net.semanticmetadata.lire.DocumentBuilder;
 import net.semanticmetadata.lire.utils.FileUtils;
 

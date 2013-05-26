@@ -1,6 +1,6 @@
-package com.wks.CalorieApp.Codes;
+package com.wks.CalorieApp.StatusCodes;
 
-public enum IndexerCodes {
+public enum IndexStatusCodes {
 	INDEXING_SUCCESSFUL("File Indexed Successfully."),
 	TOO_FEW_ARGS("Insufficient parameters provided. File name missing."),
 	IO_ERROR(""),
@@ -10,7 +10,7 @@ public enum IndexerCodes {
 	
 	private final String description;
 	
-	private IndexerCodes(String description)
+	private IndexStatusCodes(String description)
 	{
 		this.description = description;
 	}

@@ -15,8 +15,8 @@ import net.semanticmetadata.lire.DocumentBuilderFactory;
 
 import org.json.simple.JSONObject;
 
-import com.wks.CalorieApp.Codes.IndexerCodes;
 import com.wks.CalorieApp.Models.Indexer;
+import com.wks.CalorieApp.StatusCodes.IndexStatusCodes;
 import com.wks.CalorieApp.Utils.Environment;
 
 public class Index extends HttpServlet {
@@ -45,7 +45,7 @@ public class Index extends HttpServlet {
 		
 		if(parameters.length<2 )
 		{
-			outputJSON(out, false, IndexerCodes.TOO_FEW_ARGS.getDescription());
+			outputJSON(out, false, IndexStatusCodes.TOO_FEW_ARGS.getDescription());
 			return;
 		}
 		
@@ -54,7 +54,7 @@ public class Index extends HttpServlet {
 		
 		if(!imageFile.exists())
 		{
-			outputJSON(out,false, IndexerCodes.FILE_NOT_FOUND.getDescription());
+			outputJSON(out,false, IndexStatusCodes.FILE_NOT_FOUND.getDescription());
 			return;
 		}
 		
@@ -63,12 +63,12 @@ public class Index extends HttpServlet {
 		Indexer indexer = new Indexer(builder);
 		try {
 			indexer.indexImage(fileURI, indexesDir);
-			outputJSON(out,true,IndexerCodes.INDEXING_SUCCESSFUL.getDescription());
+			outputJSON(out,true,IndexStatusCodes.INDEXING_SUCCESSFUL.getDescription());
 		} catch (FileNotFoundException e) {
-			outputJSON(out,false,IndexerCodes.FILE_NOT_FOUND.getDescription());
+			outputJSON(out,false,IndexStatusCodes.FILE_NOT_FOUND.getDescription());
 			e.printStackTrace();
 		} catch (IOException e) {
-			outputJSON(out,false,IndexerCodes.IO_ERROR.getDescription());
+			outputJSON(out,false,IndexStatusCodes.IO_ERROR.getDescription());
 			e.printStackTrace();
 		}
 		
