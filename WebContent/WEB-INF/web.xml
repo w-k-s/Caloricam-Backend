@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="http://java.sun.com/xml/ns/javaee" xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+	id="WebApp_ID" version="3.0">
+	<display-name>CalorieApp</display-name>
+	<welcome-file-list>
+		<welcome-file>index.html</welcome-file>
+	</welcome-file-list>
+
+	<servlet>
+		<servlet-name>upload</servlet-name>
+		<servlet-class>com.wks.CalorieApp.Controllers.Upload</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>upload</servlet-name>
+		<url-pattern>/upload</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>index</servlet-name>
+		<servlet-class>com.wks.CalorieApp.Controllers.Indexer</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>index</servlet-name>
+		<url-pattern>/index/*</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>identify</servlet-name>
+		<servlet-class>com.wks.CalorieApp.Controllers.Identify</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>identify</servlet-name>
+		<url-pattern>/identify/*</url-pattern>
+	</servlet-mapping>
+
+
+	<context-param>
+		<param-name>resources_dir</param-name>
+		<param-value>calorie_app/</param-value>
+	</context-param>
+	<context-param>
+		<param-name>images_dir</param-name>
+		<param-value>images/</param-value>
+	</context-param>
+	<context-param>
+		<param-name>indexes_dir</param-name>
+		<param-value>indexes/</param-value>
+	</context-param>
+	<context-param>
+		<param-name>default_max_hits</param-name>
+		<param-value>10</param-value>
+	</context-param>
+
+
+</web-app>
