@@ -19,7 +19,7 @@
 
 	<servlet>
 		<servlet-name>index</servlet-name>
-		<servlet-class>com.wks.CalorieApp.Controllers.Indexer</servlet-class>
+		<servlet-class>com.wks.CalorieApp.Controllers.Index</servlet-class>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>index</servlet-name>

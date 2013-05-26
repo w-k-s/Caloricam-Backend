@@ -14,8 +14,8 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.json.simple.JSONObject;
 
 import com.wks.CalorieApp.Codes.UploadCode;
-import com.wks.CalorieApp.Models.FileUpload;
-import com.wks.CalorieApp.Utils.FileUtils;
+import com.wks.CalorieApp.Utils.FileUpload;
+import com.wks.CalorieApp.Utils.Environment;
 
 public class Upload extends HttpServlet {
 
@@ -23,13 +23,6 @@ public class Upload extends HttpServlet {
 	private static final String CONTENT_TYPE = "application/json";
 	private static final String EXTENSION_JPEG = ".jpeg";
 	private static final String EXTENSION_JPG = ".jpg";
-
-	private static String imagesDir;
-
-	public void init() throws ServletException
-	{
-		imagesDir = FileUtils.getImagesDirectory(getServletContext());
-	}
 
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
@@ -44,6 +37,8 @@ public class Upload extends HttpServlet {
 			throws ServletException, IOException
 			{
 
+		String imagesDir = Environment.getImagesDirectory(getServletContext());
+		
 		// set content type
 		resp.setContentType(CONTENT_TYPE);
 		PrintWriter out = resp.getWriter();

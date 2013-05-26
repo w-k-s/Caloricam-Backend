@@ -4,7 +4,7 @@ import java.io.File;
 
 import javax.servlet.ServletContext;
 
-public class FileUtils {
+public class Environment {
 
 	private final static String PARAM_RESOURCES_DIR = "resources_dir";
 	private final static String PARAM_IMAGES_DIR = "images_dir";

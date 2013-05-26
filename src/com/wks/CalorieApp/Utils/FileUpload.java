@@ -1,4 +1,4 @@
-package com.wks.CalorieApp.Models;
+package com.wks.CalorieApp.Utils;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -53,8 +53,5 @@ public class FileUpload
 			is.close();
 			
 			return true;
-			
-		
-		
 	}
 }
