@@ -2,7 +2,7 @@ package com.wks.CalorieApp.StatusCodes;
 
 public enum IndexStatusCodes {
 	INDEXING_SUCCESSFUL("File Indexed Successfully."),
-	TOO_FEW_ARGS("Insufficient parameters provided. File name missing."),
+	TOO_FEW_ARGS("Insufficient parameters provided.Service: index/{FileName}"),
 	IO_ERROR(""),
 	INDEX_ERROR(""),
 	IO_INDEX_ERROR("Error occured while reading or indexing image"),

@@ -15,6 +15,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import com.wks.CalorieApp.Models.Identifier;
+import com.wks.CalorieApp.StatusCodes.IdentifyStatusCodes;
 import com.wks.CalorieApp.StatusCodes.IndexStatusCodes;
 import com.wks.CalorieApp.Utils.Environment;
 
@@ -57,7 +58,7 @@ public class Identify extends HttpServlet {
 
 		if (parameters.length < 2) {
 			// TODO
-			outputJSON(out, false, IndexStatusCodes.TOO_FEW_ARGS.getDescription());
+			outputJSON(out, false, IdentifyStatusCodes.TOO_FEW_ARGS.getDescription());
 			return;
 		}
 		if (parameters.length > 2) {
@@ -67,7 +68,7 @@ public class Identify extends HttpServlet {
 			} catch (NumberFormatException nfe) {
 				// TODO
 				outputJSON(out, false,
-						IndexStatusCodes.TOO_FEW_ARGS.getDescription());
+						IdentifyStatusCodes.INVALID_MAX_HITS.getDescription());
 				return;
 			}
 		}
@@ -89,7 +90,7 @@ public class Identify extends HttpServlet {
 			outputJSON(out, true, similarImagesJSON.toJSONString());
 		} catch (IOException e) {
 			// TODO create indexer codes
-			outputJSON(out, false, IndexStatusCodes.IO_ERROR.getDescription());
+			outputJSON(out, false, IdentifyStatusCodes.IO_ERROR.getDescription());
 			e.printStackTrace();
 		}
 	}

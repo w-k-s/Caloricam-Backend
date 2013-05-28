@@ -59,7 +59,6 @@ public class Indexer {
 		Document document = getDocumentBuilder()
 				.createDocument(image, imageURI);
 		indexWriter.addDocument(document);
-
 		indexWriter.close();
 
 		return true;
