@@ -24,4 +24,10 @@ public class FoodItem {
     public void setName(String name) {
 	this.name = name;
     }
+    
+   
+    public String toString() {
+        return String.format("[id: %d,name: %s]", foodId,name);
+    }
+    
 }

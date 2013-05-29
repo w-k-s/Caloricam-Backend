@@ -16,7 +16,6 @@ import org.json.simple.JSONObject;
 
 import com.wks.CalorieApp.Models.Identifier;
 import com.wks.CalorieApp.StatusCodes.IdentifyStatusCodes;
-import com.wks.CalorieApp.StatusCodes.IndexStatusCodes;
 import com.wks.CalorieApp.Utils.Environment;
 
 /*

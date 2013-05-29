@@ -14,7 +14,7 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.json.simple.JSONObject;
 
 import com.wks.CalorieApp.StatusCodes.UploadStatusCode;
-import com.wks.CalorieApp.Utils.FileUpload;
+import com.wks.CalorieApp.Utils.FileUtils;
 import com.wks.CalorieApp.Utils.Environment;
 
 public class Upload extends HttpServlet {
@@ -76,7 +76,7 @@ public class Upload extends HttpServlet {
 						return;
 					}
 
-					boolean fileDidUpload = FileUpload.uploadFile(imagesDir,
+					boolean fileDidUpload = FileUtils.upload(imagesDir,
 							item);
 
 					if (fileDidUpload)

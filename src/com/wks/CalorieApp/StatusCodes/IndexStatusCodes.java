@@ -6,7 +6,9 @@ public enum IndexStatusCodes {
 	IO_ERROR(""),
 	INDEX_ERROR(""),
 	IO_INDEX_ERROR("Error occured while reading or indexing image"),
-	FILE_NOT_FOUND("Indexing failed because file not found.");
+	FILE_NOT_FOUND("Indexing failed because file not found."),
+	DB_INTEGRITY_VIOLATION("Database Integrity Violation."),
+	DB_INSERT_FAILED("Image could not be added to database.");
 	
 	private final String description;
 	

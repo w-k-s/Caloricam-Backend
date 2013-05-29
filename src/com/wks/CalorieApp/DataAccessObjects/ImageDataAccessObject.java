@@ -8,6 +8,9 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.servlet.ServletContext;
+
+import com.mysql.jdbc.exceptions.MySQLIntegrityConstraintViolationException;
 import com.wks.CalorieApp.Models.ImageItem;
 
 public class ImageDataAccessObject {
@@ -21,36 +24,53 @@ public class ImageDataAccessObject {
     private static final String CREATE_QUERY = "INSERT INTO "+TABLE_IMAGES+" ("+COLUMN_IMAGE_ID+", "+COLUMN_FOOD_ID+","+COLUMN_SIZE+","+COLUMN_IS_FINALIZED+") VALUES (?,?,?,?)";
     private static final String READ_QUERY = "SELECT "+COLUMN_IMAGE_ID+", "+COLUMN_FOOD_ID+", "+COLUMN_SIZE+","+COLUMN_IS_FINALIZED+" FROM "+TABLE_IMAGES;
     private static final String UPDATE_QUERY = "UPDATE "+TABLE_IMAGES+" SET "+COLUMN_FOOD_ID+"=? , "+COLUMN_SIZE+"=?,"+COLUMN_IS_FINALIZED+"=? WHERE "+COLUMN_IMAGE_ID+" = ?";
-    private static final String DELETE_QUERY = "DELETE FROM images WHERE image_id = ?";
+    private static final String DELETE_QUERY = "DELETE FROM "+TABLE_IMAGES+" WHERE "+COLUMN_IMAGE_ID+" = ?";
     private static final String FIND_QUERY = "SELECT "+COLUMN_IMAGE_ID+", "+COLUMN_FOOD_ID+", "+COLUMN_SIZE+","+COLUMN_IS_FINALIZED+" FROM "+TABLE_IMAGES + " WHERE "+COLUMN_IMAGE_ID+" = ?";
     
-    public void create(ImageItem image)
+    private static final String ATTR_CONNECTION = "connection";
+    
+    private Connection connection;
+    
+    public ImageDataAccessObject(ServletContext context)
     {
-	Connection connection = null;
+	connection = (Connection) context.getAttribute(ATTR_CONNECTION);
+	if(connection == null)
+	    throw new IllegalStateException("Null Connection");
+    }
+    
+    public boolean create(ImageItem image) throws MySQLIntegrityConstraintViolationException
+    {
+	//Connection connection = null;
 	PreparedStatement statement = null;
-
+	boolean success = false;
+	
 	try {
 	    //connection = DatabaseUtils.getConnection();
 	    statement = connection.prepareStatement(CREATE_QUERY);
 	    statement.setString(1, image.getImageId());
-	    statement.setLong(2, image.getFoodId());
+	    if(image.getFoodId()==0)
+		    statement.setNull(2, java.sql.Types.NULL);
+	    else
+		statement.setLong(2, image.getFoodId());
 	    statement.setLong(3, image.getSize());
 	    statement.setBoolean(4, image.isFinalized());
 	    statement.executeUpdate();
-	       
+	    success = true;
+	}catch(MySQLIntegrityConstraintViolationException e){
+	    throw e;
 	} catch (SQLException e) {
 	    // TODO Auto-generated catch block
 	    e.printStackTrace();
 	}finally{
 	    try {
 		statement.close();
-		connection.close();
+		//connection.close();
 	    } catch (SQLException e) {
 		// TODO Auto-generated catch block
 		e.printStackTrace();
 	    }
 	}
-	
+	return success;
 	 
     }
     
@@ -58,7 +78,7 @@ public class ImageDataAccessObject {
     {
 	List<ImageItem> imageItems = new ArrayList<ImageItem>();
 	ImageItem imageItem = null;
-	Connection connection = null;
+	//Connection connection = null;
 	PreparedStatement statement = null;
 	ResultSet results = null;
 	
@@ -87,7 +107,7 @@ public class ImageDataAccessObject {
 	    try {
 		results.close();
 		statement.close();
-		connection.close();
+		//connection.close();
 	    } catch (SQLException e) {
 		// TODO Auto-generated catch block
 		e.printStackTrace();
@@ -99,27 +119,32 @@ public class ImageDataAccessObject {
 	
     }
     
-    public boolean update(ImageItem image)
+    public boolean update(ImageItem image) throws MySQLIntegrityConstraintViolationException
     {
-	Connection connection = null;
+	//Connection connection = null;
 	PreparedStatement statement = null;
 	
 	try {
 	    //connection = DatabaseUtils.getConnection();
 	    statement = connection.prepareStatement(UPDATE_QUERY);
-	    statement.setLong(1, image.getFoodId());
+	    if(image.getFoodId()==0)
+		    statement.setNull(2, java.sql.Types.NULL);
+	    else
+		statement.setLong(2, image.getFoodId());
 	    statement.setLong(2, image.getSize());
 	    statement.setBoolean(3, image.isFinalized());
 	    statement.setString(4, image.getImageId());
 	    statement.execute();
 	    return true;
+	} catch(MySQLIntegrityConstraintViolationException e){
+	    throw e;
 	} catch (SQLException e) {
 	    // TODO Auto-generated catch block
 	    e.printStackTrace();
 	}finally{
 	    try {
 		statement.close();
-		connection.close();
+		//connection.close();
 	    } catch (SQLException e) {
 		// TODO Auto-generated catch block
 		e.printStackTrace();
@@ -130,11 +155,11 @@ public class ImageDataAccessObject {
     
     public boolean delete(String id)
     {
-	Connection connection = null;
+	//Connection connection = null;
 	PreparedStatement statement = null;
 	
 	try {
-	    //connection = DatabaseUtils.getConnection();
+	   // connection = DatabaseUtils.getConnection();
 	    statement = connection.prepareStatement(DELETE_QUERY);
 	    statement.setString(1, id);
 	    statement.execute();
@@ -145,7 +170,7 @@ public class ImageDataAccessObject {
 	}finally{
 	    try {
 		statement.close();
-		connection.close();
+		//connection.close();
 	    } catch (SQLException e) {
 		// TODO Auto-generated catch block
 		e.printStackTrace();
@@ -154,15 +179,14 @@ public class ImageDataAccessObject {
 	return false;
     }
     
-    public ImageItem findImageById(String id)
+    public ImageItem findImageItemById(String id)
     {
-	Connection connection = null;
+	//Connection connection = null;
 	PreparedStatement statement = null;
 	ResultSet result = null;
 	ImageItem image = null;
 	
 	try {
-	    //connection = DatabaseUtils.getConnection();
 	    statement = connection.prepareStatement(FIND_QUERY);
 	    statement.setString(1, id);
 	    statement.execute();
@@ -185,7 +209,7 @@ public class ImageDataAccessObject {
 	    try {
 		result.close();
 		statement.close();
-		connection.close();
+		//connection.close();
 	    } catch (SQLException e) {
 		// TODO Auto-generated catch block
 		e.printStackTrace();
@@ -193,5 +217,24 @@ public class ImageDataAccessObject {
 	}
 	return image;
 	
+    }
+    
+  //NOTES: http://javarevisited.blogspot.ae/2012/03/finalize-method-in-java-tutorial.html
+    public void close() throws SQLException
+    {
+	connection.close();
+    }
+    
+    
+    @Override
+    protected void finalize() throws Throwable {
+        try {
+	    if(connection.isClosed())
+		connection.close();
+	} catch (Exception e) {
+	    throw e;
+	}finally{
+	    super.finalize();
+	}
     }
 }

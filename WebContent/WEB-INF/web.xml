@@ -35,6 +35,7 @@
 		<url-pattern>/identify/*</url-pattern>
 	</servlet-mapping>
 
+	<!-- RESOURCES -->
 
 	<context-param>
 		<param-name>resources_dir</param-name>
@@ -53,5 +54,27 @@
 		<param-value>10</param-value>
 	</context-param>
 
+	<!-- DATABASE -->
+
+	<context-param>
+		<param-name>driver</param-name>
+		<param-value>com.mysql.jdbc.Driver</param-value>
+	</context-param>
+	<context-param>
+		<param-name>url</param-name>
+		<param-value>jdbc:mysql://localhost:3306/calorie_app</param-value>
+	</context-param>
+	<context-param>
+		<param-name>user</param-name>
+		<param-value>waqqas</param-value>
+	</context-param>
+	<context-param>
+		<param-name>password</param-name>
+		<param-value>wks270188</param-value>
+	</context-param>
+
+	<listener>
+		<listener-class>com.wks.CalorieApp.Listeners.MySqlServletContextListener</listener-class>
+	</listener>
 
 </web-app>

@@ -43,4 +43,10 @@ public class ImageItem {
 	this.finalized = finalized;
     }
     
+    @Override
+    public String toString() {
+        return String.format("[imageId: %s,foodId: %d,size: %d,finalized: %s]",getImageId(),getFoodId(),getSize(),isFinalized());
+    }
+    
+    
 }
