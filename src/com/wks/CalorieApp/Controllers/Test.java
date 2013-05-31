@@ -3,6 +3,7 @@ package com.wks.CalorieApp.Controllers;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -11,9 +12,13 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.mysql.jdbc.exceptions.MySQLIntegrityConstraintViolationException;
 import com.wks.CalorieApp.DataAccessObjects.ImageDataAccessObject;
+import com.wks.CalorieApp.DataAccessObjects.UserDataAccessObject;
 import com.wks.CalorieApp.Models.ImageItem;
+import com.wks.CalorieApp.Models.User;
 
 public class Test extends HttpServlet{
+
+    private static final long serialVersionUID = 1L;
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
@@ -54,7 +59,7 @@ public class Test extends HttpServlet{
 	    
 	    
 	}*/
-	
+	/*
 	ImageDataAccessObject imagesDb = new ImageDataAccessObject(this.getServletContext());
 	synchronized(imagesDb)
 	{
@@ -70,7 +75,7 @@ public class Test extends HttpServlet{
 	}
 	  out.println("Created.<br/>");
 	  
-	  ImageItem image2 = imagesDb.findImageItemById("1");
+	  ImageItem image2 = imagesDb.find("1");
 	  out.println("Find: "+image2+"<br/>");
 	  
 	  List<ImageItem> images= imagesDb.read();
@@ -89,7 +94,17 @@ public class Test extends HttpServlet{
 	  imagesDb.delete(image.getImageId());
 	  images= imagesDb.read();
 	  out.println("Update: "+images+"<br/>");
+	}*/
+	UserDataAccessObject usersDb = new UserDataAccessObject(getServletContext());
+	synchronized(usersDb)
+	{
+	    Map<String,User> users = usersDb.read();
+	    User user = new User("Test","123");
+	    usersDb.delete(user);
+	    users = usersDb.read();
+	    resp.getWriter().println("delte: "+users);
 	}
+	
     }
     
     @Override

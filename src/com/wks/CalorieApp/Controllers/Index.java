@@ -66,18 +66,20 @@ public class Index extends HttpServlet {
 
 	// add image to database
 	//Don't index image if you can't record it in db.
+	boolean imageIsInserted = false;
 	try {
 	    insertImage(imageFile);
+	    imageIsInserted = true;
 	} catch (MySQLIntegrityConstraintViolationException icve) {
 	    outputJSON(out, false, IndexStatusCodes.DB_INTEGRITY_VIOLATION.getDescription());
 	    icve.printStackTrace();
-	    return;
 	}catch(Exception e)
 	{
 	    outputJSON(out,false,IndexStatusCodes.DB_INSERT_FAILED.getDescription());
-	    return;
 	}
 	
+	if(!imageIsInserted)
+	    return;
 	
 	try {
 	    indexImage(fileURI, indexesDir);
@@ -115,7 +117,7 @@ public class Index extends HttpServlet {
 	indexer.indexImage(fileURI, indexesDir);
     }
 
-    private boolean insertImage(File imageFile) throws MySQLIntegrityConstraintViolationException
+    private boolean insertImage(File imageFile) throws SQLException
     {
 	ImageDataAccessObject imageDb = new ImageDataAccessObject(getServletContext());
 	ImageItem imageItem = new ImageItem();
@@ -125,7 +127,9 @@ public class Index extends HttpServlet {
 	
 	synchronized(imageDb)
 	{
-	    return imageDb.create(imageItem);
+	    boolean done =  imageDb.create(imageItem);
+	    imageDb.close();
+	    return done;
 	}
     }
 }

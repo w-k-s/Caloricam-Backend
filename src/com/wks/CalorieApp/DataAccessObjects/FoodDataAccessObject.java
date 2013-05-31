@@ -166,7 +166,7 @@ public class FoodDataAccessObject {
 	return false;
     }
 
-    public FoodItem findFoodItemById(long id) {
+    public FoodItem find(long id) {
 	// Connection connection = null;
 	PreparedStatement statement = null;
 	ResultSet result = null;

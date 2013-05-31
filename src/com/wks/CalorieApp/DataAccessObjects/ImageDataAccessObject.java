@@ -97,9 +97,7 @@ public class ImageDataAccessObject {
 	        imageItem.setFinalized(results.getBoolean(COLUMN_IS_FINALIZED));
 	        imageItems.add(imageItem);
 	    }
-	    
-	    return imageItems;
-	    
+	   
 	} catch (SQLException e) {
 	    // TODO Auto-generated catch block
 	    e.printStackTrace();
@@ -114,7 +112,7 @@ public class ImageDataAccessObject {
 	    }
 	}
 	
-	return null;
+	return imageItems;
 	
 	
     }
@@ -179,7 +177,7 @@ public class ImageDataAccessObject {
 	return false;
     }
     
-    public ImageItem findImageItemById(String id)
+    public ImageItem find(String id)
     {
 	//Connection connection = null;
 	PreparedStatement statement = null;
