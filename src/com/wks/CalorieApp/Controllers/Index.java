@@ -20,6 +20,7 @@ import com.mysql.jdbc.exceptions.MySQLIntegrityConstraintViolationException;
 import com.wks.CalorieApp.DataAccessObjects.ImageDataAccessObject;
 import com.wks.CalorieApp.Models.ImageItem;
 import com.wks.CalorieApp.Models.Indexer;
+import com.wks.CalorieApp.StatusCodes.IdentifyStatusCodes;
 import com.wks.CalorieApp.StatusCodes.IndexStatusCodes;
 import com.wks.CalorieApp.Utils.Environment;
 
@@ -46,6 +47,14 @@ public class Index extends HttpServlet {
 	resp.setContentType(CONTENT_TYPE);
 	PrintWriter out = resp.getWriter();
 
+	// check that parameters were provided
+	if (req.getPathInfo() == null) {
+	    // TODO
+	    outputJSON(out, false,IdentifyStatusCodes.TOO_FEW_ARGS.getDescription());
+	    return;
+	}
+
+	// seperate parameters
 	String[] parameters = req.getPathInfo().split(PARAMETER_SEPERATOR);
 
 	if (parameters.length < 2) {
@@ -65,22 +74,23 @@ public class Index extends HttpServlet {
 	}
 
 	// add image to database
-	//Don't index image if you can't record it in db.
+	// Don't index image if you can't record it in db.
 	boolean imageIsInserted = false;
 	try {
 	    insertImage(imageFile);
 	    imageIsInserted = true;
 	} catch (MySQLIntegrityConstraintViolationException icve) {
-	    outputJSON(out, false, IndexStatusCodes.DB_INTEGRITY_VIOLATION.getDescription());
+	    outputJSON(out, false,
+		    IndexStatusCodes.DB_INTEGRITY_VIOLATION.getDescription());
 	    icve.printStackTrace();
-	}catch(Exception e)
-	{
-	    outputJSON(out,false,IndexStatusCodes.DB_INSERT_FAILED.getDescription());
+	} catch (Exception e) {
+	    outputJSON(out, false,
+		    IndexStatusCodes.DB_INSERT_FAILED.getDescription());
 	}
-	
-	if(!imageIsInserted)
+
+	if (!imageIsInserted)
 	    return;
-	
+
 	try {
 	    indexImage(fileURI, indexesDir);
 	    outputJSON(out, true,
@@ -117,17 +127,16 @@ public class Index extends HttpServlet {
 	indexer.indexImage(fileURI, indexesDir);
     }
 
-    private boolean insertImage(File imageFile) throws SQLException
-    {
-	ImageDataAccessObject imageDb = new ImageDataAccessObject(getServletContext());
+    private boolean insertImage(File imageFile) throws SQLException {
+	ImageDataAccessObject imageDb = new ImageDataAccessObject(
+		getServletContext());
 	ImageItem imageItem = new ImageItem();
 	imageItem.setImageId(imageFile.getName());
 	imageItem.setSize(imageFile.length());
 	imageItem.setFinalized(false);
-	
-	synchronized(imageDb)
-	{
-	    boolean done =  imageDb.create(imageItem);
+
+	synchronized (imageDb) {
+	    boolean done = imageDb.create(imageItem);
 	    imageDb.close();
 	    return done;
 	}
