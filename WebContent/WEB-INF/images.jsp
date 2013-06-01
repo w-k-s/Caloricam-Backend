@@ -1,6 +1,8 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
     pageEncoding="ISO-8859-1" import="java.util.*,java.io.File"%>
 <%!
+	private static final String HREF_VIEW = "images?action=view&img=";
+	private static final String HREF_DELETE = "images?action=delete&img=";
 	private static final String ATTR_IMAGE_LIST = "images";
 	private static final String ATTR_IMAGE_DIR = "image_dir";
 %>
@@ -27,11 +29,15 @@
 	for(String file : files)
 	{
 	    File f = new File(imageDir+file);
-	    
+	    String view=HREF_VIEW+file;
+	    String delete=HREF_DELETE+file;
 	    
 	    out.println("<tr>");
 	    out.println("<td>"+file+"</td>");
 	    out.println("<td>"+f.length()+"</td>");
+	    out.println("<td><a href='"+view+"'>VIEW</a></td>");
+	    out.println("<td><a href='"+delete+"'>DELETE</a></td>");
+	    
 	    out.println("</tr>");
 	}
 %>

@@ -79,4 +79,12 @@ public class FileUtils {
 
 	return files;
     }
+    
+    public static synchronized boolean deleteFile(String fileURI)
+    {
+	File file = new File(fileURI);
+	if(file.exists() && !file.isDirectory())
+	    return file.delete();
+	return false;
+    }
 }
