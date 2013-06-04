@@ -13,8 +13,11 @@ import javax.servlet.http.HttpServletResponse;
 import com.mysql.jdbc.exceptions.MySQLIntegrityConstraintViolationException;
 import com.wks.CalorieApp.DataAccessObjects.ImageDataAccessObject;
 import com.wks.CalorieApp.DataAccessObjects.UserDataAccessObject;
+import com.wks.CalorieApp.Models.FatSecretRESTClient;
 import com.wks.CalorieApp.Models.ImageItem;
 import com.wks.CalorieApp.Models.User;
+
+import fatsecret.platform.Result;
 
 public class Test extends HttpServlet{
 
@@ -95,6 +98,7 @@ public class Test extends HttpServlet{
 	  images= imagesDb.read();
 	  out.println("Update: "+images+"<br/>");
 	}*/
+	/*
 	UserDataAccessObject usersDb = new UserDataAccessObject(getServletContext());
 	synchronized(usersDb)
 	{
@@ -104,7 +108,14 @@ public class Test extends HttpServlet{
 	    users = usersDb.read();
 	    resp.getWriter().println("delte: "+users);
 	}
+	*/
 	
+	FatSecretRESTClient client = new FatSecretRESTClient("abc","def");
+	Result r = new Result();
+	client.foodsSearch("turkey sandwich", r);
+	
+	out.println("nrp: "+r.getNormalizedRequestParameters()+"<br/>");
+	out.println("url: "+r.getURL());
     }
     
     @Override
