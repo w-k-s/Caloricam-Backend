@@ -1,4 +1,4 @@
-package fatsecret.platform;
+package api.fatsecret.platform.Models;
 
 public enum Method {
     FOODS_SEARCH("foods.search"),

@@ -10,22 +10,25 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import api.fatsecret.platform.Models.FatSecretAPI;
+import api.fatsecret.platform.Models.Result;
+import api.fatsecret.platform.Utils.HTTPClient;
+
 import com.mysql.jdbc.exceptions.MySQLIntegrityConstraintViolationException;
 import com.wks.CalorieApp.DataAccessObjects.ImageDataAccessObject;
 import com.wks.CalorieApp.DataAccessObjects.UserDataAccessObject;
-import com.wks.CalorieApp.Models.FatSecretRESTClient;
 import com.wks.CalorieApp.Models.ImageItem;
 import com.wks.CalorieApp.Models.User;
 
-import fatsecret.platform.Result;
 
+@SuppressWarnings("unused")
 public class Test extends HttpServlet{
 
     private static final long serialVersionUID = 1L;
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-            throws ServletException, IOException {
+	    throws ServletException, IOException {
        
 	resp.setContentType("text/html");
 	PrintWriter out = resp.getWriter();
@@ -110,12 +113,9 @@ public class Test extends HttpServlet{
 	}
 	*/
 	
-	FatSecretRESTClient client = new FatSecretRESTClient("abc","def");
-	Result r = new Result();
-	client.foodsSearch("turkey sandwich", r);
-	
-	out.println("nrp: "+r.getNormalizedRequestParameters()+"<br/>");
-	out.println("url: "+r.getURL());
+	FatSecretAPI fatsecret = new FatSecretAPI("ea0d6a946b3e4b3a8d5cbdb0a55900dd","49704a68e7114143925f6390aeca8b42");
+	String s = fatsecret.foodsSearch("chicken");
+	out.println("<em>json</em>:"+s);
     }
     
     @Override

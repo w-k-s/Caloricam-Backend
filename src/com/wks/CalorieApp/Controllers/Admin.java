@@ -11,10 +11,11 @@ import javax.servlet.http.HttpSession;
 
 public class Admin extends HttpServlet{
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
     private static final String ATTR_AUTHENTICATED = "authenticated";
-    private static final String ATTR_USERNAME = "username";
-    
-    private static final String REDIRECT = "/calorieapp";
     private static final String SRVLT_LOGIN = "/login";
     private static final String JSP_ADMIN = "/WEB-INF/admin.jsp";
     
@@ -31,9 +32,6 @@ public class Admin extends HttpServlet{
     {
 	//get params and attributes
 	boolean authenticated = false;
-	String username = null;
-	
-	
 	HttpSession session = req.getSession();
 	synchronized(session)
 	{
@@ -41,7 +39,6 @@ public class Admin extends HttpServlet{
 	    if(b != null) authenticated = b;
 	}
 	
-	username = (String) req.getAttribute(ATTR_USERNAME);
 	
 	//check that the user is signed in.
 	if(authenticated)

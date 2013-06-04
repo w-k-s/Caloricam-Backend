@@ -1,4 +1,4 @@
-package fatsecret.platform;
+package api.fatsecret.platform.Models;
 
 import java.io.*;
 import java.net.*;
@@ -31,7 +31,7 @@ public class OAuthBase {
 
     protected String unreservedChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_.~";
 
-    public void generateSignature(URL url, String consumerKey,
+    public void generateSignature(String httpMethod, URL url, String consumerKey,
 	    String consumerSecret, String token, String tokenSecret,
 	    Result result) {
 	
@@ -41,7 +41,7 @@ public class OAuthBase {
 	result.setNonce(n);
 	result.setTimestamp(ts);
 	
-	GenerateSignatureBase(url, consumerKey, token, "GET",
+	GenerateSignatureBase(url, consumerKey, token, httpMethod,
 		ts, n, "HMAC-SHA1", result);
 
 	String secret = consumerSecret + "&";

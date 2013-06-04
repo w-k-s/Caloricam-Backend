@@ -29,7 +29,7 @@ public class AdminLogin extends HttpServlet {
     //only the admin servlet is allowed to load the admin.jsp
     //so this servlet will redirect to admin servlet instead of loading the admin.jsp.
     private static final String SRVLT_ADMIN = "/admin";
-    private static final String REDIRECT = "/calorieapp";
+    //private static final String REDIRECT = "/calorieapp";
     
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)

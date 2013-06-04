@@ -1,4 +1,4 @@
-package fatsecret.platform;
+package api.fatsecret.platform.Models;
 
 public class Result {
     private String _signature, _signatureBase, _normalizedUrl,

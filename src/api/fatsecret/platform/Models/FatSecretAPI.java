@@ -1,16 +1,17 @@
-package com.wks.CalorieApp.Models;
+package api.fatsecret.platform.Models;
 
 import java.util.HashMap;
 import java.util.Map.Entry;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import fatsecret.platform.Method;
-import fatsecret.platform.OAuthBase;
-import fatsecret.platform.Parameter;
-import fatsecret.platform.Result;
+import api.fatsecret.platform.Utils.HTTPClient;
 
-public class FatSecretRESTClient {
+
+
+
+public class FatSecretAPI {
     
     private static final String URL = "http://platform.fatsecret.com/rest/server.api?";
     
@@ -19,13 +20,13 @@ public class FatSecretRESTClient {
     private Format responseFormat = Format.JSON;
    
 	    
-    public FatSecretRESTClient(String consumerKey, String sharedKey)
+    public FatSecretAPI(String consumerKey, String sharedKey)
     {
 	if(consumerKey == null || sharedKey == null)
 	    throw new IllegalStateException("Consumer Key and Shared Key values must not be null");
 	
-	this.consumerKey = consumerKey; 
-	this.consumerSecret = sharedKey;
+	FatSecretAPI.consumerKey = consumerKey; 
+	FatSecretAPI.consumerSecret = sharedKey;
     }
     
     public Format getResponseFormat() {
@@ -35,17 +36,22 @@ public class FatSecretRESTClient {
     public void setResponseFormat(Format responseFormat) {
 	this.responseFormat = responseFormat;
     }
-    
-    public void foodsSearch(String searchExpression, Result result) throws MalformedURLException
+   
+    //TODO make a more general method rather than this concrete one.
+    public String foodsSearch(String searchExpression) throws IOException 
     {
-
 	
+	//add parameters to url
 	HashMap<String,String> parameters = new HashMap<String,String>();
 	parameters.put(Parameter.METHOD.getName(), Method.FOODS_SEARCH.getName());
 	parameters.put(Parameter.FORMAT.getName(), getResponseFormat().value());
 	parameters.put(Parameter.SEARCH_EXPRESSION.getName(), searchExpression);
 	String urlWithParameters = addParametersToUrl(URL,parameters);
 	
+	//create result object to store url with Oauth signature 
+	Result result = new Result();
+	
+	//generate oauth_signature
 	OAuthBase oauth = new OAuthBase();
 	URL url = null;
 	try {
@@ -54,8 +60,13 @@ public class FatSecretRESTClient {
 	    e.printStackTrace();
 	}
 	
-	oauth.generateSignature(url, consumerKey, consumerSecret, null, null, result);
+	oauth.generateSignature("GET",url, consumerKey, consumerSecret, null, null, result);
     	
+	String signedUrl = result.getURL();
+	
+	String jsonResults = HTTPClient.get(signedUrl);
+	return jsonResults;
+	
     }
     
     private String addParametersToUrl(String url,HashMap<String,String> parameters)
