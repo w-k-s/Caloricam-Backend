@@ -10,7 +10,12 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.json.simple.parser.ParseException;
+
 import api.fatsecret.platform.Models.FatSecretAPI;
+import api.fatsecret.platform.Models.FatSecretException;
+import api.fatsecret.platform.Models.FoodInfoItem;
+import api.fatsecret.platform.Models.FoodInfoItemFactory;
 import api.fatsecret.platform.Models.Result;
 import api.fatsecret.platform.Utils.HTTPClient;
 
@@ -113,9 +118,28 @@ public class Test extends HttpServlet{
 	}
 	*/
 	
-	FatSecretAPI fatsecret = new FatSecretAPI("ea0d6a946b3e4b3a8d5cbdb0a55900dd","49704a68e7114143925f6390aeca8b42");
-	String s = fatsecret.foodsSearch("chicken");
-	out.println("<em>json</em>:"+s);
+	
+	try {
+	    FatSecretAPI fatsecret = new FatSecretAPI("ea0d6a946b3e4b3a8d5cbdb0a55900dd","49704a68e7114143925f6390aeca8b42");
+	    String json = fatsecret.foodsSearch("chicken");
+	    
+	    
+	    
+	    List<FoodInfoItem> foods = FoodInfoItemFactory.createFoodItemsFromJSON(json);
+	    //out.println(foods);
+	    //out.println(json);
+	    
+	    FoodInfoItem food = foods.get(1);
+	    out.println("cal per 100g"+food.getCaloriesPer100g());
+	    
+	} catch (FatSecretException e) {
+	    // TODO Auto-generated catch block
+	    e.printStackTrace();
+	} catch (ParseException e) {
+	    // TODO Auto-generated catch block
+	    e.printStackTrace();
+	}
+	
     }
     
     @Override

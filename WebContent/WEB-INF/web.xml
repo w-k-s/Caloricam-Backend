@@ -82,6 +82,15 @@
 		<url-pattern>/images</url-pattern>
 	</servlet-mapping>
 
+	<servlet>
+		<servlet-name>nutrition_info</servlet-name>
+		<servlet-class>com.wks.CalorieApp.Controllers.NutritionInfo</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>nutrition_info</servlet-name>
+		<url-pattern>/nutrition_info/*</url-pattern>
+	</servlet-mapping>
+
 	<!-- RESOURCES -->
 
 	<context-param>
@@ -120,6 +129,18 @@
 		<param-value>wks270188</param-value>
 	</context-param>
 
+	<!-- API KEYS -->
+	<context-param>
+		<param-name>consumer_key</param-name>
+		<param-value>ea0d6a946b3e4b3a8d5cbdb0a55900dd</param-value>
+	</context-param>
+	<context-param>
+		<param-name>consumer_secret</param-name>
+		<param-value>49704a68e7114143925f6390aeca8b42</param-value>
+	</context-param>
+
+	<!-- LISTENERS -->
+	
 	<listener>
 		<listener-class>com.wks.CalorieApp.Listeners.MySqlServletContextListener</listener-class>
 	</listener>

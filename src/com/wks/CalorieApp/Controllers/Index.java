@@ -24,10 +24,11 @@ import com.wks.CalorieApp.StatusCodes.IdentifyStatusCodes;
 import com.wks.CalorieApp.StatusCodes.IndexStatusCodes;
 import com.wks.CalorieApp.Utils.Environment;
 
-public class Index extends HttpServlet {
+public class Index extends HttpServlet
+{
 
-    private static final long serialVersionUID = 1L;
-    private static final String CONTENT_TYPE = "application/json";
+    private static final long   serialVersionUID    = 1L;
+    private static final String CONTENT_TYPE	= "application/json";
     private static final String PARAMETER_SEPERATOR = "/";
 
     @Override
@@ -48,16 +49,19 @@ public class Index extends HttpServlet {
 	PrintWriter out = resp.getWriter();
 
 	// check that parameters were provided
-	if (req.getPathInfo() == null) {
+	if (req.getPathInfo() == null)
+	{
 	    // TODO
-	    outputJSON(out, false,IdentifyStatusCodes.TOO_FEW_ARGS.getDescription());
+	    outputJSON(out, false,
+		    IdentifyStatusCodes.TOO_FEW_ARGS.getDescription());
 	    return;
 	}
 
 	// seperate parameters
 	String[] parameters = req.getPathInfo().split(PARAMETER_SEPERATOR);
 
-	if (parameters.length < 2) {
+	if (parameters.length < 2)
+	{
 	    outputJSON(out, false,
 		    IndexStatusCodes.TOO_FEW_ARGS.getDescription());
 	    return;
@@ -67,7 +71,8 @@ public class Index extends HttpServlet {
 	String fileURI = imagesDir + fileName;
 	File imageFile = new File(fileURI);
 
-	if (!imageFile.exists()) {
+	if (!imageFile.exists())
+	{
 	    outputJSON(out, false,
 		    IndexStatusCodes.FILE_NOT_FOUND.getDescription());
 	    return;
@@ -76,33 +81,39 @@ public class Index extends HttpServlet {
 	// add image to database
 	// Don't index image if you can't record it in db.
 	boolean imageIsInserted = false;
-	try {
+	try
+	{
 	    insertImage(imageFile);
 	    imageIsInserted = true;
-	} catch (MySQLIntegrityConstraintViolationException icve) {
+	} catch (MySQLIntegrityConstraintViolationException icve)
+	{
 	    outputJSON(out, false,
 		    IndexStatusCodes.DB_INTEGRITY_VIOLATION.getDescription());
 	    icve.printStackTrace();
-	} catch (Exception e) {
+	} catch (Exception e)
+	{
 	    outputJSON(out, false,
 		    IndexStatusCodes.DB_INSERT_FAILED.getDescription());
 	}
 
-	if (!imageIsInserted)
-	    return;
+	if (!imageIsInserted) return;
 
-	try {
+	try
+	{
 	    indexImage(fileURI, indexesDir);
 	    outputJSON(out, true,
 		    IndexStatusCodes.INDEXING_SUCCESSFUL.getDescription());
-	} catch (FileNotFoundException fnf) {
+	} catch (FileNotFoundException fnf)
+	{
 	    outputJSON(out, false,
 		    IndexStatusCodes.FILE_NOT_FOUND.getDescription());
 	    fnf.printStackTrace();
-	} catch (IOException ioe) {
+	} catch (IOException ioe)
+	{
 	    outputJSON(out, false, IndexStatusCodes.IO_ERROR.getDescription());
 	    ioe.printStackTrace();
-	} catch (Exception e) {
+	} catch (Exception e)
+	{
 	    outputJSON(out, false, e.getMessage());
 	    e.printStackTrace();
 	}
@@ -135,7 +146,8 @@ public class Index extends HttpServlet {
 	imageItem.setSize(imageFile.length());
 	imageItem.setFinalized(false);
 
-	synchronized (imageDb) {
+	synchronized (imageDb)
+	{
 	    boolean done = imageDb.create(imageItem);
 	    imageDb.close();
 	    return done;
