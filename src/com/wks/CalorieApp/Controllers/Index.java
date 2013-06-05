@@ -14,36 +14,30 @@ import javax.servlet.http.HttpServletResponse;
 import net.semanticmetadata.lire.DocumentBuilder;
 import net.semanticmetadata.lire.DocumentBuilderFactory;
 
-import org.json.simple.JSONObject;
-
 import com.mysql.jdbc.exceptions.MySQLIntegrityConstraintViolationException;
 import com.wks.CalorieApp.DataAccessObjects.ImageDataAccessObject;
 import com.wks.CalorieApp.Models.ImageItem;
 import com.wks.CalorieApp.Models.Indexer;
-import com.wks.CalorieApp.StatusCodes.IdentifyStatusCodes;
-import com.wks.CalorieApp.StatusCodes.IndexStatusCodes;
 import com.wks.CalorieApp.Utils.Environment;
+import com.wks.CalorieApp.Utils.JSONHelper;
 
 public class Index extends HttpServlet
 {
 
-    private static final long   serialVersionUID    = 1L;
-    private static final String CONTENT_TYPE	= "application/json";
+    private static final long serialVersionUID = 1L;
+    private static final String CONTENT_TYPE = "application/json";
     private static final String PARAMETER_SEPERATOR = "/";
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-	    throws ServletException, IOException {
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 	doPost(req, resp);
     }
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp)
-	    throws ServletException, IOException {
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
 	String imagesDir = Environment.getImagesDirectory(getServletContext());
-	String indexesDir = Environment
-		.getIndexesDirectory(getServletContext());
+	String indexesDir = Environment.getIndexesDirectory(getServletContext());
 
 	resp.setContentType(CONTENT_TYPE);
 	PrintWriter out = resp.getWriter();
@@ -52,8 +46,8 @@ public class Index extends HttpServlet
 	if (req.getPathInfo() == null)
 	{
 	    // TODO
-	    outputJSON(out, false,
-		    IdentifyStatusCodes.TOO_FEW_ARGS.getDescription());
+	    out.println(JSONHelper.writeStatus(false, Status.TOO_FEW_ARGS.getMessage()));
+
 	    return;
 	}
 
@@ -62,8 +56,7 @@ public class Index extends HttpServlet
 
 	if (parameters.length < 2)
 	{
-	    outputJSON(out, false,
-		    IndexStatusCodes.TOO_FEW_ARGS.getDescription());
+	    out.println(JSONHelper.writeStatus(false, Status.TOO_FEW_ARGS.getMessage()));
 	    return;
 	}
 
@@ -73,8 +66,8 @@ public class Index extends HttpServlet
 
 	if (!imageFile.exists())
 	{
-	    outputJSON(out, false,
-		    IndexStatusCodes.FILE_NOT_FOUND.getDescription());
+	    out.println( JSONHelper.writeStatus(false, Status.FILE_NOT_FOUND.getMessage()) );
+	    
 	    return;
 	}
 
@@ -87,13 +80,11 @@ public class Index extends HttpServlet
 	    imageIsInserted = true;
 	} catch (MySQLIntegrityConstraintViolationException icve)
 	{
-	    outputJSON(out, false,
-		    IndexStatusCodes.DB_INTEGRITY_VIOLATION.getDescription());
+	    out.println( JSONHelper.writeStatus(false, Status.DB_INTEGRITY_VIOLATION.getMessage()) );
 	    icve.printStackTrace();
 	} catch (Exception e)
 	{
-	    outputJSON(out, false,
-		    IndexStatusCodes.DB_INSERT_FAILED.getDescription());
+	    out.println( JSONHelper.writeStatus(false, Status.DB_INSERT_FAILED.getMessage()) );
 	}
 
 	if (!imageIsInserted) return;
@@ -101,46 +92,33 @@ public class Index extends HttpServlet
 	try
 	{
 	    indexImage(fileURI, indexesDir);
-	    outputJSON(out, true,
-		    IndexStatusCodes.INDEXING_SUCCESSFUL.getDescription());
+	    out.println( JSONHelper.writeStatus(true, Status.INDEXING_SUCCESSFUL.getMessage()) );
 	} catch (FileNotFoundException fnf)
 	{
-	    outputJSON(out, false,
-		    IndexStatusCodes.FILE_NOT_FOUND.getDescription());
+	    out.println( JSONHelper.writeStatus(false, Status.FILE_NOT_FOUND.getMessage()) );
 	    fnf.printStackTrace();
 	} catch (IOException ioe)
 	{
-	    outputJSON(out, false, IndexStatusCodes.IO_ERROR.getDescription());
+	    out.println( JSONHelper.writeStatus(false, Status.IO_ERROR.getMessage()) );
 	    ioe.printStackTrace();
 	} catch (Exception e)
 	{
-	    outputJSON(out, false, e.getMessage());
+	    out.println( JSONHelper.writeStatus(false, e.getMessage()) );
 	    e.printStackTrace();
 	}
 
     }
 
-    @SuppressWarnings("unchecked")
-    private void outputJSON(PrintWriter out, boolean success, String message) {
-	JSONObject json = new JSONObject();
-	json.put("message", message);
-	json.put("success", success);
-	out.println(json);
-    }
-
-    private void indexImage(String fileURI, String indexesDir)
-	    throws FileNotFoundException, IOException {
+    private void indexImage(String fileURI, String indexesDir) throws FileNotFoundException, IOException {
 	// use auto color correlogram document builder
-	DocumentBuilder builder = DocumentBuilderFactory
-		.getAutoColorCorrelogramDocumentBuilder();
+	DocumentBuilder builder = DocumentBuilderFactory.getAutoColorCorrelogramDocumentBuilder();
 	Indexer indexer = new Indexer(builder);
 
 	indexer.indexImage(fileURI, indexesDir);
     }
 
     private boolean insertImage(File imageFile) throws SQLException {
-	ImageDataAccessObject imageDb = new ImageDataAccessObject(
-		getServletContext());
+	ImageDataAccessObject imageDb = new ImageDataAccessObject(getServletContext());
 	ImageItem imageItem = new ImageItem();
 	imageItem.setImageId(imageFile.getName());
 	imageItem.setSize(imageFile.length());
@@ -151,6 +129,29 @@ public class Index extends HttpServlet
 	    boolean done = imageDb.create(imageItem);
 	    imageDb.close();
 	    return done;
+	}
+    }
+
+    public enum Status
+    {
+	INDEXING_SUCCESSFUL("File Indexed Successfully."),
+	TOO_FEW_ARGS("Insufficient parameters provided.Service: index/{FileName}"),
+	IO_ERROR(""),
+	INDEX_ERROR(""),
+	IO_INDEX_ERROR("Error occured while reading or indexing image"),
+	FILE_NOT_FOUND("Indexing failed because file not found."),
+	DB_INTEGRITY_VIOLATION("Database Integrity Violation."),
+	DB_INSERT_FAILED("Image could not be added to database.");
+
+	private final String message;
+
+	Status(String message)
+	{
+	    this.message = message;
+	}
+
+	public String getMessage() {
+	    return message;
 	}
     }
 }

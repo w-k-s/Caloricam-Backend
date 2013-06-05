@@ -12,18 +12,18 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.json.simple.parser.ParseException;
 
-import api.fatsecret.platform.Models.FatSecretAPI;
-import api.fatsecret.platform.Models.FatSecretException;
-import api.fatsecret.platform.Models.FoodInfoItem;
-import api.fatsecret.platform.Models.FoodInfoItemFactory;
-import api.fatsecret.platform.Models.Result;
-import api.fatsecret.platform.Utils.HTTPClient;
 
 import com.mysql.jdbc.exceptions.MySQLIntegrityConstraintViolationException;
 import com.wks.CalorieApp.DataAccessObjects.ImageDataAccessObject;
 import com.wks.CalorieApp.DataAccessObjects.UserDataAccessObject;
 import com.wks.CalorieApp.Models.ImageItem;
 import com.wks.CalorieApp.Models.User;
+import com.wks.CalorieApp.api.fatsecret.FatSecretAPI;
+import com.wks.CalorieApp.api.fatsecret.FatSecretException;
+import com.wks.CalorieApp.api.fatsecret.FoodInfoItem;
+import com.wks.CalorieApp.api.fatsecret.FoodInfoItemFactory;
+import com.wks.CalorieApp.api.fatsecret.Result;
+import com.wks.CalorieApp.Utils.HTTPClient;
 
 
 @SuppressWarnings("unused")

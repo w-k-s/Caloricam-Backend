@@ -13,15 +13,18 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
 
-import api.fatsecret.platform.Models.FatSecretAPI;
-import api.fatsecret.platform.Models.FatSecretException;
-import api.fatsecret.platform.Models.FoodInfoItem;
-import api.fatsecret.platform.Models.FoodInfoItemFactory;
+import com.wks.CalorieApp.api.fatsecret.FatSecretAPI;
+import com.wks.CalorieApp.api.fatsecret.FatSecretException;
+import com.wks.CalorieApp.api.fatsecret.FoodInfoItem;
+import com.wks.CalorieApp.api.fatsecret.FoodInfoItemFactory;
+import com.wks.CalorieApp.Utils.JSONHelper;
+
 
 
 public class NutritionInfo extends HttpServlet
 {
 
+    private static final long serialVersionUID = 2084144039896224805L;
     private static final String CONTENT_TYPE	  = "application/json";
     private static final String PARAMETER_SEPERATOR   = "/";
     private static final String PARAM_CONSUMER_KEY    = "consumer_key";
@@ -53,8 +56,7 @@ public class NutritionInfo extends HttpServlet
 
 	if (req.getPathInfo() == null)
 	{
-	    outputJSON(out, false,
-		    NutritionInfoStatusCode.TOO_FEW_ARGS.getMessage());
+	    out.println( JSONHelper.writeStatus(false, Status.TOO_FEW_ARGS.getMessage()) );
 	    return;
 	}
 
@@ -62,8 +64,7 @@ public class NutritionInfo extends HttpServlet
 
 	if (parameters.length < 2)
 	{
-	    outputJSON(out, false,
-		    NutritionInfoStatusCode.TOO_FEW_ARGS.getMessage());
+	    out.println( JSONHelper.writeStatus(false, Status.TOO_FEW_ARGS.getMessage()) );
 	    return;
 	}
 
@@ -74,9 +75,7 @@ public class NutritionInfo extends HttpServlet
 		numResults = Integer.parseInt(parameters[2]);
 	    } catch (NumberFormatException nfe)
 	    {
-		outputJSON(out, false,
-			NutritionInfoStatusCode.INVALID_NUM_RESULTS_ARG
-				.getMessage());
+		out.println( JSONHelper.writeStatus(false, Status.INVALID_NUM_RESULTS_ARG.getMessage()) );
 		return;
 	    }
 	}
@@ -85,8 +84,7 @@ public class NutritionInfo extends HttpServlet
 
 	if (consumerKey == null && consumerSecret == null)
 	{
-	    outputJSON(out, false,
-		    NutritionInfoStatusCode.KEY_NOT_PROVIDED.getMessage());
+	    out.println( JSONHelper.writeStatus(false, Status.KEY_NOT_PROVIDED.getMessage()) );
 	    return;
 	}
 
@@ -113,32 +111,20 @@ public class NutritionInfo extends HttpServlet
 		foodsJSON.add(foodJSON);
 	    }
 
-	    outputJSON(out, true, foodsJSON.toJSONString());
+	    out.println( JSONHelper.writeStatus(true, foodsJSON.toJSONString()) );
 
 	} catch (FatSecretException e)
 	{
-	    outputJSON(out, false,
-		    NutritionInfoStatusCode.INFO_NOT_RETRIEVABLE.getMessage()
-			    + " Error Code: " + e.getCode());
+	    out.println( JSONHelper.writeStatus(false, Status.INFO_NOT_RETRIEVABLE.getMessage()+ " Error Code: " + e.getCode() ) );
 	} catch (ParseException e)
 	{
-	    outputJSON(out, false,
-		    NutritionInfoStatusCode.INFO_NOT_RETRIEVABLE.getMessage());
+	    out.println( JSONHelper.writeStatus(false, Status.INFO_NOT_RETRIEVABLE.getMessage()) );
 	    e.printStackTrace();
 	}
 
     }
 
-    private void outputJSON(PrintWriter out, boolean success, String message) {
-	JSONObject json = new JSONObject();
-	json.put("success", success);
-	json.put("message", message);
-
-	out.println(json.toJSONString());
-
-    }
-
-    public enum NutritionInfoStatusCode
+    public enum Status
     {
 	TOO_FEW_ARGS(
 		"Insufficient arguments provided.Arguments are /nutrition_info/{required: food name/{optional: num results}};"), INVALID_NUM_RESULTS_ARG(
@@ -148,7 +134,7 @@ public class NutritionInfo extends HttpServlet
 
 	private final String message;
 
-	NutritionInfoStatusCode(String message)
+	Status(String message)
 	{
 	    this.message = message;
 	}
