@@ -130,7 +130,7 @@ public class Test extends HttpServlet{
 	    //out.println(json);
 	    
 	    FoodInfoItem food = foods.get(1);
-	    out.println("cal per 100g"+food.getCaloriesPer100g());
+	    out.println(food.getDescription());
 	    
 	} catch (FatSecretException e) {
 	    // TODO Auto-generated catch block

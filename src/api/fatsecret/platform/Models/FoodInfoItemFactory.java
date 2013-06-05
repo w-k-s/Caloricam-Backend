@@ -9,10 +9,11 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-public class FoodInfoItemFactory {
+public class FoodInfoItemFactory
+{
 
-    //TODO food description handling.
-    
+    // TODO food description handling.
+
     private static final String JSON_FOODS_KEY = "foods";
     private static final String JSON_FOOD_KEY = "food";
     private static final String JSON_FOOD_ID_KEY = "food_id";
@@ -20,31 +21,30 @@ public class FoodInfoItemFactory {
     private static final String JSON_FOOD_TYPE_KEY = "food_type";
     private static final String JSON_FOOD_DESCRIPTION_KEY = "food_description";
     private static final String JSON_FOOD_URL_KEY = "food_url";
-    
+
     private static final String JSON_ERROR_KEY = "error";
     private static final String JSON_ERROR_CODE_KEY = "code";
     private static final String JSON_ERROR_MESSAGE_KEY = "message";
-    
+
     private static JSONParser parser;
 
-    public static List<FoodInfoItem> createFoodItemsFromJSON(String jsonString)
-	    throws FatSecretException, ParseException {
+    public static List<FoodInfoItem> createFoodItemsFromJSON(String jsonString) throws FatSecretException,
+	    ParseException {
 	parser = new JSONParser();
 	JSONObject json = (JSONObject) parser.parse(jsonString);
 
 	JSONObject foodsJSON = (JSONObject) json.get(JSON_FOODS_KEY);
 	JSONObject errorJSON = (JSONObject) json.get(JSON_ERROR_KEY);
 
-	if (foodsJSON == null && errorJSON == null)
-	    return null;
+	if (foodsJSON == null && errorJSON == null) return null;
 
-	if (errorJSON != null)
-	    throw createFatSecretException(errorJSON);
+	if (errorJSON != null) throw createFatSecretException(errorJSON);
 
 	List<FoodInfoItem> foods = new ArrayList<FoodInfoItem>();
 	JSONArray foodJSON = (JSONArray) foodsJSON.get(JSON_FOOD_KEY);
 
-	if (foodJSON != null) {
+	if (foodJSON != null)
+	{
 	    /*
 	     * FoodInfoItem foodInfoItem = new FoodInfoItem();
 	     * foodInfoItem.setDescription(foodJSON.toJSONString());
@@ -53,14 +53,14 @@ public class FoodInfoItemFactory {
 	    @SuppressWarnings("unchecked")
 	    Iterator<JSONObject> iterator = foodJSON.iterator();
 
-	    while (iterator.hasNext()) {
+	    while (iterator.hasNext())
+	    {
 		JSONObject foodObject = iterator.next();
 
 		String foodId = (String) foodObject.get(JSON_FOOD_ID_KEY);
 		String foodName = (String) foodObject.get(JSON_FOOD_NAME_KEY);
-		String foodDescription = (String) foodObject
-			.get(JSON_FOOD_DESCRIPTION_KEY);
-		
+		String foodDescription = (String) foodObject.get(JSON_FOOD_DESCRIPTION_KEY);
+
 		String foodType = (String) foodObject.get(JSON_FOOD_TYPE_KEY);
 		String foodURL = (String) foodObject.get(JSON_FOOD_URL_KEY);
 
@@ -79,8 +79,7 @@ public class FoodInfoItemFactory {
 	return foods;
     }
 
-    private static FatSecretException createFatSecretException(
-	    JSONObject errorJSON) {
+    private static FatSecretException createFatSecretException(JSONObject errorJSON) {
 
 	long code = (Long) errorJSON.get(JSON_ERROR_CODE_KEY) | 0L;
 	String message = (String) errorJSON.get(JSON_ERROR_MESSAGE_KEY);
