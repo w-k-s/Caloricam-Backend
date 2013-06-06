@@ -17,52 +17,42 @@ import com.wks.CalorieApp.Utils.*;
 public class AdminImages extends HttpServlet
 {
 
-    /**
-     * 
-     */
-    private static final long     serialVersionUID   = 1L;
+    private static final long serialVersionUID = 1L;
 
-    private static final String   PARAM_ACTION       = "action";
-    private static final String   PARAM_IMAGE	= "img";
+    private static final String ACTION_DELETE = "delete";
+    private static final String ACTION_VIEW = "view";
 
-    private static final String   ACTION_DELETE      = "delete";
-    private static final String   ACTION_VIEW	= "view";
+    private static final String JSP_IMAGE = "/WEB-INF/images.jsp";
+    private static final String SRVLT_LOGIN = "/login";
 
-    private static final String   ATTR_IMAGE_LIST    = "images";
-    private static final String   ATTR_IMAGE_DIR     = "image_dir";
-    private static final String   ATTR_AUTHENTICATED = "authenticated";
+    private static final String[] EXTENSIONS = { ".jpeg", ".jpg" };
+    private static final String DEFAULT_MIME_TYPE = "image/jpeg";
+    private static final String REDIRECT = "/calorieapp";
 
-    private static final String   JSP_IMAGE	  = "/WEB-INF/images.jsp";
-    private static final String   SRVLT_LOGIN	= "/login";
-
-    private static final String[] EXTENSIONS	 = { ".jpeg", ".jpg" };
-    private static final String   DEFAULT_MIME_TYPE  = "image/jpeg";
-
-    protected void doGet(javax.servlet.http.HttpServletRequest req,
-	    javax.servlet.http.HttpServletResponse resp)
+    protected void doGet(javax.servlet.http.HttpServletRequest req, javax.servlet.http.HttpServletResponse resp)
 	    throws javax.servlet.ServletException, java.io.IOException {
 
-	// laods all images, stores them into a list and passes it as an
-	// attribute to
-	// images.jsp
+	// laods all images, stores them into a list and passes it as an attribute to images.jsp
+	
 	boolean authenticated = false;
 	String action = null;
 	String image = null;
 
+	//session is not a thread-safe variable.
 	HttpSession session = req.getSession();
 	synchronized (session)
 	{
-	    Boolean b = (Boolean) session.getAttribute(ATTR_AUTHENTICATED);
+	    Boolean b = (Boolean) session.getAttribute(Attribute.AUTHENTICATED.toString());
 	    if (b != null) authenticated = b;
 	}
 
-	action = req.getParameter(PARAM_ACTION);
-	image = req.getParameter(PARAM_IMAGE);
+	action = req.getParameter(Parameter.ACTION.toString());
+	image = req.getParameter(Parameter.IMAGE.toString());
 
 	if (!authenticated)
 	{
-	    RequestDispatcher login = req.getRequestDispatcher(SRVLT_LOGIN);
-	    login.forward(req, resp);
+	    //redirect to login page
+	    resp.sendRedirect(REDIRECT+SRVLT_LOGIN);
 	    return;
 	}
 
@@ -72,30 +62,23 @@ public class AdminImages extends HttpServlet
 	    if (action.equalsIgnoreCase(ACTION_VIEW)) return;
 	}
 
-	List<String> files = FileUtils
-		.getFilesInDir(
-			Environment.getImagesDirectory(getServletContext()),
-			EXTENSIONS);
+	List<String> imageURIList = FileUtils.getFilesInDir(Environment.getImagesDirectory(getServletContext()), EXTENSIONS);
 
-	req.setAttribute(ATTR_IMAGE_LIST, files);
-	req.setAttribute(ATTR_IMAGE_DIR,
-		Environment.getImagesDirectory(getServletContext()));
+	req.setAttribute(Attribute.IMAGE_LIST.toString(), imageURIList);
+	req.setAttribute(Attribute.IMAGE_DIR.toString(), Environment.getImagesDirectory(getServletContext()));
 	RequestDispatcher request = req.getRequestDispatcher(JSP_IMAGE);
 	request.forward(req, resp);
     }
 
-    private void handleAction(String action, String fileName,
-	    HttpServletResponse resp) {
+    private void handleAction(String action, String fileName, HttpServletResponse resp) {
 	if (action.equalsIgnoreCase(ACTION_DELETE))
 	{
-	    String fileURI = Environment
-		    .getImagesDirectory(getServletContext()) + fileName;
+	    String fileURI = Environment.getImagesDirectory(getServletContext()) + fileName;
 	    deleteFile(fileURI);
 	}
 	if (action.equalsIgnoreCase(ACTION_VIEW))
 	{
-	    String fileURI = Environment
-		    .getImagesDirectory(getServletContext()) + fileName;
+	    String fileURI = Environment.getImagesDirectory(getServletContext()) + fileName;
 	    respondWithImage(resp, fileURI);
 	}
     };
@@ -104,8 +87,7 @@ public class AdminImages extends HttpServlet
 	return FileUtils.deleteFile(file);
     }
 
-    private boolean respondWithImage(HttpServletResponse response,
-	    String imageFile) {
+    private boolean respondWithImage(HttpServletResponse response, String imageFile) {
 	String mime = getServletContext().getMimeType(imageFile);
 	if (mime == null) mime = DEFAULT_MIME_TYPE;
 

@@ -3,6 +3,12 @@ package com.wks.CalorieApp.api.fatsecret;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * TODO: I think the calculation of nutrients per 100g is incorrent. Double check results.
+ * 
+ * @author Waqqas
+ *
+ */
 public class FoodInfoItem
 {
 

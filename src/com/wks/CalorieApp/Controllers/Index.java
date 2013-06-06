@@ -29,18 +29,20 @@ public class Index extends HttpServlet
     private static final String PARAMETER_SEPERATOR = "/";
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException
+    {
 	doPost(req, resp);
     }
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-
-	String imagesDir = Environment.getImagesDirectory(getServletContext());
-	String indexesDir = Environment.getIndexesDirectory(getServletContext());
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException
+    {
 
 	resp.setContentType(CONTENT_TYPE);
 	PrintWriter out = resp.getWriter();
+
+	String imagesDir = Environment.getImagesDirectory(getServletContext());
+	String indexesDir = Environment.getIndexesDirectory(getServletContext());
 
 	// check that parameters were provided
 	if (req.getPathInfo() == null)
@@ -66,8 +68,7 @@ public class Index extends HttpServlet
 
 	if (!imageFile.exists())
 	{
-	    out.println( JSONHelper.writeStatus(false, Status.FILE_NOT_FOUND.getMessage()) );
-	    
+	    out.println(JSONHelper.writeStatus(false, Status.FILE_NOT_FOUND.getMessage()));
 	    return;
 	}
 
@@ -76,15 +77,14 @@ public class Index extends HttpServlet
 	boolean imageIsInserted = false;
 	try
 	{
-	    insertImage(imageFile);
-	    imageIsInserted = true;
+	    imageIsInserted = insertImage(imageFile);
 	} catch (MySQLIntegrityConstraintViolationException icve)
 	{
-	    out.println( JSONHelper.writeStatus(false, Status.DB_INTEGRITY_VIOLATION.getMessage()) );
+	    out.println(JSONHelper.writeStatus(false, Status.DB_INTEGRITY_VIOLATION.getMessage()));
 	    icve.printStackTrace();
 	} catch (Exception e)
 	{
-	    out.println( JSONHelper.writeStatus(false, Status.DB_INSERT_FAILED.getMessage()) );
+	    out.println(JSONHelper.writeStatus(false, Status.DB_INSERT_FAILED.getMessage()));
 	}
 
 	if (!imageIsInserted) return;
@@ -92,24 +92,25 @@ public class Index extends HttpServlet
 	try
 	{
 	    indexImage(fileURI, indexesDir);
-	    out.println( JSONHelper.writeStatus(true, Status.INDEXING_SUCCESSFUL.getMessage()) );
+	    out.println(JSONHelper.writeStatus(true, Status.INDEXING_SUCCESSFUL.getMessage()));
 	} catch (FileNotFoundException fnf)
 	{
-	    out.println( JSONHelper.writeStatus(false, Status.FILE_NOT_FOUND.getMessage()) );
+	    out.println(JSONHelper.writeStatus(false, Status.FILE_NOT_FOUND.getMessage()));
 	    fnf.printStackTrace();
 	} catch (IOException ioe)
 	{
-	    out.println( JSONHelper.writeStatus(false, Status.IO_ERROR.getMessage()) );
+	    out.println(JSONHelper.writeStatus(false, Status.IO_ERROR.getMessage()));
 	    ioe.printStackTrace();
 	} catch (Exception e)
 	{
-	    out.println( JSONHelper.writeStatus(false, e.getMessage()) );
+	    out.println(JSONHelper.writeStatus(false, e.getMessage()));
 	    e.printStackTrace();
 	}
 
     }
 
-    private void indexImage(String fileURI, String indexesDir) throws FileNotFoundException, IOException {
+    private void indexImage(String fileURI, String indexesDir) throws FileNotFoundException, IOException
+    {
 	// use auto color correlogram document builder
 	DocumentBuilder builder = DocumentBuilderFactory.getAutoColorCorrelogramDocumentBuilder();
 	Indexer indexer = new Indexer(builder);
@@ -117,22 +118,20 @@ public class Index extends HttpServlet
 	indexer.indexImage(fileURI, indexesDir);
     }
 
-    private boolean insertImage(File imageFile) throws SQLException {
+    private boolean insertImage(File imageFile) throws SQLException
+    {
 	ImageDataAccessObject imageDb = new ImageDataAccessObject(getServletContext());
 	ImageItem imageItem = new ImageItem();
 	imageItem.setImageId(imageFile.getName());
 	imageItem.setSize(imageFile.length());
 	imageItem.setFinalized(false);
 
-	synchronized (imageDb)
-	{
-	    boolean done = imageDb.create(imageItem);
-	    imageDb.close();
-	    return done;
-	}
+	boolean done = imageDb.create(imageItem);
+	imageDb.close();
+	return done;
     }
 
-    public enum Status
+    enum Status
     {
 	INDEXING_SUCCESSFUL("File Indexed Successfully."),
 	TOO_FEW_ARGS("Insufficient parameters provided.Service: index/{FileName}"),
@@ -150,7 +149,8 @@ public class Index extends HttpServlet
 	    this.message = message;
 	}
 
-	public String getMessage() {
+	public String getMessage()
+	{
 	    return message;
 	}
     }

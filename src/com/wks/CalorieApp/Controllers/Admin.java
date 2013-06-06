@@ -12,30 +12,30 @@ import javax.servlet.http.HttpSession;
 public class Admin extends HttpServlet
 {
 
-    /**
-     * 
-     */
-    private static final long   serialVersionUID   = 1L;
-    private static final String ATTR_AUTHENTICATED = "authenticated";
-    private static final String SRVLT_LOGIN	= "/login";
-    private static final String JSP_ADMIN	  = "/WEB-INF/admin.jsp";
+    private static final long serialVersionUID = 1L;
+    private static final String SRVLT_LOGIN = "/login";
+    private static final String JSP_ADMIN = "/WEB-INF/admin.jsp";
+    private static final String REDIRECT = "/calorieapp";
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-	    throws ServletException, IOException {
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException
+    {
 
 	doPost(req, resp);
     }
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp)
-	    throws ServletException, IOException {
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException
+    {
+
 	// get params and attributes
 	boolean authenticated = false;
+
 	HttpSession session = req.getSession();
+
 	synchronized (session)
 	{
-	    Boolean b = (Boolean) session.getAttribute(ATTR_AUTHENTICATED);
+	    Boolean b = (Boolean) session.getAttribute(Attribute.AUTHENTICATED.toString());
 	    if (b != null) authenticated = b;
 	}
 
@@ -45,13 +45,14 @@ public class Admin extends HttpServlet
 	    // if user is signed in, load admin
 	    RequestDispatcher admin = req.getRequestDispatcher(JSP_ADMIN);
 	    admin.forward(req, resp);
-	    return;
+
 	} else
 	{
 	    // if user is not signed in, redirect to login panel.
-	    RequestDispatcher login = req.getRequestDispatcher(SRVLT_LOGIN);
-	    login.forward(req, resp);
-	    return;
+	    resp.sendRedirect(REDIRECT + SRVLT_LOGIN);
+
 	}
+
+	return;
     }
 }

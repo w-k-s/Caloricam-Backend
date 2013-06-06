@@ -11,9 +11,6 @@ import org.json.simple.parser.ParseException;
 
 public class FoodInfoItemFactory
 {
-
-    // TODO food description handling.
-
     private static final String JSON_FOODS_KEY = "foods";
     private static final String JSON_FOOD_KEY = "food";
     private static final String JSON_FOOD_ID_KEY = "food_id";
@@ -45,11 +42,7 @@ public class FoodInfoItemFactory
 
 	if (foodJSON != null)
 	{
-	    /*
-	     * FoodInfoItem foodInfoItem = new FoodInfoItem();
-	     * foodInfoItem.setDescription(foodJSON.toJSONString());
-	     * foods.add(foodInfoItem);
-	     */
+
 	    @SuppressWarnings("unchecked")
 	    Iterator<JSONObject> iterator = foodJSON.iterator();
 

@@ -43,7 +43,7 @@ public class Upload extends HttpServlet
 	boolean isMultipart = ServletFileUpload.isMultipartContent(req);
 	if (!isMultipart)
 	{
-	    out.println( JSONHelper.writeStatus(false, Status.FILE_NOT_FOUND.getMessage()) );
+	    out.println(JSONHelper.writeStatus(false, Status.FILE_NOT_FOUND.getMessage()));
 	    return;
 	}
 
@@ -66,7 +66,7 @@ public class Upload extends HttpServlet
 		    String extension = fileName.substring(fileName.lastIndexOf("."));
 		    if (!extension.equals(EXTENSION_JPEG) && !extension.equals(EXTENSION_JPG))
 		    {
-			out.println( JSONHelper.writeStatus(false, Status.INVALID_TYPE.getMessage() + ": " + extension) ); 
+			out.println(JSONHelper.writeStatus(false, Status.INVALID_TYPE.getMessage() + ": " + extension));
 			return;
 		    }
 
@@ -79,41 +79,41 @@ public class Upload extends HttpServlet
 			RequestDispatcher indexer = req.getRequestDispatcher("/index/" + fileName);
 			indexer.forward(req, resp);
 		    } else
-			out.println( JSONHelper.writeStatus(false, Status.UPLOAD_FAILED.getMessage()) );
+			out.println(JSONHelper.writeStatus(false, Status.UPLOAD_FAILED.getMessage()));
 		}
 	    }
 
 	} catch (FileUploadException fue)
 	{
-	    out.println( JSONHelper.writeStatus(false, Status.FILE_NOT_FOUND.getMessage()) );
+	    out.println(JSONHelper.writeStatus(false, Status.FILE_NOT_FOUND.getMessage()));
 	} catch (IOException ioe)
 	{
-	    out.println( JSONHelper.writeStatus(false, Status.IO_ERROR.getMessage()) );  
-	} catch(Exception e)
+	    out.println(JSONHelper.writeStatus(false, Status.IO_ERROR.getMessage()));
+	} catch (Exception e)
 	{
-	    out.println( JSONHelper.writeStatus(false, e.getMessage()) );
+	    out.println(JSONHelper.writeStatus(false, e.getMessage()));
 	}
 
     }
-    
-    public enum Status
+
+    enum Status
     {
-	UPLOAD_SUCCESSFUL("File uploaded successfully."),
-	UPLOAD_FAILED("File Upload failed."),
-	IO_ERROR("An error occured while reading the file."),
+	UPLOAD_SUCCESSFUL("File uploaded successfully."), 
+	UPLOAD_FAILED("File Upload failed."), 
+	IO_ERROR("An error occured while reading the file."), 
 	NO_FILE_PROVIDED("No file provided."),
-	FILE_NOT_FOUND("Uploaded content does not contain a file."),
+	FILE_NOT_FOUND("Request did not contain any file."),
 	INVALID_TYPE("File must be either a JPEG or JPG file.");
-	
+
 	private final String message;
-	
+
 	Status(String message)
 	{
-		this.message = message;
+	    this.message = message;
 	}
-	
+
 	public String getMessage() {
-		return message;
+	    return message;
 	}
     }
 }

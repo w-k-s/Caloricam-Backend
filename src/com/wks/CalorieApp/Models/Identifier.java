@@ -14,11 +14,13 @@ import net.semanticmetadata.lire.DocumentBuilder;
 import net.semanticmetadata.lire.ImageSearchHits;
 import net.semanticmetadata.lire.ImageSearcher;
 
-public class Identifier {
+public class Identifier
+{
 
     ImageSearcher searcher;
 
-    public Identifier(ImageSearcher searcher) {
+    public Identifier(ImageSearcher searcher)
+    {
 	this.searcher = searcher;
     }
 
@@ -30,18 +32,18 @@ public class Identifier {
 	return searcher;
     }
 
-    public synchronized String[] findSimilarImages(String imageURI,
-	    String indexesDir, int maximumHits) throws IOException {
+    public synchronized String[] findSimilarImages(String imageURI, String indexesDir, int maximumHits)
+	    throws IOException {
+	
 	String[] matchedImages = new String[maximumHits];
 
 	BufferedImage image = ImageIO.read(new File(imageURI));
-	IndexReader reader = DirectoryReader.open(FSDirectory.open(new File(
-		indexesDir)));
+	IndexReader reader = DirectoryReader.open(FSDirectory.open(new File(indexesDir)));
 	ImageSearchHits hits = getSearcher().search(image, reader);
 
-	for (int i = 0; i < hits.length(); i++) {
-	    String fileName = hits.doc(i).getValues(
-		    DocumentBuilder.FIELD_NAME_IDENTIFIER)[0];
+	for (int i = 0; i < hits.length(); i++)
+	{
+	    String fileName = hits.doc(i).getValues(DocumentBuilder.FIELD_NAME_IDENTIFIER)[0];
 	    matchedImages[i] = hits.score(i) + ":" + fileName;
 	}
 

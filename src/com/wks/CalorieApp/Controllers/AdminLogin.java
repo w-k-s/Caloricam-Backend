@@ -16,12 +16,6 @@ public class AdminLogin extends HttpServlet
 {
 
     private static final long serialVersionUID = 1L;
-    private static final String PARAM_USERNAME = "username";
-    private static final String PARAM_PASSWORD = "password";
-
-    private static final String ATTR_STATUS = "status";
-    private static final String ATTR_AUTHENTICATED = "authenticated";
-    private static final String ATTR_USERNAME = PARAM_USERNAME;
 
     private static final String JSP_LOGIN = "/WEB-INF/login.jsp";
 
@@ -34,12 +28,14 @@ public class AdminLogin extends HttpServlet
     // private static final String REDIRECT = "/calorieapp";
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException
+    {
 	// TODO Auto-generated method stub
 	doPost(req, resp);
     }
 
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException
+    {
 
 	// get all parameters
 	boolean authenticated = false;
@@ -49,12 +45,12 @@ public class AdminLogin extends HttpServlet
 	HttpSession session = req.getSession();
 	synchronized (session)
 	{
-	    Boolean b = (Boolean) session.getAttribute(ATTR_AUTHENTICATED);
+	    Boolean b = (Boolean) session.getAttribute(Attribute.AUTHENTICATED.toString());
 	    if (b != null) authenticated = b;
 	}
 
-	username = req.getParameter(PARAM_USERNAME);
-	password = req.getParameter(PARAM_PASSWORD);
+	username = req.getParameter(Parameter.USERNAME.toString());
+	password = req.getParameter(Parameter.PASSWORD.toString());
 
 	// check if user is already signed in
 	if (authenticated)
@@ -69,25 +65,23 @@ public class AdminLogin extends HttpServlet
 	{
 	    if (loginCredentialsAreValid(username, password))
 	    {
-		synchronized (session)
-		{
-		    session.setAttribute(ATTR_AUTHENTICATED, true);
-		    session.setAttribute(ATTR_USERNAME, username);
-		}
+
+		session.setAttribute(Attribute.AUTHENTICATED.toString(), true);
+		session.setAttribute(Attribute.USERNAME.toString(), username);
 
 		RequestDispatcher admin = req.getRequestDispatcher(SRVLT_ADMIN);
 		admin.forward(req, resp);
 		return;
 	    } else
 	    {
-		req.setAttribute(ATTR_STATUS, Status.INCORRECT_USERNAME_PASSWORD.getMessage());
+		req.setAttribute(Attribute.STATUS.toString(), Status.INCORRECT_USERNAME_PASSWORD.getMessage());
 		RequestDispatcher login = req.getRequestDispatcher(JSP_LOGIN);
 		login.forward(req, resp);
 		return;
 	    }
 	} else
 	{
-	    req.removeAttribute(ATTR_STATUS);
+	    req.removeAttribute(Attribute.STATUS.toString());
 	    RequestDispatcher login = req.getRequestDispatcher(JSP_LOGIN);
 	    login.forward(req, resp);
 	    return;
@@ -95,14 +89,12 @@ public class AdminLogin extends HttpServlet
 
     }
 
-    private boolean loginCredentialsAreValid(String username, String password) {
+    private boolean loginCredentialsAreValid(String username, String password)
+    {
 	UserDataAccessObject usersDb = new UserDataAccessObject(getServletContext());
 	User user = null;
 
-	synchronized (usersDb)
-	{
-	    user = usersDb.find(username);
-	}
+	user = usersDb.find(username);
 
 	if (user == null) return false;
 
@@ -110,11 +102,10 @@ public class AdminLogin extends HttpServlet
 	return false;
     }
 
-    public enum Status
+    enum Status
     {
-	NULL_USERNAME_PASSWORD("Must provide a valid username and password."),
-	INCORRECT_USERNAME_PASSWORD("Username or password is not correct."),
-	NOT_REGISTERED("This username is not registered as admin.");
+	NULL_USERNAME_PASSWORD("Must provide a valid username and password."), INCORRECT_USERNAME_PASSWORD(
+		"Username or password is not correct."), NOT_REGISTERED("This username is not registered as admin.");
 
 	private final String message;
 
@@ -123,7 +114,8 @@ public class AdminLogin extends HttpServlet
 	    this.message = message;
 	}
 
-	public String getMessage() {
+	public String getMessage()
+	{
 	    return message;
 	}
     }

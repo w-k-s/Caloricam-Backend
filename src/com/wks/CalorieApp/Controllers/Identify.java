@@ -29,9 +29,9 @@ public class Identify extends HttpServlet
     private static final long serialVersionUID = 1L;
     private static final String CONTENT_TYPE = "application/json";
     private static final String PARAMETER_SEPERATOR = "/";
-    private static final String PARAM_DEFAULT_MAX_HITS = "default_max_hits";
 
     private static final int MIN_NUM_PARAMETERS = 2;
+    private static final int DEFAULT_MAX_HITS = 10;
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -43,13 +43,13 @@ public class Identify extends HttpServlet
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
-	String imagesDir = Environment.getImagesDirectory(getServletContext());
-	String indexesDir = Environment.getIndexesDirectory(getServletContext());
-	int defaultMaxHits = Integer.parseInt(getServletContext().getInitParameter(PARAM_DEFAULT_MAX_HITS)) | 10;
-	int maximumHits = defaultMaxHits;
-
 	resp.setContentType(CONTENT_TYPE);
 	PrintWriter out = resp.getWriter();
+	
+	String imagesDir = Environment.getImagesDirectory(getServletContext());
+	String indexesDir = Environment.getIndexesDirectory(getServletContext());
+	int defaultMaxHits = Integer.parseInt(getServletContext().getInitParameter(Parameter.DEFAULT_MAX_HITS.toString())) | DEFAULT_MAX_HITS;
+	int maximumHits = defaultMaxHits;
 
 	// check that parameters were provided
 	if (req.getPathInfo() == null)
@@ -74,7 +74,7 @@ public class Identify extends HttpServlet
 	    try
 	    {
 		maximumHits = Integer.parseInt(parameters[2]);
-	    } catch (NumberFormatException nfe)
+	    } catch (Exception e)
 	    {
 		out.println( JSONHelper.writeStatus(false, Status.INVALID_MAX_HITS.getMessage()));
 		return;
@@ -86,36 +86,42 @@ public class Identify extends HttpServlet
 
 	// find similar images
 	ImageSearcher searcher = ImageSearcherFactory.createAutoColorCorrelogramImageSearcher(maximumHits);
-	Identifier srchr = new Identifier(searcher);
+	Identifier identifier = new Identifier(searcher);
 
 	try
 	{
-	    String[] similarImages = srchr.findSimilarImages(fileURI, indexesDir, maximumHits);
+	    String[] similarImages = identifier.findSimilarImages(fileURI, indexesDir, maximumHits);
 	    JSONArray similarImagesJSON = new JSONArray();
 	    for (String uri : similarImages)
 		similarImagesJSON.add(uri);
 
 	    out.println( JSONHelper.writeStatus(true, similarImagesJSON.toJSONString()));
 	    
-	} catch (IOException e)
+	} catch (IOException ioe)
 	{
 	    // TODO create indexer codes
-		out.println( JSONHelper.writeStatus(false, Status.IO_ERROR.getMessage()));
-
-	    e.printStackTrace();
+	    out.println( JSONHelper.writeStatus(false, Status.IO_ERROR.getMessage()));
+	    ioe.printStackTrace();
+	}catch(Exception e)
+	{
+	   out.println( JSONHelper.writeStatus(false, Status.IDENTIFICATION_FAILED.getMessage()));
+	   e.printStackTrace();
 	}
     }
 
-    public enum Status
+    enum Status
     {
-	TOO_FEW_ARGS("Insufficient parameters provided.Service: identify/{FileName}/{MaxHits(optional)}"), 
+	TOO_FEW_ARGS(
+		"Insufficient parameters provided.Service: identify/{required: file_name.jpg}/{optional: max_hits}"),
 	INVALID_MAX_HITS("Invalid value provided for maximum number of hits. Value must be an integer."),
-	IO_ERROR("Error reading files while retrieving similar images"),
-	FILE_NOT_FOUND("Search image not found on server. The file ma have failed to upload or may have been deleted.");
+	IO_ERROR("An error occurred while reading the image file."),
+	FILE_NOT_FOUND("Search image not found on server. The file may have failed to upload or may have been deleted."),
+	IDENTIFICATION_FAILED("Uploaded image could not be identified.");
 
 	private final String message;
 
-	private Status(String message) {
+	private Status(String message)
+	{
 	    this.message = message;
 	}
 
