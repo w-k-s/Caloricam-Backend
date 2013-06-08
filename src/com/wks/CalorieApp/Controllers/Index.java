@@ -11,6 +11,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.log4j.Logger;
+
 import net.semanticmetadata.lire.DocumentBuilder;
 import net.semanticmetadata.lire.DocumentBuilderFactory;
 
@@ -18,8 +20,8 @@ import com.mysql.jdbc.exceptions.MySQLIntegrityConstraintViolationException;
 import com.wks.CalorieApp.DataAccessObjects.ImageDataAccessObject;
 import com.wks.CalorieApp.Models.ImageItem;
 import com.wks.CalorieApp.Models.Indexer;
+import com.wks.CalorieApp.Models.Response;
 import com.wks.CalorieApp.Utils.Environment;
-import com.wks.CalorieApp.Utils.JSONHelper;
 
 public class Index extends HttpServlet
 {
@@ -27,7 +29,18 @@ public class Index extends HttpServlet
     private static final long serialVersionUID = 1L;
     private static final String CONTENT_TYPE = "application/json";
     private static final String PARAMETER_SEPERATOR = "/";
+    private static String imagesDir = "";
+    private static String indexesDir = "";
+    private static Logger logger = Logger.getLogger(Index.class);
+    
 
+    @Override
+    public void init() throws ServletException
+    {
+	imagesDir = Environment.getImagesDirectory(getServletContext());
+	indexesDir = Environment.getIndexesDirectory(getServletContext());
+    }
+    
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException
     {
@@ -41,14 +54,10 @@ public class Index extends HttpServlet
 	resp.setContentType(CONTENT_TYPE);
 	PrintWriter out = resp.getWriter();
 
-	String imagesDir = Environment.getImagesDirectory(getServletContext());
-	String indexesDir = Environment.getIndexesDirectory(getServletContext());
-
 	// check that parameters were provided
 	if (req.getPathInfo() == null)
 	{
-	    // TODO
-	    out.println(JSONHelper.writeStatus(false, Status.TOO_FEW_ARGS.getMessage()));
+	    out.println( new Response(false, Status.TOO_FEW_ARGS.getMessage()).toJSON());
 
 	    return;
 	}
@@ -58,7 +67,7 @@ public class Index extends HttpServlet
 
 	if (parameters.length < 2)
 	{
-	    out.println(JSONHelper.writeStatus(false, Status.TOO_FEW_ARGS.getMessage()));
+	    out.println( new Response(false, Status.TOO_FEW_ARGS.getMessage()).toJSON());
 	    return;
 	}
 
@@ -68,7 +77,7 @@ public class Index extends HttpServlet
 
 	if (!imageFile.exists())
 	{
-	    out.println(JSONHelper.writeStatus(false, Status.FILE_NOT_FOUND.getMessage()));
+	    out.println( new Response(false, Status.FILE_NOT_FOUND.getMessage()).toJSON());
 	    return;
 	}
 
@@ -80,11 +89,12 @@ public class Index extends HttpServlet
 	    imageIsInserted = insertImage(imageFile);
 	} catch (MySQLIntegrityConstraintViolationException icve)
 	{
-	    out.println(JSONHelper.writeStatus(false, Status.DB_INTEGRITY_VIOLATION.getMessage()));
-	    icve.printStackTrace();
-	} catch (Exception e)
+	    out.println( new Response(false, Status.DB_INTEGRITY_VIOLATION.getMessage()).toJSON());
+	    logger.fatal(icve+" Image:"+fileURI);
+	}catch(SQLException sqle)
 	{
-	    out.println(JSONHelper.writeStatus(false, Status.DB_INSERT_FAILED.getMessage()));
+	    out.println(  new Response(false, sqle.toString()).toJSON());
+	    logger.error(sqle+" Image:"+fileURI);
 	}
 
 	if (!imageIsInserted) return;
@@ -92,20 +102,16 @@ public class Index extends HttpServlet
 	try
 	{
 	    indexImage(fileURI, indexesDir);
-	    out.println(JSONHelper.writeStatus(true, Status.INDEXING_SUCCESSFUL.getMessage()));
+	    out.println( new Response(true, Status.INDEXING_SUCCESSFUL.getMessage()).toJSON());
 	} catch (FileNotFoundException fnf)
 	{
-	    out.println(JSONHelper.writeStatus(false, Status.FILE_NOT_FOUND.getMessage()));
-	    fnf.printStackTrace();
+	    out.println( new Response(false, Status.FILE_NOT_FOUND.getMessage()).toJSON());
+	    logger.error(fnf+" Image:"+fileURI);
 	} catch (IOException ioe)
 	{
-	    out.println(JSONHelper.writeStatus(false, Status.IO_ERROR.getMessage()));
-	    ioe.printStackTrace();
-	} catch (Exception e)
-	{
-	    out.println(JSONHelper.writeStatus(false, e.getMessage()));
-	    e.printStackTrace();
-	}
+	    out.println( new Response(false, Status.IO_ERROR.getMessage()).toJSON());
+	   logger.error(ioe+" Image:"+fileURI);
+	} 
 
     }
 
@@ -120,7 +126,7 @@ public class Index extends HttpServlet
 
     private boolean insertImage(File imageFile) throws SQLException
     {
-	ImageDataAccessObject imageDb = new ImageDataAccessObject(getServletContext());
+	ImageDataAccessObject imageDb = new ImageDataAccessObject();
 	ImageItem imageItem = new ImageItem();
 	imageItem.setImageId(imageFile.getName());
 	imageItem.setSize(imageFile.length());

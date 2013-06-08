@@ -9,6 +9,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.log4j.Logger;
+
 import com.wks.CalorieApp.DataAccessObjects.UserDataAccessObject;
 import com.wks.CalorieApp.Models.User;
 
@@ -24,6 +26,7 @@ public class AdminLogin extends HttpServlet
     // so this servlet will redirect to admin servlet instead of loading the
     // admin.jsp.
     private static final String SRVLT_ADMIN = "/admin";
+    private static Logger logger = Logger.getLogger(AdminLogin.class);
 
     // private static final String REDIRECT = "/calorieapp";
 
@@ -65,7 +68,7 @@ public class AdminLogin extends HttpServlet
 	{
 	    if (loginCredentialsAreValid(username, password))
 	    {
-
+		logger.info(username+" has signed in");
 		session.setAttribute(Attribute.AUTHENTICATED.toString(), true);
 		session.setAttribute(Attribute.USERNAME.toString(), username);
 
@@ -91,7 +94,7 @@ public class AdminLogin extends HttpServlet
 
     private boolean loginCredentialsAreValid(String username, String password)
     {
-	UserDataAccessObject usersDb = new UserDataAccessObject(getServletContext());
+	UserDataAccessObject usersDb = new UserDataAccessObject();
 	User user = null;
 
 	user = usersDb.find(username);

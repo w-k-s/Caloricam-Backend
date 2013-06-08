@@ -12,11 +12,13 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.log4j.Logger;
+
 import com.wks.CalorieApp.Utils.*;
 
 public class AdminImages extends HttpServlet
 {
-
+    private static final boolean appIsDeployed = false;
     private static final long serialVersionUID = 1L;
 
     private static final String ACTION_DELETE = "delete";
@@ -27,7 +29,8 @@ public class AdminImages extends HttpServlet
 
     private static final String[] EXTENSIONS = { ".jpeg", ".jpg" };
     private static final String DEFAULT_MIME_TYPE = "image/jpeg";
-    private static final String REDIRECT = "/calorieapp";
+    private static final String REDIRECT = appIsDeployed?"/":"/calorieapp";
+    private static Logger logger = Logger.getLogger(Admin.class);
 
     protected void doGet(javax.servlet.http.HttpServletRequest req, javax.servlet.http.HttpServletResponse resp)
 	    throws javax.servlet.ServletException, java.io.IOException {
@@ -84,6 +87,7 @@ public class AdminImages extends HttpServlet
     };
 
     private boolean deleteFile(String file) {
+	logger.info("image "+file+" deleted.");
 	return FileUtils.deleteFile(file);
     }
 
@@ -114,13 +118,15 @@ public class AdminImages extends HttpServlet
 	} catch (FileNotFoundException e)
 	{
 	    e.printStackTrace();
-
+	    logger.error(e);
 	} catch (IOException e)
 	{
 	    e.printStackTrace();
+	    logger.error(e);
 	} catch (Exception e)
 	{
 	    e.printStackTrace();
+	    logger.error(e);
 	} finally
 	{
 	    try
@@ -130,7 +136,7 @@ public class AdminImages extends HttpServlet
 
 	    } catch (IOException e)
 	    {
-		e.printStackTrace();
+		logger.error(e);
 	    }
 	}
 	return done;

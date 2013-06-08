@@ -7,9 +7,8 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.servlet.ServletContext;
-
 import com.wks.CalorieApp.Models.User;
+import com.wks.CalorieApp.Utils.DatabaseUtil;
 
 public class UserDataAccessObject {
 
@@ -31,12 +30,11 @@ public class UserDataAccessObject {
 	    + COLUMN_PASSWORD + " FROM " + TABLE_USERS + " WHERE "
 	    + COLUMN_USERNAME + " = ?";
 
-    private static final String ATTR_CONNECTION = "connection";
 
     private Connection connection = null;
 
-    public UserDataAccessObject(ServletContext context) {
-	connection = (Connection) context.getAttribute(ATTR_CONNECTION);
+    public UserDataAccessObject() {
+	connection = DatabaseUtil.getConnection();
 	if (connection == null)
 	    throw new IllegalStateException("Null Connection");
     }

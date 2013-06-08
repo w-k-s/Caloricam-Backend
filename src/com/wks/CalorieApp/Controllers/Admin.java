@@ -9,13 +9,16 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.log4j.Logger;
+
 public class Admin extends HttpServlet
 {
-
+    private static final boolean appIsDeployed = false;
     private static final long serialVersionUID = 1L;
     private static final String SRVLT_LOGIN = "/login";
     private static final String JSP_ADMIN = "/WEB-INF/admin.jsp";
-    private static final String REDIRECT = "/calorieapp";
+    private static final String REDIRECT = appIsDeployed?"/":"/calorieapp";
+    
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException

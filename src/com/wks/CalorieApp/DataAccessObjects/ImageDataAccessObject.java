@@ -8,10 +8,9 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.servlet.ServletContext;
-
 import com.mysql.jdbc.exceptions.MySQLIntegrityConstraintViolationException;
 import com.wks.CalorieApp.Models.ImageItem;
+import com.wks.CalorieApp.Utils.DatabaseUtil;
 
 public class ImageDataAccessObject {
     
@@ -27,13 +26,12 @@ public class ImageDataAccessObject {
     private static final String DELETE_QUERY = "DELETE FROM "+TABLE_IMAGES+" WHERE "+COLUMN_IMAGE_ID+" = ?";
     private static final String FIND_QUERY = "SELECT "+COLUMN_IMAGE_ID+", "+COLUMN_FOOD_ID+", "+COLUMN_SIZE+","+COLUMN_IS_FINALIZED+" FROM "+TABLE_IMAGES + " WHERE "+COLUMN_IMAGE_ID+" = ?";
     
-    private static final String ATTR_CONNECTION = "connection";
     
     private Connection connection;
     
-    public ImageDataAccessObject(ServletContext context)
+    public ImageDataAccessObject()
     {
-	connection = (Connection) context.getAttribute(ATTR_CONNECTION);
+	connection = DatabaseUtil.getConnection();
 	if(connection == null)
 	    throw new IllegalStateException("Null Connection");
     }

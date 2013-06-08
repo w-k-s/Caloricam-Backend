@@ -10,6 +10,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.log4j.BasicConfigurator;
+import org.apache.log4j.Logger;
 import org.json.simple.parser.ParseException;
 
 
@@ -30,6 +32,7 @@ import com.wks.CalorieApp.Utils.HTTPClient;
 public class Test extends HttpServlet{
 
     private static final long serialVersionUID = 1L;
+    private static Logger logger = Logger.getLogger(Test.class);
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
@@ -118,7 +121,7 @@ public class Test extends HttpServlet{
 	}
 	*/
 	
-	
+	/*
 	try {
 	    FatSecretAPI fatsecret = new FatSecretAPI("ea0d6a946b3e4b3a8d5cbdb0a55900dd","49704a68e7114143925f6390aeca8b42");
 	    String json = fatsecret.foodsSearch("chicken");
@@ -138,8 +141,16 @@ public class Test extends HttpServlet{
 	} catch (ParseException e) {
 	    // TODO Auto-generated catch block
 	    e.printStackTrace();
-	}
+	}*/
 	
+	logger.info("Let the games begin!");
+	
+	try{
+	    int s = Integer.parseInt("s");
+	}catch(NumberFormatException e)
+	{
+	    logger.error(e);
+	}
     }
     
     @Override

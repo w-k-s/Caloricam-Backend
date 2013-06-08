@@ -11,11 +11,12 @@ import javax.servlet.http.HttpServletResponse;
 import net.semanticmetadata.lire.ImageSearcher;
 import net.semanticmetadata.lire.ImageSearcherFactory;
 
+import org.apache.log4j.Logger;
 import org.json.simple.JSONArray;
 
 import com.wks.CalorieApp.Models.Identifier;
+import com.wks.CalorieApp.Models.Response;
 import com.wks.CalorieApp.Utils.Environment;
-import com.wks.CalorieApp.Utils.JSONHelper;
 
 /*
  * - think of a better JSON writer impmentation.
@@ -32,30 +33,40 @@ public class Identify extends HttpServlet
 
     private static final int MIN_NUM_PARAMETERS = 2;
     private static final int DEFAULT_MAX_HITS = 10;
+    private static String imagesDir = "";
+    private static String indexesDir = "";
+    private static int defaultMaxHits = DEFAULT_MAX_HITS;
+    private static Logger logger = Logger.getLogger(Identify.class);
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    public void init() throws ServletException
+    {
+	imagesDir = Environment.getImagesDirectory(getServletContext());
+	indexesDir = Environment.getIndexesDirectory(getServletContext());
+	defaultMaxHits = Integer.parseInt(getServletContext().getInitParameter(Parameter.DEFAULT_MAX_HITS.toString()));
+    }
+
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException
+    {
 
 	doPost(req, resp);
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException
+    {
 
 	resp.setContentType(CONTENT_TYPE);
 	PrintWriter out = resp.getWriter();
-	
-	String imagesDir = Environment.getImagesDirectory(getServletContext());
-	String indexesDir = Environment.getIndexesDirectory(getServletContext());
-	int defaultMaxHits = Integer.parseInt(getServletContext().getInitParameter(Parameter.DEFAULT_MAX_HITS.toString())) | DEFAULT_MAX_HITS;
+
 	int maximumHits = defaultMaxHits;
 
 	// check that parameters were provided
 	if (req.getPathInfo() == null)
 	{
-	    // TODO
-	   out.println( JSONHelper.writeStatus(false, Status.TOO_FEW_ARGS.getMessage()));
+	    out.println( new Response(false, Status.TOO_FEW_ARGS.getMessage()).toJSON());
 	    return;
 	}
 
@@ -64,7 +75,7 @@ public class Identify extends HttpServlet
 
 	if (parameters.length < MIN_NUM_PARAMETERS)
 	{
-	    out.println( JSONHelper.writeStatus(false, Status.TOO_FEW_ARGS.getMessage()));
+	    out.println( new Response(false, Status.TOO_FEW_ARGS.getMessage()).toJSON());
 	    return;
 	}
 
@@ -74,15 +85,18 @@ public class Identify extends HttpServlet
 	    try
 	    {
 		maximumHits = Integer.parseInt(parameters[2]);
-	    } catch (Exception e)
+	    } catch (NumberFormatException e)
 	    {
-		out.println( JSONHelper.writeStatus(false, Status.INVALID_MAX_HITS.getMessage()));
+		out.println( new Response(false, Status.INVALID_MAX_HITS.getMessage()).toJSON());
+		logger.info(e+" parameter: "+parameters[2]);
 		return;
 	    }
 	}
 
 	// check that file exists
 	String fileURI = imagesDir + parameters[1];
+
+	logger.info("Identifying: "+fileURI);
 
 	// find similar images
 	ImageSearcher searcher = ImageSearcherFactory.createAutoColorCorrelogramImageSearcher(maximumHits);
@@ -95,18 +109,14 @@ public class Identify extends HttpServlet
 	    for (String uri : similarImages)
 		similarImagesJSON.add(uri);
 
-	    out.println( JSONHelper.writeStatus(true, similarImagesJSON.toJSONString()));
-	    
+	    out.println( new Response(true, similarImagesJSON.toJSONString()).toJSON());
+
 	} catch (IOException ioe)
 	{
-	    // TODO create indexer codes
-	    out.println( JSONHelper.writeStatus(false, Status.IO_ERROR.getMessage()));
-	    ioe.printStackTrace();
-	}catch(Exception e)
-	{
-	   out.println( JSONHelper.writeStatus(false, Status.IDENTIFICATION_FAILED.getMessage()));
-	   e.printStackTrace();
-	}
+
+	    out.println( new Response(false, Status.IO_ERROR.getMessage()).toJSON());
+	    logger.error(ioe + " image:"+fileURI);
+	} 
     }
 
     enum Status
@@ -125,7 +135,8 @@ public class Identify extends HttpServlet
 	    this.message = message;
 	}
 
-	public String getMessage() {
+	public String getMessage()
+	{
 	    return message;
 	}
     }

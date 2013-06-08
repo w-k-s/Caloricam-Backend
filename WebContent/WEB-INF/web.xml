@@ -36,7 +36,7 @@
 		<servlet-name>identify</servlet-name>
 		<url-pattern>/identify/*</url-pattern>
 	</servlet-mapping>
-	
+
 	<servlet>
 		<servlet-name>test</servlet-name>
 		<servlet-class>com.wks.CalorieApp.Controllers.Test</servlet-class>
@@ -45,7 +45,7 @@
 		<servlet-name>test</servlet-name>
 		<url-pattern>/test</url-pattern>
 	</servlet-mapping>
-	
+
 	<servlet>
 		<servlet-name>login</servlet-name>
 		<servlet-class>com.wks.CalorieApp.Controllers.AdminLogin</servlet-class>
@@ -72,7 +72,7 @@
 		<servlet-name>logout</servlet-name>
 		<url-pattern>/logout</url-pattern>
 	</servlet-mapping>
-	
+
 	<servlet>
 		<servlet-name>images</servlet-name>
 		<servlet-class>com.wks.CalorieApp.Controllers.AdminImages</servlet-class>
@@ -91,6 +91,28 @@
 		<url-pattern>/nutrition_info/*</url-pattern>
 	</servlet-mapping>
 
+	<servlet>
+		<servlet-name>error</servlet-name>
+		<servlet-class>com.wks.CalorieApp.Controllers.Error</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>error</servlet-name>
+		<url-pattern>/error</url-pattern>
+	</servlet-mapping>
+	
+	
+	<!-- LOGGING -->
+
+	<servlet>
+		<servlet-name>log_init</servlet-name>
+		<servlet-class>com.wks.CalorieApp.Controllers.LogInit</servlet-class>
+		<init-param>
+			<param-name>log4j_properties_uri</param-name>
+			<param-value>WEB-INF/log4j.properties</param-value>
+		</init-param>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+
 	<!-- RESOURCES -->
 
 	<context-param>
@@ -106,28 +128,14 @@
 		<param-value>indexes/</param-value>
 	</context-param>
 	<context-param>
+		<param-name>log_dir</param-name>
+		<param-value>log/</param-value>
+	</context-param>
+	<context-param>
 		<param-name>default_max_hits</param-name>
 		<param-value>10</param-value>
 	</context-param>
 
-	<!-- DATABASE -->
-
-	<context-param>
-		<param-name>driver</param-name>
-		<param-value>com.mysql.jdbc.Driver</param-value>
-	</context-param>
-	<context-param>
-		<param-name>url</param-name>
-		<param-value>jdbc:mysql://localhost:3306/calorie_app</param-value>
-	</context-param>
-	<context-param>
-		<param-name>user</param-name>
-		<param-value>waqqas</param-value>
-	</context-param>
-	<context-param>
-		<param-name>password</param-name>
-		<param-value>wks270188</param-value>
-	</context-param>
 
 	<!-- API KEYS -->
 	<context-param>
@@ -139,10 +147,12 @@
 		<param-value>49704a68e7114143925f6390aeca8b42</param-value>
 	</context-param>
 
-	<!-- LISTENERS -->
-	
-	<listener>
-		<listener-class>com.wks.CalorieApp.Listeners.MySqlServletContextListener</listener-class>
-	</listener>
+
+	<!-- UNHANDLED EXCEPTION REDIRECT -->
+
+	<error-page>
+		<exception-type>java.lang.Throwable</exception-type>
+		<location>/error</location>
+	</error-page>
 
 </web-app>

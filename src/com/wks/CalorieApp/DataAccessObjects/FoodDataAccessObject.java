@@ -8,9 +8,8 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.servlet.ServletContext;
-
 import com.wks.CalorieApp.Models.FoodItem;
+import com.wks.CalorieApp.Utils.DatabaseUtil;
 
 public class FoodDataAccessObject {
 
@@ -31,13 +30,12 @@ public class FoodDataAccessObject {
 	    + COLUMN_FOOD_NAME + " FROM " + TABLE_FOODS + " WHERE "
 	    + COLUMN_FOOD_ID + " = ?";
 
-    private static final String ATTR_CONNECTION = "connection";
 
     private Connection connection = null;
 
-    public FoodDataAccessObject(ServletContext context)
+    public FoodDataAccessObject()
 	    throws IllegalStateException {
-	connection = (Connection) context.getAttribute(ATTR_CONNECTION);
+	connection = DatabaseUtil.getConnection();
 	if (connection == null)
 	    throw new IllegalStateException("Null Connection");
     }

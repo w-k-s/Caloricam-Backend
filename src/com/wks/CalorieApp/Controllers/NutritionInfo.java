@@ -9,15 +9,16 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.log4j.Logger;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
 
+import com.wks.CalorieApp.Models.Response;
 import com.wks.CalorieApp.api.fatsecret.FatSecretAPI;
 import com.wks.CalorieApp.api.fatsecret.FatSecretException;
 import com.wks.CalorieApp.api.fatsecret.FoodInfoItem;
 import com.wks.CalorieApp.api.fatsecret.FoodInfoItemFactory;
-import com.wks.CalorieApp.Utils.JSONHelper;
 
 public class NutritionInfo extends HttpServlet
 {
@@ -26,6 +27,7 @@ public class NutritionInfo extends HttpServlet
     private static final String CONTENT_TYPE = "application/json";
     private static final String PARAMETER_SEPERATOR = "/";
     private static final int MIN_NUM_ARGS = 2;
+    private static Logger logger = Logger.getLogger(NutritionInfo.class);
 
     private static String consumerKey;
     private static String consumerSecret;
@@ -50,7 +52,7 @@ public class NutritionInfo extends HttpServlet
 
 	if (req.getPathInfo() == null)
 	{
-	    out.println(JSONHelper.writeStatus(false, Status.TOO_FEW_ARGS.getMessage()));
+	    out.println( new Response(false, Status.TOO_FEW_ARGS.getMessage()).toJSON());
 	    return;
 	}
 
@@ -58,7 +60,7 @@ public class NutritionInfo extends HttpServlet
 
 	if (parameters.length < MIN_NUM_ARGS)
 	{
-	    out.println(JSONHelper.writeStatus(false, Status.TOO_FEW_ARGS.getMessage()));
+	    out.println( new Response(false, Status.TOO_FEW_ARGS.getMessage()).toJSON());
 	    return;
 	}
 
@@ -67,18 +69,21 @@ public class NutritionInfo extends HttpServlet
 	    try
 	    {
 		numResults = Integer.parseInt(parameters[2]);
-	    } catch (Exception e)
+	    } catch (NumberFormatException e)
 	    {
-		out.println(JSONHelper.writeStatus(false, Status.INVALID_NUM_RESULTS_ARG.getMessage()));
+		out.println( new Response(false, Status.INVALID_NUM_RESULTS_ARG.getMessage()).toJSON());
 		return;
 	    }
 	}
 
 	String foodName = parameters[1];
+	
+	logger.info("retrieving nutrition info for "+foodName);
 
 	if (consumerKey == null && consumerSecret == null)
 	{
-	    out.println(JSONHelper.writeStatus(false, Status.KEY_NOT_PROVIDED.getMessage()));
+	    out.println( new Response(false, Status.KEY_NOT_PROVIDED.getMessage()).toJSON());
+	    logger.fatal(Status.KEY_NOT_PROVIDED.getMessage().toString());
 	    return;
 	}
 
@@ -90,7 +95,7 @@ public class NutritionInfo extends HttpServlet
 
 	    if (foodList == null)
 	    {
-		out.println( JSONHelper.writeStatus(false, Status.DATA_UNAVAILABLE.getMessage()) );
+		out.println( new Response(false, Status.DATA_UNAVAILABLE.getMessage()).toJSON() );
 		return;
 	    }
 
@@ -108,16 +113,18 @@ public class NutritionInfo extends HttpServlet
 		foodsArray.add(food);
 	    }
 
-	    out.println(JSONHelper.writeStatus(true, foodsArray.toJSONString()));
+	    out.println( new Response(true, foodsArray.toJSONString()).toJSON());
 
 	} catch (FatSecretException e)
 	{
-	    out.println(JSONHelper.writeStatus(false,
-		    Status.DATA_IRRETRIEVABLE.getMessage() + " Error Code: " + e.getCode()));
+	    out.println( new Response(false,
+		    Status.DATA_IRRETRIEVABLE.getMessage() + " Error Code: " + e.getCode()).toJSON());
+	    logger.error(e + " foodname: "+foodName);
 	} catch (ParseException e)
 	{
-	    out.println(JSONHelper.writeStatus(false, Status.DATA_IRRETRIEVABLE.getMessage()));
+	    out.println( new Response(false, Status.DATA_IRRETRIEVABLE.getMessage()).toJSON());
 	    e.printStackTrace();
+	    logger.error(e + " foodname: "+foodName);
 	}
 
     }
