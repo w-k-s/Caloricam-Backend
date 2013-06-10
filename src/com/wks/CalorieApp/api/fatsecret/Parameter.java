@@ -1,4 +1,4 @@
-package com.wks.CalorieApp.api.fatsecret;
+package com.wks.calorieapp.api.fatsecret;
 
 public enum Parameter {
     SEARCH_EXPRESSION("search_expression"),

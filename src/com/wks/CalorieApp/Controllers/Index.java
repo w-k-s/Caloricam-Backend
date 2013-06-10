@@ -1,9 +1,10 @@
-package com.wks.CalorieApp.Controllers;
+package com.wks.calorieapp.controllers;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.Connection;
 import java.sql.SQLException;
 
 import javax.servlet.ServletException;
@@ -17,26 +18,30 @@ import net.semanticmetadata.lire.DocumentBuilder;
 import net.semanticmetadata.lire.DocumentBuilderFactory;
 
 import com.mysql.jdbc.exceptions.MySQLIntegrityConstraintViolationException;
-import com.wks.CalorieApp.DataAccessObjects.ImageDataAccessObject;
-import com.wks.CalorieApp.Models.ImageItem;
-import com.wks.CalorieApp.Models.Indexer;
-import com.wks.CalorieApp.Models.Response;
-import com.wks.CalorieApp.Utils.Environment;
+import com.wks.calorieapp.daos.ImageDataAccessObject;
+import com.wks.calorieapp.models.ImageItem;
+import com.wks.calorieapp.models.Indexer;
+import com.wks.calorieapp.models.Response;
+import com.wks.calorieapp.utils.DatabaseUtil;
+import com.wks.calorieapp.utils.Environment;
+import com.wks.calorieapp.utils.RequestParameterUtil;
 
 public class Index extends HttpServlet
 {
 
     private static final long serialVersionUID = 1L;
     private static final String CONTENT_TYPE = "application/json";
-    private static final String PARAMETER_SEPERATOR = "/";
+    private static final int MIN_NUM_PARAMETERS = 1;
     private static String imagesDir = "";
     private static String indexesDir = "";
     private static Logger logger = Logger.getLogger(Index.class);
+    private static Connection connection = null;
     
 
     @Override
     public void init() throws ServletException
     {
+	connection = DatabaseUtil.getConnection();
 	imagesDir = Environment.getImagesDirectory(getServletContext());
 	indexesDir = Environment.getIndexesDirectory(getServletContext());
     }
@@ -54,63 +59,67 @@ public class Index extends HttpServlet
 	resp.setContentType(CONTENT_TYPE);
 	PrintWriter out = resp.getWriter();
 
-	// check that parameters were provided
-	if (req.getPathInfo() == null)
-	{
-	    out.println( new Response(false, Status.TOO_FEW_ARGS.getMessage()).toJSON());
-
-	    return;
-	}
 
 	// seperate parameters
-	String[] parameters = req.getPathInfo().split(PARAMETER_SEPERATOR);
+	String fileName = "";
+	String[] parameters = RequestParameterUtil.getRequestParameters(req);
 
-	if (parameters.length < 2)
+	if (parameters == null || parameters.length < MIN_NUM_PARAMETERS)
 	{
-	    out.println( new Response(false, Status.TOO_FEW_ARGS.getMessage()).toJSON());
+	    out.println(new Response(false, Status.TOO_FEW_ARGS.getMessage()).toJSON());
 	    return;
-	}
-
-	String fileName = parameters[1];
-	String fileURI = imagesDir + fileName;
+	} else
+	    if (parameters.length > 1) fileName = parameters[1];
+	
+	String fileURI = imagesDir+fileName;
 	File imageFile = new File(fileURI);
+	
+	logger.info("Index Request. Image: "+fileURI);
 
 	if (!imageFile.exists())
 	{
 	    out.println( new Response(false, Status.FILE_NOT_FOUND.getMessage()).toJSON());
+	    logger.error("Index Request Failed. "+fileURI+" does not exist.");
 	    return;
 	}
 
+	
 	// add image to database
 	// Don't index image if you can't record it in db.
 	boolean imageIsInserted = false;
 	try
 	{
 	    imageIsInserted = insertImage(imageFile);
-	} catch (MySQLIntegrityConstraintViolationException icve)
+	    logger.info("Index Request. "+fileURI+" has been recorded in the database.");
+	} catch (MySQLIntegrityConstraintViolationException e)
 	{
 	    out.println( new Response(false, Status.DB_INTEGRITY_VIOLATION.getMessage()).toJSON());
-	    logger.fatal(icve+" Image:"+fileURI);
-	}catch(SQLException sqle)
+	    logger.fatal("Index Request. Database integrity violated while indexing: "+fileURI,e);
+	}catch(SQLException e)
 	{
-	    out.println(  new Response(false, sqle.toString()).toJSON());
-	    logger.error(sqle+" Image:"+fileURI);
+	    out.println(  new Response(false, Status.DB_INSERT_FAILED.toString()).toJSON());
+	    logger.error("Index Requst. Invalid SQL statement.",e);
 	}
 
-	if (!imageIsInserted) return;
+	if (!imageIsInserted)
+	{
+	    out.println( new Response(false,Status.DB_INSERT_FAILED.toString()).toJSON() );
+	    return;
+	}
 
 	try
 	{
 	    indexImage(fileURI, indexesDir);
 	    out.println( new Response(true, Status.INDEXING_SUCCESSFUL.getMessage()).toJSON());
-	} catch (FileNotFoundException fnf)
+	    logger.info("Index Request. "+fileURI+" has been indexed.");
+	} catch (FileNotFoundException e)
 	{
 	    out.println( new Response(false, Status.FILE_NOT_FOUND.getMessage()).toJSON());
-	    logger.error(fnf+" Image:"+fileURI);
-	} catch (IOException ioe)
+	    logger.error("Index Request. File not found exception encountered while indexing: "+fileURI,e);
+	} catch (IOException e)
 	{
 	    out.println( new Response(false, Status.IO_ERROR.getMessage()).toJSON());
-	   logger.error(ioe+" Image:"+fileURI);
+	    logger.error("Index Request. IOException encountered while indexing: "+fileURI,e);
 	} 
 
     }
@@ -126,14 +135,16 @@ public class Index extends HttpServlet
 
     private boolean insertImage(File imageFile) throws SQLException
     {
-	ImageDataAccessObject imageDb = new ImageDataAccessObject();
+	if(connection == null)
+	    return false;
+	
+	ImageDataAccessObject imageDb = new ImageDataAccessObject(connection);
 	ImageItem imageItem = new ImageItem();
 	imageItem.setImageId(imageFile.getName());
 	imageItem.setSize(imageFile.length());
 	imageItem.setFinalized(false);
 
 	boolean done = imageDb.create(imageItem);
-	imageDb.close();
 	return done;
     }
 

@@ -1,4 +1,4 @@
-package com.wks.CalorieApp.Utils;
+package com.wks.calorieapp.utils;
 
 import java.io.BufferedReader;
 import java.io.IOException;

@@ -1,4 +1,4 @@
-package com.wks.CalorieApp.Controllers;
+package com.wks.calorieapp.controllers;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -14,79 +14,85 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
 
-import com.wks.CalorieApp.Models.Response;
-import com.wks.CalorieApp.api.fatsecret.FatSecretAPI;
-import com.wks.CalorieApp.api.fatsecret.FatSecretException;
-import com.wks.CalorieApp.api.fatsecret.FoodInfoItem;
-import com.wks.CalorieApp.api.fatsecret.FoodInfoItemFactory;
+import com.wks.calorieapp.api.fatsecret.FatSecretAPI;
+import com.wks.calorieapp.api.fatsecret.FatSecretException;
+import com.wks.calorieapp.api.fatsecret.FoodInfoItem;
+import com.wks.calorieapp.api.fatsecret.FoodInfoItemFactory;
+import com.wks.calorieapp.models.Response;
+import com.wks.calorieapp.utils.RequestParameterUtil;
 
 public class NutritionInfo extends HttpServlet
 {
 
     private static final long serialVersionUID = 2084144039896224805L;
     private static final String CONTENT_TYPE = "application/json";
-    private static final String PARAMETER_SEPERATOR = "/";
-    private static final int MIN_NUM_ARGS = 2;
+    private static final int MIN_NUM_PARAMETERS = 2;
     private static Logger logger = Logger.getLogger(NutritionInfo.class);
 
     private static String consumerKey;
     private static String consumerSecret;
 
-    public void init() throws ServletException {
+    public void init() throws ServletException
+    {
 	consumerKey = getServletContext().getInitParameter(Parameter.CONSUMER_KEY.toString());
 	consumerSecret = getServletContext().getInitParameter(Parameter.CONSUMER_SECRET.toString());
     };
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException
+    {
 	doPost(req, resp);
     }
 
-    @SuppressWarnings("unchecked")
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException
+    {
 
 	resp.setContentType(CONTENT_TYPE);
 	PrintWriter out = resp.getWriter();
-	String[] parameters = null;
+
 	int numResults = -1;
+	String foodName = "";
+	String[] parameters = RequestParameterUtil.getRequestParameters(req);
 
-	if (req.getPathInfo() == null)
+	if (parameters == null || parameters.length < MIN_NUM_PARAMETERS)
 	{
-	    out.println( new Response(false, Status.TOO_FEW_ARGS.getMessage()).toJSON());
+	    out.println(new Response(false, Status.TOO_FEW_ARGS.getMessage()).toJSON());
 	    return;
-	}
-
-	parameters = req.getPathInfo().split(PARAMETER_SEPERATOR);
-
-	if (parameters.length < MIN_NUM_ARGS)
+	} else
 	{
-	    out.println( new Response(false, Status.TOO_FEW_ARGS.getMessage()).toJSON());
-	    return;
-	}
-
-	if (parameters.length > MIN_NUM_ARGS)
-	{
-	    try
+	    if (parameters.length > 1) foodName = parameters[1];
+	    if (parameters.length > 2)
 	    {
-		numResults = Integer.parseInt(parameters[2]);
-	    } catch (NumberFormatException e)
-	    {
-		out.println( new Response(false, Status.INVALID_NUM_RESULTS_ARG.getMessage()).toJSON());
-		return;
+		try
+		{
+		    numResults = Integer.parseInt(parameters[2]);
+		} catch (NumberFormatException e)
+		{
+		    out.println(new Response(false, Status.INVALID_NUM_RESULTS_ARG.getMessage()).toJSON());
+		    logger.error("Identify Request. Invalid number of maximum Hits provided: " + parameters[2], e);
+		    return;
+		}
 	    }
+
 	}
 
-	String foodName = parameters[1];
-	
-	logger.info("retrieving nutrition info for "+foodName);
+	logger.info("Nutrition Info Request. Finding Nutrition information for " + foodName);
 
 	if (consumerKey == null && consumerSecret == null)
 	{
-	    out.println( new Response(false, Status.KEY_NOT_PROVIDED.getMessage()).toJSON());
-	    logger.fatal(Status.KEY_NOT_PROVIDED.getMessage().toString());
+	    out.println(new Response(false, Status.KEY_NOT_PROVIDED.getMessage()).toJSON());
+	    logger.fatal("Nutrition Info Request. " + Status.KEY_NOT_PROVIDED.getMessage().toString());
 	    return;
 	}
 
+	String responseJSON = getNutritionInfo(foodName, numResults);
+	out.println(responseJSON);
+
+    }
+
+    @SuppressWarnings("unchecked")
+    private String getNutritionInfo(String foodName, int numResults)
+    {
 	FatSecretAPI fatSecret = new FatSecretAPI(consumerKey, consumerSecret);
 	try
 	{
@@ -95,8 +101,8 @@ public class NutritionInfo extends HttpServlet
 
 	    if (foodList == null)
 	    {
-		out.println( new Response(false, Status.DATA_UNAVAILABLE.getMessage()).toJSON() );
-		return;
+		logger.info("Nutrition Info Request. No nutrition information was retrieved for: " + foodName);
+		return new Response(false, Status.DATA_UNAVAILABLE.getMessage()).toJSON();
 	    }
 
 	    if (numResults == -1) numResults = foodList.size();
@@ -113,27 +119,36 @@ public class NutritionInfo extends HttpServlet
 		foodsArray.add(food);
 	    }
 
-	    out.println( new Response(true, foodsArray.toJSONString()).toJSON());
+	    logger.info("Nutrition Info Request. Nutrition information for " + foodName + " provided.");
+	    return new Response(true, foodsArray.toJSONString()).toJSON();
 
 	} catch (FatSecretException e)
 	{
-	    out.println( new Response(false,
-		    Status.DATA_IRRETRIEVABLE.getMessage() + " Error Code: " + e.getCode()).toJSON());
-	    logger.error(e + " foodname: "+foodName);
+	    logger.error("Nutrition Info Request. FatSecretException encountered for " + foodName, e);
+	    return new Response(false, Status.DATA_IRRETRIEVABLE.getMessage() + " Error Code: " + e.getCode()).toJSON();
+
 	} catch (ParseException e)
 	{
-	    out.println( new Response(false, Status.DATA_IRRETRIEVABLE.getMessage()).toJSON());
-	    e.printStackTrace();
-	    logger.error(e + " foodname: "+foodName);
-	}
+	    logger.error("Nutrition Info Request. JSONParser failed to parse JSON: " + foodName, e);
+	    return new Response(false, Status.DATA_IRRETRIEVABLE.getMessage()).toJSON();
 
+	} catch (IOException e)
+	{
+	    logger.error(
+		    "Nutrition Info Request. IOException encontered while retrieving information for: " + foodName, e);
+	    return new Response(false, Status.IO_ERROR.getMessage()).toJSON();
+
+	}
     }
 
     enum Status
     {
-	TOO_FEW_ARGS("Insufficient arguments provided.Arguments are /nutrition_info/{required: food name/{optional: num results}};"),
+	TOO_FEW_ARGS(
+		"Insufficient arguments provided.Arguments are /nutrition_info/{required: food name/{optional: num results}};"),
 	INVALID_NUM_RESULTS_ARG("The number of results argument must be an integer. "),
-	KEY_NOT_PROVIDED("Fatal: Nutritional Information could not be retrieved because key wasn't provided. Report this error."),
+	KEY_NOT_PROVIDED(
+		"Fatal: Nutritional Information could not be retrieved because key wasn't provided. Report this error."),
+	IO_ERROR("Failed to read nutrition information from webservice."),
 	DATA_IRRETRIEVABLE("Nutrition info can't be retrieved right now."),
 	DATA_UNAVAILABLE("Sorry, there is no nutrition information available for this item.");
 
@@ -144,7 +159,8 @@ public class NutritionInfo extends HttpServlet
 	    this.message = message;
 	}
 
-	public String getMessage() {
+	public String getMessage()
+	{
 	    return message;
 	}
     }

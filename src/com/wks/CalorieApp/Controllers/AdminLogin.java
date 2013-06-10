@@ -1,6 +1,7 @@
-package com.wks.CalorieApp.Controllers;
+package com.wks.calorieapp.controllers;
 
 import java.io.IOException;
+import java.sql.Connection;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -11,8 +12,9 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
 
-import com.wks.CalorieApp.DataAccessObjects.UserDataAccessObject;
-import com.wks.CalorieApp.Models.User;
+import com.wks.calorieapp.daos.UserDataAccessObject;
+import com.wks.calorieapp.models.User;
+import com.wks.calorieapp.utils.DatabaseUtil;
 
 public class AdminLogin extends HttpServlet
 {
@@ -27,8 +29,13 @@ public class AdminLogin extends HttpServlet
     // admin.jsp.
     private static final String SRVLT_ADMIN = "/admin";
     private static Logger logger = Logger.getLogger(AdminLogin.class);
+    private static Connection connection = null;
 
-    // private static final String REDIRECT = "/calorieapp";
+    @Override
+    public void init() throws ServletException
+    {
+	connection = DatabaseUtil.getConnection();
+    }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException
@@ -58,6 +65,7 @@ public class AdminLogin extends HttpServlet
 	// check if user is already signed in
 	if (authenticated)
 	{
+	    logger.info(username + "  has resumed session.");
 	    RequestDispatcher admin = req.getRequestDispatcher(SRVLT_ADMIN);
 	    admin.forward(req, resp);
 	    return;
@@ -66,22 +74,26 @@ public class AdminLogin extends HttpServlet
 	// if username and password submitted, validate
 	if (username != null && password != null)
 	{
-	    if (loginCredentialsAreValid(username, password))
+	   LoginStatus loginStatus = loginCredentialsAreValid(username,password);
+	    switch (loginStatus)
 	    {
-		logger.info(username+" has signed in");
+	    case AUTHENTICATED:
+		logger.info(username + " has signed in.");
 		session.setAttribute(Attribute.AUTHENTICATED.toString(), true);
 		session.setAttribute(Attribute.USERNAME.toString(), username);
 
 		RequestDispatcher admin = req.getRequestDispatcher(SRVLT_ADMIN);
 		admin.forward(req, resp);
 		return;
-	    } else
-	    {
-		req.setAttribute(Attribute.STATUS.toString(), Status.INCORRECT_USERNAME_PASSWORD.getMessage());
+
+	    default:
+		logger.info(username + " - "+loginStatus.getMessage());
+		req.setAttribute(Attribute.STATUS.toString(), loginStatus.getMessage());
 		RequestDispatcher login = req.getRequestDispatcher(JSP_LOGIN);
 		login.forward(req, resp);
 		return;
 	    }
+
 	} else
 	{
 	    req.removeAttribute(Attribute.STATUS.toString());
@@ -92,27 +104,30 @@ public class AdminLogin extends HttpServlet
 
     }
 
-    private boolean loginCredentialsAreValid(String username, String password)
+    private LoginStatus loginCredentialsAreValid(String username, String password)
     {
-	UserDataAccessObject usersDb = new UserDataAccessObject();
+	if (connection == null) return LoginStatus.DB_FAILURE;
+
+	UserDataAccessObject usersDb = new UserDataAccessObject(connection);
 	User user = null;
 
 	user = usersDb.find(username);
 
-	if (user == null) return false;
-
-	if (user.getPassword().equals(password)) return true;
-	return false;
+	if (user == null) return LoginStatus.NOT_REGISTERED;
+	if (user.getPassword().equals(password)) return LoginStatus.AUTHENTICATED;
+	return LoginStatus.INCORRECT_USERNAME_PASSWORD;
     }
 
-    enum Status
+    enum LoginStatus
     {
-	NULL_USERNAME_PASSWORD("Must provide a valid username and password."), INCORRECT_USERNAME_PASSWORD(
-		"Username or password is not correct."), NOT_REGISTERED("This username is not registered as admin.");
+	AUTHENTICATED("Username and password valid. You will be redirected to admin page."),
+	INCORRECT_USERNAME_PASSWORD("Username or password is not correct."),
+	NOT_REGISTERED("This username is not registered as admin."),
+	DB_FAILURE("Credentials can not be validated at this time. Please report this issue.");
 
 	private final String message;
 
-	Status(String message)
+	LoginStatus(String message)
 	{
 	    this.message = message;
 	}
@@ -122,4 +137,5 @@ public class AdminLogin extends HttpServlet
 	    return message;
 	}
     }
+
 }

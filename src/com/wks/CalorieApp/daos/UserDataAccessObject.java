@@ -1,4 +1,4 @@
-package com.wks.CalorieApp.DataAccessObjects;
+package com.wks.calorieapp.daos;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -7,58 +7,60 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.wks.CalorieApp.Models.User;
-import com.wks.CalorieApp.Utils.DatabaseUtil;
+import com.wks.calorieapp.models.User;
 
-public class UserDataAccessObject {
+public class UserDataAccessObject
+{
 
     private static final String TABLE_USERS = "users";
     private static final String COLUMN_USERNAME = "username";
     private static final String COLUMN_PASSWORD = "password";
 
-    private static final String CREATE_QUERY = "INSERT INTO " + TABLE_USERS
-	    + " (" + COLUMN_USERNAME + ", " + COLUMN_PASSWORD
-	    + ") VALUES (?,?)";
-    private static final String READ_QUERY = "SELECT " + COLUMN_USERNAME + ", "
-	    + COLUMN_PASSWORD + " FROM " + TABLE_USERS;
-    private static final String UPDATE_QUERY = "UPDATE " + TABLE_USERS
-	    + " SET " + COLUMN_PASSWORD + "= ? WHERE " + COLUMN_USERNAME
-	    + " = ?";
-    private static final String DELETE_QUERY = "DELETE FROM " + TABLE_USERS
-	    + " WHERE " + COLUMN_USERNAME + " = ?";
-    private static final String FIND_QUERY = "SELECT " + COLUMN_USERNAME + ", "
-	    + COLUMN_PASSWORD + " FROM " + TABLE_USERS + " WHERE "
+    private static final String CREATE_QUERY = "INSERT INTO " + TABLE_USERS + " (" + COLUMN_USERNAME + ", "
+	    + COLUMN_PASSWORD + ") VALUES (?,?)";
+    private static final String READ_QUERY = "SELECT " + COLUMN_USERNAME + ", " + COLUMN_PASSWORD + " FROM "
+	    + TABLE_USERS;
+    private static final String UPDATE_QUERY = "UPDATE " + TABLE_USERS + " SET " + COLUMN_PASSWORD + "= ? WHERE "
 	    + COLUMN_USERNAME + " = ?";
-
+    private static final String DELETE_QUERY = "DELETE FROM " + TABLE_USERS + " WHERE " + COLUMN_USERNAME + " = ?";
+    private static final String FIND_QUERY = "SELECT " + COLUMN_USERNAME + ", " + COLUMN_PASSWORD + " FROM "
+	    + TABLE_USERS + " WHERE " + COLUMN_USERNAME + " = ?";
 
     private Connection connection = null;
 
-    public UserDataAccessObject() {
-	connection = DatabaseUtil.getConnection();
+    public UserDataAccessObject(Connection connection)
+    {
 	if (connection == null)
 	    throw new IllegalStateException("Null Connection");
+	this.connection = connection;
     }
 
-    public boolean create(User user) {
+    public boolean create(User user)
+    {
 	// Connection connection = null;
 	PreparedStatement statement = null;
 	boolean success = false;
 
-	try {
+	try
+	{
 	    // connection = DatabaseUtils.getConnection();
 	    statement = connection.prepareStatement(CREATE_QUERY);
 	    statement.setString(1, user.getUsername());
 	    statement.setString(2, user.getPassword());
 	    statement.executeUpdate();
 	    success = true;
-	} catch (SQLException e) {
+	} catch (SQLException e)
+	{
 
 	    e.printStackTrace();
-	} finally {
-	    try {
-		statement.close();
+	} finally
+	{
+	    try
+	    {
+		if (statement != null) statement.close();
 
-	    } catch (SQLException e) {
+	    } catch (SQLException e)
+	    {
 
 		e.printStackTrace();
 	    }
@@ -66,18 +68,21 @@ public class UserDataAccessObject {
 	return success;
     }
 
-    public Map<String, User> read() {
+    public Map<String, User> read()
+    {
 	Map<String, User> usersList = new HashMap<String, User>();
 	User user = null;
 	PreparedStatement statement = null;
 	ResultSet results = null;
 
-	try {
+	try
+	{
 	    statement = connection.prepareStatement(READ_QUERY);
 	    statement.execute();
 	    results = statement.getResultSet();
 
-	    while (results.next()) {
+	    while (results.next())
+	    {
 		String username = results.getString(COLUMN_USERNAME);
 		String password = results.getString(COLUMN_PASSWORD);
 
@@ -86,15 +91,19 @@ public class UserDataAccessObject {
 		usersList.put(username, user);
 	    }
 
-	} catch (SQLException e) {
+	} catch (SQLException e)
+	{
 	    // TODO Auto-generated catch block
 	    e.printStackTrace();
-	} finally {
-	    try {
-		results.close();
-		statement.close();
+	} finally
+	{
+	    try
+	    {
+		if (results != null) results.close();
+		if (statement != null) statement.close();
 		// connection.close();
-	    } catch (SQLException e) {
+	    } catch (SQLException e)
+	    {
 		// TODO Auto-generated catch block
 		e.printStackTrace();
 	    }
@@ -103,25 +112,31 @@ public class UserDataAccessObject {
 	return usersList;
     }
 
-    public boolean update(User user) {
+    public boolean update(User user)
+    {
 
 	PreparedStatement statement = null;
 
-	try {
+	try
+	{
 
 	    statement = connection.prepareStatement(UPDATE_QUERY);
 	    statement.setString(1, user.getPassword());
 	    statement.setString(2, user.getUsername());
 	    statement.execute();
 	    return true;
-	} catch (SQLException e) {
+	} catch (SQLException e)
+	{
 	    // TODO Auto-generated catch block
 	    e.printStackTrace();
-	} finally {
-	    try {
-		statement.close();
+	} finally
+	{
+	    try
+	    {
+		if (statement != null) statement.close();
 
-	    } catch (SQLException e) {
+	    } catch (SQLException e)
+	    {
 		e.printStackTrace();
 	    }
 	}
@@ -129,22 +144,28 @@ public class UserDataAccessObject {
 
     }
 
-    public boolean delete(User user) {
+    public boolean delete(User user)
+    {
 	PreparedStatement statement = null;
 
-	try {
+	try
+	{
 	    statement = connection.prepareStatement(DELETE_QUERY);
 	    statement.setString(1, user.getUsername());
 	    statement.execute();
 	    return true;
-	} catch (SQLException e) {
+	} catch (SQLException e)
+	{
 	    // TODO Auto-generated catch block
 	    e.printStackTrace();
-	} finally {
-	    try {
-		statement.close();
+	} finally
+	{
+	    try
+	    {
+		if (statement != null) statement.close();
 		// connection.close();
-	    } catch (SQLException e) {
+	    } catch (SQLException e)
+	    {
 		// TODO Auto-generated catch block
 		e.printStackTrace();
 	    }
@@ -153,34 +174,41 @@ public class UserDataAccessObject {
 
     }
 
-    public User find(String id) {
-	
+    public User find(String id)
+    {
+
 	PreparedStatement statement = null;
 	ResultSet result = null;
 	User user = null;
 
-	try {
+	try
+	{
 	    statement = connection.prepareStatement(FIND_QUERY);
 	    statement.setString(1, id);
 	    statement.execute();
 
 	    result = statement.getResultSet();
-	    if (result.next() && result != null) {
-		
+	    if (result.next() && result != null)
+	    {
+
 		String username = result.getString(COLUMN_USERNAME);
 		String password = result.getString(COLUMN_PASSWORD);
-		user = new User(username,password);
+		user = new User(username, password);
 	    }
 
-	} catch (SQLException e) {
+	} catch (SQLException e)
+	{
 	    // TODO Auto-generated catch block
 	    e.printStackTrace();
-	} finally {
-	    try {
-		result.close();
-		statement.close();
+	} finally
+	{
+	    try
+	    {
+		if (result != null) result.close();
+		if (statement != null) statement.close();
 		// connection.close();
-	    } catch (SQLException e) {
+	    } catch (SQLException e)
+	    {
 		// TODO Auto-generated catch block
 		e.printStackTrace();
 	    }
@@ -188,21 +216,11 @@ public class UserDataAccessObject {
 	return user;
     }
 
-    // NOTES:
-    // http://javarevisited.blogspot.ae/2012/03/finalize-method-in-java-tutorial.html
-    public void close() throws SQLException {
-	connection.close();
+    public void close() throws SQLException
+    {
+	if(connection != null)
+	    connection.close();
     }
 
-    @Override
-    protected void finalize() throws Throwable {
-	try {
-	    if (connection.isClosed())
-		connection.close();
-	} catch (Exception e) {
-	    throw e;
-	} finally {
-	    super.finalize();
-	}
-    }
+
 }

@@ -1,4 +1,4 @@
-package com.wks.CalorieApp.Controllers;
+package com.wks.calorieapp.controllers;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -13,13 +13,13 @@ import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.log4j.Logger;
 
-import com.wks.CalorieApp.Models.Response;
-import com.wks.CalorieApp.Utils.Environment;
-import com.wks.CalorieApp.Utils.FileUtils;
+import com.wks.calorieapp.models.Response;
+import com.wks.calorieapp.utils.Environment;
+import com.wks.calorieapp.utils.FileUtils;
 
 public class Upload extends HttpServlet
 {
-
+    //TODO set size limit
     private static final long serialVersionUID = 1L;
     private static final String CONTENT_TYPE = "application/json";
     private static final String EXTENSION_JPEG = ".jpeg";
@@ -53,7 +53,7 @@ public class Upload extends HttpServlet
 	if (!isMultipart)
 	{
 	    out.println(new Response(false, Status.FILE_NOT_FOUND.getMessage()).toJSON());
-	    logger.info(Status.FILE_NOT_FOUND.getMessage().toString());
+	    logger.info("Upload Request. "+Status.FILE_NOT_FOUND.getMessage().toString());
 	    return;
 	}
 
@@ -71,14 +71,14 @@ public class Upload extends HttpServlet
 		{
 
 		    String fileName = item.getName();
-		    logger.info("Uploading: " + fileName);
+		    logger.info("Upload Request. Uploading: " + fileName);
 
 		    // check file type before uploading it.
 		    String extension = fileName.substring(fileName.lastIndexOf("."));
 		    if (!extension.equals(EXTENSION_JPEG) && !extension.equals(EXTENSION_JPG))
 		    {
 			out.println(new Response(false, Status.INVALID_TYPE.getMessage() + ": " + extension).toJSON());
-			logger.error("Failed to upload " + fileName + ". Invalid file extension: " + extension);
+			logger.error("Upload Request. Failed to upload " + fileName + ". Invalid file extension: " + extension);
 			return;
 		    }
 
@@ -88,25 +88,25 @@ public class Upload extends HttpServlet
 		    {
 			// forward the request to indexer so that uploaded image
 			// can be added to index of images.
-			logger.info("File uploaded successfully: " + fileName);
+			logger.info("Uploaded Request. File uploaded successfully; forwarding request to indexer: " + fileName);
 			RequestDispatcher indexer = req.getRequestDispatcher("/index/" + fileName);
 			indexer.forward(req, resp);
 		    } else
 		    {
 			out.println(new Response(false, Status.UPLOAD_FAILED.getMessage()).toJSON());
-			logger.error("File failed to upload: "+fileName);
+			logger.error("Upload Request. File failed to upload: "+fileName);
 		    }
 		}
 	    }
 
-	} catch (FileUploadException fue)
+	} catch (FileUploadException e)
 	{
 	    out.println(new Response(false, Status.FILE_NOT_FOUND.getMessage()).toJSON());
-	    logger.error(fue);
-	} catch (IOException ioe)
+	    logger.error("Upload Request. FileUploadException encountered.",e);
+	} catch (IOException e)
 	{
 	    out.println(new Response(false, Status.IO_ERROR.getMessage()).toJSON());
-	    logger.error(ioe);
+	    logger.error("Upload Request. IOException encountered.",e);
 	}
 
     }

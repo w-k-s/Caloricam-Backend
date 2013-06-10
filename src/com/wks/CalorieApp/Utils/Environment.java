@@ -1,4 +1,4 @@
-package com.wks.CalorieApp.Utils;
+package com.wks.calorieapp.utils;
 
 import java.io.File;
 
@@ -7,11 +7,11 @@ import javax.servlet.ServletContext;
 //TODO Change resources dir to localhost
 public class Environment
 {
-    private final static boolean appIsDeployed = false;
     private final static String PARAM_RESOURCES_DIR = "resources_dir";
     private final static String PARAM_IMAGES_DIR = "images_dir";
     private final static String PARAM_INDEXES_DIR = "indexes_dir";
     private final static String PARAM_LOG_DIR = "log_dir";
+    private final static String PARAM_LOG_FILE = "log_file";
     
 
     public static String getRootDirectory(ServletContext context)
@@ -21,7 +21,8 @@ public class Environment
     
     public static String getResourcesDirectory(ServletContext context)
     {
-
+	boolean appIsDeployed = Boolean.parseBoolean(context.getInitParameter("is_deployed"));
+	
 	// get name of images directory
 	String resourcesDir = context.getInitParameter(PARAM_RESOURCES_DIR);
 	String outsideRoot = "";
@@ -65,6 +66,13 @@ public class Environment
 	String logDir = context.getInitParameter(PARAM_LOG_DIR);
 	String resourcesDir = getResourcesDirectory(context);
 	return resourcesDir + logDir;
+    }
+    
+    public static String getLogFile(ServletContext context)
+    {
+	String logFile = context.getInitParameter(PARAM_LOG_FILE);
+	String logDir = getLogDirectory(context);
+	return logDir + logFile;
     }
 
 }

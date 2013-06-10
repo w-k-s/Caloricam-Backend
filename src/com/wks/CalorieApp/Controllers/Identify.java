@@ -1,4 +1,4 @@
-package com.wks.CalorieApp.Controllers;
+package com.wks.calorieapp.controllers;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -14,9 +14,10 @@ import net.semanticmetadata.lire.ImageSearcherFactory;
 import org.apache.log4j.Logger;
 import org.json.simple.JSONArray;
 
-import com.wks.CalorieApp.Models.Identifier;
-import com.wks.CalorieApp.Models.Response;
-import com.wks.CalorieApp.Utils.Environment;
+import com.wks.calorieapp.models.Identifier;
+import com.wks.calorieapp.models.Response;
+import com.wks.calorieapp.utils.Environment;
+import com.wks.calorieapp.utils.RequestParameterUtil;
 
 /*
  * - think of a better JSON writer impmentation.
@@ -29,7 +30,6 @@ public class Identify extends HttpServlet
 
     private static final long serialVersionUID = 1L;
     private static final String CONTENT_TYPE = "application/json";
-    private static final String PARAMETER_SEPERATOR = "/";
 
     private static final int MIN_NUM_PARAMETERS = 2;
     private static final int DEFAULT_MAX_HITS = 10;
@@ -53,7 +53,6 @@ public class Identify extends HttpServlet
 	doPost(req, resp);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException
     {
@@ -61,43 +60,44 @@ public class Identify extends HttpServlet
 	resp.setContentType(CONTENT_TYPE);
 	PrintWriter out = resp.getWriter();
 
+	String fileName = "";
 	int maximumHits = defaultMaxHits;
+	String[] parameters = RequestParameterUtil.getRequestParameters(req);
 
-	// check that parameters were provided
-	if (req.getPathInfo() == null)
+	if (parameters == null || parameters.length < MIN_NUM_PARAMETERS)
 	{
-	    out.println( new Response(false, Status.TOO_FEW_ARGS.getMessage()).toJSON());
+	    out.println(new Response(false, Status.TOO_FEW_ARGS.getMessage()).toJSON());
 	    return;
-	}
-
-	// seperate parameters
-	String[] parameters = req.getPathInfo().split(PARAMETER_SEPERATOR);
-
-	if (parameters.length < MIN_NUM_PARAMETERS)
+	} else
 	{
-	    out.println( new Response(false, Status.TOO_FEW_ARGS.getMessage()).toJSON());
-	    return;
-	}
-
-	// validate parameters
-	if (parameters.length > MIN_NUM_PARAMETERS)
-	{
-	    try
+	    if (parameters.length > 1) fileName = parameters[1];
+	    if (parameters.length > 2)
 	    {
-		maximumHits = Integer.parseInt(parameters[2]);
-	    } catch (NumberFormatException e)
-	    {
-		out.println( new Response(false, Status.INVALID_MAX_HITS.getMessage()).toJSON());
-		logger.info(e+" parameter: "+parameters[2]);
-		return;
+		try
+		{
+		    maximumHits = Integer.parseInt(parameters[2]);
+		} catch (NumberFormatException e)
+		{
+		    out.println(new Response(false, Status.INVALID_MAX_HITS.getMessage()).toJSON());
+		    logger.error("Identify Request. Invalid number of maximum Hits provided: " + parameters[2], e);
+		    return;
+		}
 	    }
+
 	}
 
 	// check that file exists
-	String fileURI = imagesDir + parameters[1];
+	String fileURI = imagesDir + fileName;
 
-	logger.info("Identifying: "+fileURI);
+	logger.info("Identify Request. Image: " + fileURI + " maximumHits: " + maximumHits);
 
+	String responseJSON = getSimilarImages(fileURI, maximumHits);
+	out.println(responseJSON);
+    }
+
+    @SuppressWarnings("unchecked")
+    private String getSimilarImages(String fileURI, int maximumHits)
+    {
 	// find similar images
 	ImageSearcher searcher = ImageSearcherFactory.createAutoColorCorrelogramImageSearcher(maximumHits);
 	Identifier identifier = new Identifier(searcher);
@@ -109,15 +109,16 @@ public class Identify extends HttpServlet
 	    for (String uri : similarImages)
 		similarImagesJSON.add(uri);
 
-	    out.println( new Response(true, similarImagesJSON.toJSONString()).toJSON());
+	    return new Response(true, similarImagesJSON.toJSONString()).toJSON();
 
-	} catch (IOException ioe)
+	} catch (IOException e)
 	{
+	    logger.error("Identify Request. IOException encountered while returning similar images.", e);
+	    return new Response(false, Status.IO_ERROR.getMessage()).toJSON();
 
-	    out.println( new Response(false, Status.IO_ERROR.getMessage()).toJSON());
-	    logger.error(ioe + " image:"+fileURI);
-	} 
+	}
     }
+
 
     enum Status
     {

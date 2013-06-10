@@ -1,4 +1,4 @@
-package com.wks.CalorieApp.Controllers;
+package com.wks.calorieapp.controllers;
 
 public enum Attribute
 {

@@ -1,4 +1,4 @@
-package com.wks.CalorieApp.Controllers;
+package com.wks.calorieapp.controllers;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -14,11 +14,10 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
 
-import com.wks.CalorieApp.Utils.*;
+import com.wks.calorieapp.utils.*;
 
 public class AdminImages extends HttpServlet
 {
-    private static final boolean appIsDeployed = false;
     private static final long serialVersionUID = 1L;
 
     private static final String ACTION_DELETE = "delete";
@@ -29,7 +28,7 @@ public class AdminImages extends HttpServlet
 
     private static final String[] EXTENSIONS = { ".jpeg", ".jpg" };
     private static final String DEFAULT_MIME_TYPE = "image/jpeg";
-    private static final String REDIRECT = appIsDeployed?"/":"/calorieapp";
+    private static final String REDIRECT = "/calorieapp";
     private static Logger logger = Logger.getLogger(Admin.class);
 
     protected void doGet(javax.servlet.http.HttpServletRequest req, javax.servlet.http.HttpServletResponse resp)
@@ -48,7 +47,7 @@ public class AdminImages extends HttpServlet
 	    Boolean b = (Boolean) session.getAttribute(Attribute.AUTHENTICATED.toString());
 	    if (b != null) authenticated = b;
 	}
-
+	
 	action = req.getParameter(Parameter.ACTION.toString());
 	image = req.getParameter(Parameter.IMAGE.toString());
 
@@ -58,13 +57,14 @@ public class AdminImages extends HttpServlet
 	    resp.sendRedirect(REDIRECT+SRVLT_LOGIN);
 	    return;
 	}
-
+		
 	if (action != null && image != null)
 	{
 	    handleAction(action, image, resp);
 	    if (action.equalsIgnoreCase(ACTION_VIEW)) return;
 	}
 
+	
 	List<String> imageURIList = FileUtils.getFilesInDir(Environment.getImagesDirectory(getServletContext()), EXTENSIONS);
 
 	req.setAttribute(Attribute.IMAGE_LIST.toString(), imageURIList);
@@ -87,7 +87,7 @@ public class AdminImages extends HttpServlet
     };
 
     private boolean deleteFile(String file) {
-	logger.info("image "+file+" deleted.");
+	logger.info("Image \'"+file+"\' deleted.");
 	return FileUtils.deleteFile(file);
     }
 
@@ -98,6 +98,8 @@ public class AdminImages extends HttpServlet
 	File file = new File(imageFile);
 	if (!file.exists()) return false;
 
+	logger.info("Displaying image \'"+file+"\'.");
+	
 	response.setContentType(mime);
 	response.setContentLength((int) file.length());
 
@@ -118,15 +120,15 @@ public class AdminImages extends HttpServlet
 	} catch (FileNotFoundException e)
 	{
 	    e.printStackTrace();
-	    logger.error(e);
+	    logger.error("FileNotFoundException encountered while displaying image: "+imageFile,e);
 	} catch (IOException e)
 	{
 	    e.printStackTrace();
-	    logger.error(e);
+	    logger.error("IOException encountered while displaying image: "+imageFile,e);
 	} catch (Exception e)
 	{
 	    e.printStackTrace();
-	    logger.error(e);
+	    logger.error("Exception encountered while displaying image: "+imageFile,e);
 	} finally
 	{
 	    try
@@ -136,7 +138,7 @@ public class AdminImages extends HttpServlet
 
 	    } catch (IOException e)
 	    {
-		logger.error(e);
+		logger.error("IOException encountered while closing IOStreams.",e);
 	    }
 	}
 	return done;

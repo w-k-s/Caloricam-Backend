@@ -1,4 +1,4 @@
-package com.wks.CalorieApp.Models;
+package com.wks.calorieapp.models;
 
 /**
  * POJO representing Image row in images database

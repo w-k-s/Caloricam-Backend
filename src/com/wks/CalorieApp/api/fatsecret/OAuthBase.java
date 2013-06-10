@@ -1,4 +1,4 @@
-package com.wks.CalorieApp.api.fatsecret;
+package com.wks.calorieapp.api.fatsecret;
 
 import java.io.*;
 import java.net.*;

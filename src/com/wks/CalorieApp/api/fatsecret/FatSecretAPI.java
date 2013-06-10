@@ -1,11 +1,11 @@
-package com.wks.CalorieApp.api.fatsecret;
+package com.wks.calorieapp.api.fatsecret;
 
 import java.util.HashMap;
 import java.util.Map.Entry;
 import java.io.IOException;
 import java.net.URL;
 
-import com.wks.CalorieApp.Utils.HTTPClient;
+import com.wks.calorieapp.utils.HTTPClient;
 
 public class FatSecretAPI
 {

@@ -1,8 +1,7 @@
-package com.wks.CalorieApp.Models;
+package com.wks.calorieapp.models;
 
 import org.json.simple.JSONObject;
 
-import com.wks.CalorieApp.Utils.JSONWriteable;
 
 public class Response implements JSONWriteable
 {

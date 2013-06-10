@@ -1,4 +1,4 @@
-package com.wks.CalorieApp.Controllers;
+package com.wks.calorieapp.controllers;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -16,16 +16,16 @@ import org.json.simple.parser.ParseException;
 
 
 import com.mysql.jdbc.exceptions.MySQLIntegrityConstraintViolationException;
-import com.wks.CalorieApp.DataAccessObjects.ImageDataAccessObject;
-import com.wks.CalorieApp.DataAccessObjects.UserDataAccessObject;
-import com.wks.CalorieApp.Models.ImageItem;
-import com.wks.CalorieApp.Models.User;
-import com.wks.CalorieApp.api.fatsecret.FatSecretAPI;
-import com.wks.CalorieApp.api.fatsecret.FatSecretException;
-import com.wks.CalorieApp.api.fatsecret.FoodInfoItem;
-import com.wks.CalorieApp.api.fatsecret.FoodInfoItemFactory;
-import com.wks.CalorieApp.api.fatsecret.Result;
-import com.wks.CalorieApp.Utils.HTTPClient;
+import com.wks.calorieapp.api.fatsecret.FatSecretAPI;
+import com.wks.calorieapp.api.fatsecret.FatSecretException;
+import com.wks.calorieapp.api.fatsecret.FoodInfoItem;
+import com.wks.calorieapp.api.fatsecret.FoodInfoItemFactory;
+import com.wks.calorieapp.api.fatsecret.Result;
+import com.wks.calorieapp.daos.ImageDataAccessObject;
+import com.wks.calorieapp.daos.UserDataAccessObject;
+import com.wks.calorieapp.models.ImageItem;
+import com.wks.calorieapp.models.User;
+import com.wks.calorieapp.utils.HTTPClient;
 
 
 @SuppressWarnings("unused")
