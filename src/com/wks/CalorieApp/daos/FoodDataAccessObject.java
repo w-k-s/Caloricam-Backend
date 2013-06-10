@@ -37,7 +37,7 @@ public class FoodDataAccessObject
 	this.connection = connection;
     }
 
-    public long create(FoodItem item)
+    public long create(FoodItem item) throws DataAccessObjectException
     {
 	// Connection connection = null;
 	PreparedStatement statement = null;
@@ -57,26 +57,15 @@ public class FoodDataAccessObject
 		return -1;
 	} catch (SQLException e)
 	{
-	    // TODO Auto-generated catch block
-	    e.printStackTrace();
+	    throw new DataAccessObjectException(e);
 	} finally
 	{
-	    try
-	    {
-		if (result != null) result.close();
-		if (statement != null) statement.close();
-
-	    } catch (SQLException e)
-	    {
-
-		e.printStackTrace();
-	    }
+	    DatabaseUtil.close(statement,result);
 	}
 
-	return -1;
     }
 
-    public List<FoodItem> read()
+    public List<FoodItem> read() throws DataAccessObjectException
     {
 	// Connection connection = null;
 	PreparedStatement statement = null;
@@ -101,27 +90,17 @@ public class FoodDataAccessObject
 	    }
 	} catch (SQLException e)
 	{
-
-	    e.printStackTrace();
+	    throw new DataAccessObjectException(e);
 	} finally
 	{
-	    try
-	    {
-		if (results != null) results.close();
-		if (statement != null) statement.close();
-
-	    } catch (SQLException e)
-	    {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-	    }
+	    DatabaseUtil.close(statement,results);
 	}
 
 	return foodItems;
 
     }
 
-    public boolean update(FoodItem item)
+    public boolean update(FoodItem item) throws DataAccessObjectException
     {
 	// Connection connection = null;
 	PreparedStatement statement = null;
@@ -136,25 +115,15 @@ public class FoodDataAccessObject
 	    return true;
 	} catch (SQLException e)
 	{
-	    // TODO Auto-generated catch block
-	    e.printStackTrace();
+	    throw new DataAccessObjectException(e);
 	} finally
 	{
-	    try
-	    {
-		if (statement != null) statement.close();
-
-	    } catch (SQLException e)
-	    {
-
-		e.printStackTrace();
-	    }
+	    DatabaseUtil.close(statement);
 	}
 
-	return false;
     }
 
-    public boolean delete(long id)
+    public boolean delete(long id) throws DataAccessObjectException
     {
 	// Connection connection = null;
 	PreparedStatement statement = null;
@@ -168,25 +137,15 @@ public class FoodDataAccessObject
 	    return true;
 	} catch (SQLException e)
 	{
-	    // TODO Auto-generated catch block
-	    e.printStackTrace();
+	   throw new DataAccessObjectException(e);
 	} finally
 	{
-	    try
-	    {
-		if (statement != null) statement.close();
-
-	    } catch (SQLException e)
-	    {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-	    }
+	    DatabaseUtil.close(statement);
 	}
 
-	return false;
     }
 
-    public FoodItem find(long id)
+    public FoodItem find(long id) throws DataAccessObjectException
     {
 	// Connection connection = null;
 	PreparedStatement statement = null;
@@ -209,29 +168,19 @@ public class FoodDataAccessObject
 	    }
 	} catch (SQLException e)
 	{
-	    // TODO Auto-generated catch block
-	    e.printStackTrace();
+	    throw new DataAccessObjectException(e);
 	} finally
 	{
-	    try
-	    {
-		if (result != null) result.close();
-		if (statement != null) statement.close();
-
-	    } catch (SQLException e)
-	    {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-	    }
+	    DatabaseUtil.close(statement,result);
 	}
 
 	return foodItem;
 
     }
 
-    public void close() throws SQLException
+    public void close() 
     {
-	if (connection != null) connection.close();
+	DatabaseUtil.close(connection);
     }
 
 }

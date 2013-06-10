@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.wks.calorieapp.models.User;
+import com.wks.calorieapp.utils.DatabaseUtil;
 
 public class UserDataAccessObject
 {
@@ -35,7 +36,7 @@ public class UserDataAccessObject
 	this.connection = connection;
     }
 
-    public boolean create(User user)
+    public boolean create(User user) throws DataAccessObjectException
     {
 	// Connection connection = null;
 	PreparedStatement statement = null;
@@ -51,24 +52,15 @@ public class UserDataAccessObject
 	    success = true;
 	} catch (SQLException e)
 	{
-
-	    e.printStackTrace();
+	    throw new DataAccessObjectException(e);
 	} finally
 	{
-	    try
-	    {
-		if (statement != null) statement.close();
-
-	    } catch (SQLException e)
-	    {
-
-		e.printStackTrace();
-	    }
+	    DatabaseUtil.close(statement);
 	}
 	return success;
     }
 
-    public Map<String, User> read()
+    public Map<String, User> read() throws DataAccessObjectException
     {
 	Map<String, User> usersList = new HashMap<String, User>();
 	User user = null;
@@ -93,26 +85,16 @@ public class UserDataAccessObject
 
 	} catch (SQLException e)
 	{
-	    // TODO Auto-generated catch block
-	    e.printStackTrace();
+	    throw new DataAccessObjectException(e);
 	} finally
 	{
-	    try
-	    {
-		if (results != null) results.close();
-		if (statement != null) statement.close();
-		// connection.close();
-	    } catch (SQLException e)
-	    {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-	    }
+	    DatabaseUtil.close(statement, results);
 	}
 
 	return usersList;
     }
 
-    public boolean update(User user)
+    public boolean update(User user) throws DataAccessObjectException
     {
 
 	PreparedStatement statement = null;
@@ -127,24 +109,15 @@ public class UserDataAccessObject
 	    return true;
 	} catch (SQLException e)
 	{
-	    // TODO Auto-generated catch block
-	    e.printStackTrace();
+	    throw new DataAccessObjectException (e);
 	} finally
 	{
-	    try
-	    {
-		if (statement != null) statement.close();
-
-	    } catch (SQLException e)
-	    {
-		e.printStackTrace();
-	    }
+	    DatabaseUtil.close(statement);
 	}
-	return false;
 
     }
 
-    public boolean delete(User user)
+    public boolean delete(User user) throws DataAccessObjectException
     {
 	PreparedStatement statement = null;
 
@@ -156,25 +129,15 @@ public class UserDataAccessObject
 	    return true;
 	} catch (SQLException e)
 	{
-	    // TODO Auto-generated catch block
-	    e.printStackTrace();
+	    throw new DataAccessObjectException(e);
 	} finally
 	{
-	    try
-	    {
-		if (statement != null) statement.close();
-		// connection.close();
-	    } catch (SQLException e)
-	    {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-	    }
+	    DatabaseUtil.close(statement);
 	}
-	return false;
 
     }
 
-    public User find(String id)
+    public User find(String id) throws DataAccessObjectException
     {
 
 	PreparedStatement statement = null;
@@ -198,28 +161,17 @@ public class UserDataAccessObject
 
 	} catch (SQLException e)
 	{
-	    // TODO Auto-generated catch block
-	    e.printStackTrace();
+	    throw new DataAccessObjectException(e);
 	} finally
 	{
-	    try
-	    {
-		if (result != null) result.close();
-		if (statement != null) statement.close();
-		// connection.close();
-	    } catch (SQLException e)
-	    {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-	    }
+	    DatabaseUtil.close(statement, result);
 	}
 	return user;
     }
 
-    public void close() throws SQLException
+    public void close()
     {
-	if(connection != null)
-	    connection.close();
+	DatabaseUtil.close(connection);
     }
 
 

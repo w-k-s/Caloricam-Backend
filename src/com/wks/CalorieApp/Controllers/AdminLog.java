@@ -22,6 +22,7 @@ public class AdminLog extends HttpServlet
     private static final String CONTENT_TYPE = "text/plain";
     private static final String REDIRECT = "/calorieapp";
     private static final String SRVLT_LOGIN = "/login";
+    private static Object lock = new Object();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException
@@ -30,14 +31,14 @@ public class AdminLog extends HttpServlet
 
 	resp.setContentType(CONTENT_TYPE);
 	PrintWriter out = resp.getWriter();
-	
+
 	if (!authenticated)
 	{
-	    //redirect to login page
-	    resp.sendRedirect(REDIRECT+SRVLT_LOGIN);
+	    // redirect to login page
+	    resp.sendRedirect(REDIRECT + SRVLT_LOGIN);
 	    return;
 	}
-	
+
 	String log = readLog();
 	out.println(log);
     }
@@ -45,7 +46,7 @@ public class AdminLog extends HttpServlet
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException
     {
-	
+
 	doGet(req, resp);
     }
 
@@ -59,61 +60,63 @@ public class AdminLog extends HttpServlet
 	}
 	return authenticated;
     }
-    
+
     private String readLog() throws IOException
     {
-	String logUri = Environment.getLogFile(getServletContext());
-	
-	File logFile = new File(logUri);
-	if( !logFile.exists() )
-	    return Status.FILE_NOT_FOUND.getMessage();
-	
+	synchronized (lock)
+	{
+	    String logUri = Environment.getLogFile(getServletContext());
 
-	//Log file exists, read it.
-	BufferedReader reader = null;
-	String logText = "Log:\n";
-	try
-	{
-	    reader = new BufferedReader( new FileReader(logFile));
-	    String line =  "";
-	    while( (line = reader.readLine())!= null)
-	    {
-	        logText += line + "\n";
-	        
-	    }
-	} catch (FileNotFoundException e)
-	{
-	    e.printStackTrace();
-	    return Status.FILE_NOT_FOUND.getMessage()+": "+e;
-	} catch (IOException e)
-	{
-	    // TODO Auto-generated catch block
-	    e.printStackTrace();
-	    return Status.IO_ERROR.getMessage()+": "+e;
-	}finally{
+	    File logFile = new File(logUri);
+	    if (!logFile.exists()) return Status.FILE_NOT_FOUND.getMessage();
+
+	    // Log file exists, read it.
+	    BufferedReader reader = null;
+	    String logText = "Log:\n";
 	    try
 	    {
-		if(reader != null)
-		    reader.close();
+		reader = new BufferedReader(new FileReader(logFile));
+		String line = "";
+		while ((line = reader.readLine()) != null)
+		{
+		    logText += line + "\n";
+
+		}
+	    } catch (FileNotFoundException e)
+	    {
+		e.printStackTrace();
+		return Status.FILE_NOT_FOUND.getMessage() + ": " + e;
 	    } catch (IOException e)
 	    {
-		 return Status.IO_ERROR.getMessage()+": "+e;
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+		return Status.IO_ERROR.getMessage() + ": " + e;
+	    } finally
+	    {
+		try
+		{
+		    if (reader != null) reader.close();
+		} catch (IOException e)
+		{
+		    return Status.IO_ERROR.getMessage() + ": " + e;
+		}
 	    }
+	    return logText;
 	}
-	return logText;
+
     }
-    
-    enum Status{
-	FILE_NOT_FOUND("No log file found. "),
-	IO_ERROR("An IOException occured while reading log file.");
-	
+
+    enum Status
+    {
+	FILE_NOT_FOUND("No log file found. "), IO_ERROR("An IOException occured while reading log file.");
+
 	private final String message;
-	
+
 	Status(String message)
 	{
 	    this.message = message;
 	}
-	
+
 	public String getMessage()
 	{
 	    return message;

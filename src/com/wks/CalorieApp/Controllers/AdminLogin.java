@@ -12,6 +12,7 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
 
+import com.wks.calorieapp.daos.DataAccessObjectException;
 import com.wks.calorieapp.daos.UserDataAccessObject;
 import com.wks.calorieapp.models.User;
 import com.wks.calorieapp.utils.DatabaseUtil;
@@ -74,24 +75,32 @@ public class AdminLogin extends HttpServlet
 	// if username and password submitted, validate
 	if (username != null && password != null)
 	{
-	   LoginStatus loginStatus = loginCredentialsAreValid(username,password);
-	    switch (loginStatus)
+	    LoginStatus loginStatus;
+	    try
 	    {
-	    case AUTHENTICATED:
-		logger.info(username + " has signed in.");
-		session.setAttribute(Attribute.AUTHENTICATED.toString(), true);
-		session.setAttribute(Attribute.USERNAME.toString(), username);
+		loginStatus = loginCredentialsAreValid(username, password);
 
-		RequestDispatcher admin = req.getRequestDispatcher(SRVLT_ADMIN);
-		admin.forward(req, resp);
-		return;
+		switch (loginStatus)
+		{
+		case AUTHENTICATED:
+		    logger.info(username + " has signed in.");
+		    session.setAttribute(Attribute.AUTHENTICATED.toString(), true);
+		    session.setAttribute(Attribute.USERNAME.toString(), username);
 
-	    default:
-		logger.info(username + " - "+loginStatus.getMessage());
-		req.setAttribute(Attribute.STATUS.toString(), loginStatus.getMessage());
-		RequestDispatcher login = req.getRequestDispatcher(JSP_LOGIN);
-		login.forward(req, resp);
-		return;
+		    RequestDispatcher admin = req.getRequestDispatcher(SRVLT_ADMIN);
+		    admin.forward(req, resp);
+		    return;
+
+		default:
+		    logger.info(username + " - " + loginStatus.getMessage());
+		    req.setAttribute(Attribute.STATUS.toString(), loginStatus.getMessage());
+		    RequestDispatcher login = req.getRequestDispatcher(JSP_LOGIN);
+		    login.forward(req, resp);
+		    return;
+		}
+	    } catch (DataAccessObjectException e)
+	    {
+		logger.error("Login. DAOException encountered for user: "+username,e);
 	    }
 
 	} else
@@ -104,7 +113,7 @@ public class AdminLogin extends HttpServlet
 
     }
 
-    private LoginStatus loginCredentialsAreValid(String username, String password)
+    private LoginStatus loginCredentialsAreValid(String username, String password) throws DataAccessObjectException
     {
 	if (connection == null) return LoginStatus.DB_FAILURE;
 

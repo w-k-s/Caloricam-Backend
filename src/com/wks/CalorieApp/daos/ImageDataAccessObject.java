@@ -9,6 +9,7 @@ import java.util.List;
 
 import com.mysql.jdbc.exceptions.MySQLIntegrityConstraintViolationException;
 import com.wks.calorieapp.models.ImageItem;
+import com.wks.calorieapp.utils.DatabaseUtil;
 
 public class ImageDataAccessObject
 {
@@ -38,7 +39,7 @@ public class ImageDataAccessObject
 	this.connection = connection;
     }
 
-    public boolean create(ImageItem image) throws MySQLIntegrityConstraintViolationException
+    public boolean create(ImageItem image) throws DataAccessObjectException
     {
 	// Connection connection = null;
 	PreparedStatement statement = null;
@@ -57,29 +58,19 @@ public class ImageDataAccessObject
 	    success = true;
 	} catch (MySQLIntegrityConstraintViolationException e)
 	{
-	    throw e;
+	    throw new DataAccessObjectException("This image may already exist in the database.",e);
 	} catch (SQLException e)
 	{
-	    // TODO Auto-generated catch block
-	    e.printStackTrace();
+	   throw new DataAccessObjectException(e);
 	} finally
 	{
-	    try
-	    {
-
-		if (statement != null) statement.close();
-
-	    } catch (SQLException e)
-	    {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-	    }
+	    DatabaseUtil.close(statement);
 	}
 	return success;
 
     }
 
-    public List<ImageItem> read()
+    public List<ImageItem> read() throws DataAccessObjectException
     {
 	List<ImageItem> imageItems = new ArrayList<ImageItem>();
 	ImageItem imageItem = null;
@@ -105,27 +96,17 @@ public class ImageDataAccessObject
 
 	} catch (SQLException e)
 	{
-	    // TODO Auto-generated catch block
-	    e.printStackTrace();
+	    throw new DataAccessObjectException(e);
 	} finally
 	{
-	    try
-	    {
-		if (results != null) results.close();
-		if (statement != null) statement.close();
-
-	    } catch (SQLException e)
-	    {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-	    }
+	    DatabaseUtil.close(statement,results);
 	}
 
 	return imageItems;
 
     }
 
-    public boolean update(ImageItem image) throws MySQLIntegrityConstraintViolationException
+    public boolean update(ImageItem image) throws DataAccessObjectException
     {
 	// Connection connection = null;
 	PreparedStatement statement = null;
@@ -144,27 +125,17 @@ public class ImageDataAccessObject
 	    return true;
 	} catch (MySQLIntegrityConstraintViolationException e)
 	{
-	    throw e;
+	    throw new DataAccessObjectException("This image may already exist in the database.",e);
 	} catch (SQLException e)
 	{
-	    // TODO Auto-generated catch block
-	    e.printStackTrace();
+	   throw new DataAccessObjectException(e);
 	} finally
 	{
-	    try
-	    {
-		if (statement != null) statement.close();
-
-	    } catch (SQLException e)
-	    {
-
-		e.printStackTrace();
-	    }
+	    DatabaseUtil.close(statement);
 	}
-	return false;
     }
 
-    public boolean delete(String id)
+    public boolean delete(String id) throws DataAccessObjectException
     {
 	PreparedStatement statement = null;
 
@@ -176,24 +147,14 @@ public class ImageDataAccessObject
 	    return true;
 	} catch (SQLException e)
 	{
-	    // TODO Auto-generated catch block
-	    e.printStackTrace();
+	    throw new DataAccessObjectException(e);
 	} finally
 	{
-	    try
-	    {
-		if (statement != null) statement.close();
-
-	    } catch (SQLException e)
-	    {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-	    }
+	    DatabaseUtil.close(statement);
 	}
-	return false;
     }
 
-    public ImageItem find(String id)
+    public ImageItem find(String id) throws DataAccessObjectException
     {
 	// Connection connection = null;
 	PreparedStatement statement = null;
@@ -219,27 +180,18 @@ public class ImageDataAccessObject
 
 	} catch (SQLException e)
 	{
-	    // TODO Auto-generated catch block
-	    e.printStackTrace();
+	    throw new DataAccessObjectException(e);
 	} finally
 	{
-	    try
-	    {
-		if (statement != null) statement.close();
-		if (result != null) result.close();
-	    } catch (SQLException e)
-	    {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-	    }
+	    DatabaseUtil.close(statement,result);
 	}
 	return image;
 
     }
 
-    public void close() throws SQLException
+    public void close() 
     {
-	if (connection != null) connection.close();
+	DatabaseUtil.close(connection);
     }
 
 }

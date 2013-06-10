@@ -5,8 +5,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Connection;
-import java.sql.SQLException;
-
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -17,7 +15,7 @@ import org.apache.log4j.Logger;
 import net.semanticmetadata.lire.DocumentBuilder;
 import net.semanticmetadata.lire.DocumentBuilderFactory;
 
-import com.mysql.jdbc.exceptions.MySQLIntegrityConstraintViolationException;
+import com.wks.calorieapp.daos.DataAccessObjectException;
 import com.wks.calorieapp.daos.ImageDataAccessObject;
 import com.wks.calorieapp.models.ImageItem;
 import com.wks.calorieapp.models.Indexer;
@@ -91,19 +89,15 @@ public class Index extends HttpServlet
 	{
 	    imageIsInserted = insertImage(imageFile);
 	    logger.info("Index Request. "+fileURI+" has been recorded in the database.");
-	} catch (MySQLIntegrityConstraintViolationException e)
+	} catch (DataAccessObjectException e)
 	{
 	    out.println( new Response(false, Status.DB_INTEGRITY_VIOLATION.getMessage()).toJSON());
-	    logger.fatal("Index Request. Database integrity violated while indexing: "+fileURI,e);
-	}catch(SQLException e)
-	{
-	    out.println(  new Response(false, Status.DB_INSERT_FAILED.toString()).toJSON());
-	    logger.error("Index Requst. Invalid SQL statement.",e);
+	    logger.fatal("Index Request. DataAccessObjectException: File:"+fileURI+". Message: "+e.getMessage(),e);
 	}
 
 	if (!imageIsInserted)
 	{
-	    out.println( new Response(false,Status.DB_INSERT_FAILED.toString()).toJSON() );
+	    out.println( new Response(false,Status.DB_INSERT_FAILED.getMessage()).toJSON() );
 	    return;
 	}
 
@@ -133,7 +127,7 @@ public class Index extends HttpServlet
 	indexer.indexImage(fileURI, indexesDir);
     }
 
-    private boolean insertImage(File imageFile) throws SQLException
+    private boolean insertImage(File imageFile) throws DataAccessObjectException
     {
 	if(connection == null)
 	    return false;

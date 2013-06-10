@@ -24,7 +24,7 @@ td {
 	<h2>Navigation</h2>
 	<ul>
 		<li><a href="/calorieapp/images">Images</a></li>
-		<li><a href="/calorieapp/indexes">Indexed</a></li>
+		<li><a href="/calorieapp/indexes">Indexes</a></li>
 		<li><a href="/calorieapp/log">Logs</a></li>
 		<li><a href="/calorieapp/logout">Logout (${username})</a></li>
 	</ul>
@@ -36,12 +36,7 @@ td {
 			value="Upload" />
 	</form>
 	<hr />
-	<p>logdir exists: ${exists}</p>
-	<p>logdir creation: ${mkdir}</p>
-	<p>properties in webinf: ${properties}</p>
-	<p>logfile: ${logfile}</p>
 	<script type="text/javascript">
-		
 	</script>
 </body>
 </html>
