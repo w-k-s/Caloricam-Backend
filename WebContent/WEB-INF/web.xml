@@ -83,6 +83,15 @@
 	</servlet-mapping>
 
 	<servlet>
+		<servlet-name>indexes</servlet-name>
+		<servlet-class>com.wks.calorieapp.controllers.AdminIndexes</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>indexes</servlet-name>
+		<url-pattern>/indexes</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
 		<servlet-name>nutrition_info</servlet-name>
 		<servlet-class>com.wks.calorieapp.controllers.NutritionInfo</servlet-class>
 	</servlet>
@@ -153,7 +162,7 @@
 
 	<context-param>
 		<param-name>is_deployed</param-name>
-		<param-value>true</param-value>
+		<param-value>false</param-value>
 	</context-param>
 
 	<!-- API KEYS -->

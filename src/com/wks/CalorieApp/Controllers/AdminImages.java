@@ -50,14 +50,17 @@ public class AdminImages extends HttpServlet
 	// attribute to images.jsp
 
 	boolean authenticated = false;
+	String username = "";
 	String action = null;
 	String image = null;
 
+	
 	// session is not a thread-safe variable.
 	HttpSession session = req.getSession();
 	synchronized (session)
 	{
 	    Boolean b = (Boolean) session.getAttribute(Attribute.AUTHENTICATED.toString());
+	    username = (String) session.getAttribute(Attribute.USERNAME.toString());
 	    if (b != null) authenticated = b;
 	}
 
@@ -67,12 +70,18 @@ public class AdminImages extends HttpServlet
 	if (!authenticated)
 	{
 	    // redirect to login page
+	    logger.info("Admin Image. Page requested. User not authenticated");
 	    resp.sendRedirect(REDIRECT + SRVLT_LOGIN);
 	    return;
+	}else
+	{
+	    logger.info("Admin Image. Page requested by "+username);
 	}
 
+	logger.info("Admin. Request contained action='"+action+"', image='"+image+"'.");
 	if (action != null && image != null)
 	{
+	    
 	    try
 	    {
 		handleAction(action, image, resp);
@@ -89,12 +98,11 @@ public class AdminImages extends HttpServlet
 		EXTENSIONS);
 
 	req.setAttribute(Attribute.IMAGE_LIST.toString(), imageURIList);
-	req.setAttribute(Attribute.IMAGE_DIR.toString(), Environment.getImagesDirectory(getServletContext()));
 	RequestDispatcher request = req.getRequestDispatcher(JSP_IMAGE);
 	request.forward(req, resp);
     }
 
-    private void handleAction(String action, String fileName, HttpServletResponse resp) throws DataAccessObjectException
+    private boolean handleAction(String action, String fileName, HttpServletResponse resp) throws DataAccessObjectException
     {
 	if (action.equalsIgnoreCase(ACTION_DELETE))
 	{
@@ -103,20 +111,25 @@ public class AdminImages extends HttpServlet
 	    
 	    
 	    if( connection == null )
-		return;
+		return false;
 	    
 	    
 	    ImageDataAccessObject imageDao = new ImageDataAccessObject( connection);
 	    boolean recordDeleted = imageDao.delete(fileName);
 	    logger.info("Record for image \'"+fileName+"\' deleted: "+recordDeleted);
+	    return recordDeleted;
 
 	}
-	if (action.equalsIgnoreCase(ACTION_VIEW))
+	
+	else if(action.equalsIgnoreCase(ACTION_VIEW))
 	{
 	    String fileURI = Environment.getImagesDirectory(getServletContext()) + fileName;
-	    respondWithImage(resp, fileURI);
+	    return respondWithImage(resp, fileURI);
 	}
-    };
+	
+	logger.error("Admin Images. Unidentified action from "+JSP_IMAGE+": "+action);
+	return false;
+    }
 
     private boolean deleteFile(String file)
     {

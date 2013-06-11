@@ -4,7 +4,7 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-<title>Admin Panel | Login</title>
+<title>Admin | Login</title>
 </head>
 <body>
 <form name="login" method="post" action="login" onsubmit="return doValidation();">

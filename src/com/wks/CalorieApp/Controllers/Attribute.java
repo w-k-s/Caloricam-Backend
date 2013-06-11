@@ -6,7 +6,8 @@ public enum Attribute
     AUTHENTICATED("authenticated"),
     USERNAME("username"),
     IMAGE_LIST("images"),
-    IMAGE_DIR("image_dir");
+    IMAGE_DIR("image_dir"),
+    INDEX_LIST("indexes");
     
     private final String value;
     

@@ -5,6 +5,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.fileupload.FileItemStream;
@@ -26,6 +27,8 @@ public class FileUtils {
      */
     public static synchronized boolean upload(String path, FileItemStream item)
 	    throws IOException {
+
+	
 	// create file
 	File images = new File(path);
 
@@ -85,5 +88,17 @@ public class FileUtils {
 	if(file.exists() && !file.isDirectory())
 	    return file.delete();
 	return false;
+    }
+    
+    public static synchronized boolean deleteFiles(List<String> files)
+    {
+	int deletedSuccessfully = 0;
+	Iterator fileIterator = files.iterator();
+	while(fileIterator.hasNext())
+	{
+	    if(deleteFile( (String) fileIterator.next()))
+		deletedSuccessfully++;
+	}
+	return deletedSuccessfully==files.size();
     }
 }
