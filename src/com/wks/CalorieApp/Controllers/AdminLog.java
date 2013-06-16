@@ -31,14 +31,14 @@ public class AdminLog extends HttpServlet
 
 	resp.setContentType(CONTENT_TYPE);
 	PrintWriter out = resp.getWriter();
-
+	
 	if (!authenticated)
 	{
 	    // redirect to login page
 	    resp.sendRedirect(REDIRECT + SRVLT_LOGIN);
 	    return;
 	}
-
+	
 	String log = readLog();
 	out.println(log);
     }

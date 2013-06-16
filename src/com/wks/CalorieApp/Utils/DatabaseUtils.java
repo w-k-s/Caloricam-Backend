@@ -10,7 +10,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Properties;
 
-public class DatabaseUtil
+public class DatabaseUtils
 {
     private static final boolean appIsDeployed = false;
     private static final String PARAM_DRIVER = "driver";
@@ -28,13 +28,13 @@ public class DatabaseUtil
 	try
 	{
 	    Properties dbProperties = new Properties();
-	    InputStream input = DatabaseUtil.class.getClassLoader().getResourceAsStream(DB_PROPERTIES_FILE);
+	    InputStream input = DatabaseUtils.class.getClassLoader().getResourceAsStream(DB_PROPERTIES_FILE);
 	    dbProperties.load(input);
 	    String url = "";
 	    if (appIsDeployed)
 	    {
 
-		url = "jdbc:mysql://127.12.26.130:3306/uploadte";
+		url = "jdbc:mysql://127.12.26.130:3306/uploadte?autoReconnect=true";
 	    } else
 	    {
 		url = dbProperties.getProperty(PARAM_URL);

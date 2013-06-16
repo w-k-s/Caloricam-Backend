@@ -5,7 +5,7 @@ import java.util.Map.Entry;
 import java.io.IOException;
 import java.net.URL;
 
-import com.wks.calorieapp.utils.HTTPClient;
+import com.wks.calorieapp.utils.HttpClient;
 
 public class FatSecretAPI
 {
@@ -57,7 +57,7 @@ public class FatSecretAPI
 
 	// make rest call
 	String signedUrl = result.getURL();
-	String jsonResults = HTTPClient.get(signedUrl);
+	String jsonResults = HttpClient.get(signedUrl);
 	return jsonResults;
     }
 

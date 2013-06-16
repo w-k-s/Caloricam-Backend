@@ -8,8 +8,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.mysql.jdbc.exceptions.MySQLIntegrityConstraintViolationException;
-import com.wks.calorieapp.models.ImageItem;
-import com.wks.calorieapp.utils.DatabaseUtil;
+import com.wks.calorieapp.models.ImageDataTransferObject;
+import com.wks.calorieapp.utils.DatabaseUtils;
 
 public class ImageDataAccessObject
 {
@@ -39,7 +39,7 @@ public class ImageDataAccessObject
 	this.connection = connection;
     }
 
-    public boolean create(ImageItem image) throws DataAccessObjectException
+    public boolean create(ImageDataTransferObject image) throws DataAccessObjectException
     {
 	// Connection connection = null;
 	PreparedStatement statement = null;
@@ -64,16 +64,16 @@ public class ImageDataAccessObject
 	   throw new DataAccessObjectException(e);
 	} finally
 	{
-	    DatabaseUtil.close(statement);
+	    DatabaseUtils.close(statement);
 	}
 	return success;
 
     }
 
-    public List<ImageItem> read() throws DataAccessObjectException
+    public List<ImageDataTransferObject> read() throws DataAccessObjectException
     {
-	List<ImageItem> imageItems = new ArrayList<ImageItem>();
-	ImageItem imageItem = null;
+	List<ImageDataTransferObject> imageItems = new ArrayList<ImageDataTransferObject>();
+	ImageDataTransferObject imageItem = null;
 	// Connection connection = null;
 	PreparedStatement statement = null;
 	ResultSet results = null;
@@ -86,7 +86,7 @@ public class ImageDataAccessObject
 
 	    while (results.next())
 	    {
-		imageItem = new ImageItem();
+		imageItem = new ImageDataTransferObject();
 		imageItem.setImageId(results.getString(COLUMN_IMAGE_ID));
 		imageItem.setFoodId(results.getLong(COLUMN_FOOD_ID));
 		imageItem.setSize(results.getLong(COLUMN_SIZE));
@@ -99,14 +99,14 @@ public class ImageDataAccessObject
 	    throw new DataAccessObjectException(e);
 	} finally
 	{
-	    DatabaseUtil.close(statement,results);
+	    DatabaseUtils.close(statement,results);
 	}
 
 	return imageItems;
 
     }
 
-    public boolean update(ImageItem image) throws DataAccessObjectException
+    public boolean update(ImageDataTransferObject image) throws DataAccessObjectException
     {
 	// Connection connection = null;
 	PreparedStatement statement = null;
@@ -131,7 +131,7 @@ public class ImageDataAccessObject
 	   throw new DataAccessObjectException(e);
 	} finally
 	{
-	    DatabaseUtil.close(statement);
+	    DatabaseUtils.close(statement);
 	}
     }
 
@@ -150,16 +150,16 @@ public class ImageDataAccessObject
 	    throw new DataAccessObjectException(e);
 	} finally
 	{
-	    DatabaseUtil.close(statement);
+	    DatabaseUtils.close(statement);
 	}
     }
 
-    public ImageItem find(String id) throws DataAccessObjectException
+    public ImageDataTransferObject find(String id) throws DataAccessObjectException
     {
 	// Connection connection = null;
 	PreparedStatement statement = null;
 	ResultSet result = null;
-	ImageItem image = null;
+	ImageDataTransferObject image = null;
 
 	try
 	{
@@ -170,7 +170,7 @@ public class ImageDataAccessObject
 	    result = statement.getResultSet();
 	    if (result.next() && result != null)
 	    {
-		image = new ImageItem();
+		image = new ImageDataTransferObject();
 		image.setImageId(result.getString(COLUMN_IMAGE_ID));
 		image.setFoodId(result.getLong(COLUMN_FOOD_ID));
 		image.setSize(result.getLong(COLUMN_SIZE));
@@ -183,7 +183,7 @@ public class ImageDataAccessObject
 	    throw new DataAccessObjectException(e);
 	} finally
 	{
-	    DatabaseUtil.close(statement,result);
+	    DatabaseUtils.close(statement,result);
 	}
 	return image;
 
@@ -191,7 +191,7 @@ public class ImageDataAccessObject
 
     public void close() 
     {
-	DatabaseUtil.close(connection);
+	DatabaseUtils.close(connection);
     }
 
 }

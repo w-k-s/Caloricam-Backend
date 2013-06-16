@@ -36,7 +36,19 @@ td {
 			value="Upload" />
 	</form>
 	<hr />
+	<h2>Query</h2>
+	<form name="admin" method="post">
+		<input type="text" name="query" value=""/> 
+		<input type="submit" value="go" />
+		<div>${query}</div>
+	</form>
+	<ul>
+		<li>INSERT INTO foods (name) VALUES ('lays staxx');</li>
+		<li>UPDATE images SET food_id='1' WHERE image_id='35937204245399320130615195252.jpg';</li>
+	</ul>
+	<hr />
 	<script type="text/javascript">
+		
 	</script>
 </body>
 </html>

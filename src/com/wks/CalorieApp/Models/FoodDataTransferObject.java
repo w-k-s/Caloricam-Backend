@@ -5,7 +5,7 @@ package com.wks.calorieapp.models;
  * @author Waqqas
  *
  */
-public class FoodItem {
+public class FoodDataTransferObject {
     private long foodId;
     private String name;
     

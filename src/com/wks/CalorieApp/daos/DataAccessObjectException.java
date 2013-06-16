@@ -7,6 +7,11 @@ package com.wks.calorieapp.daos;
  */
 public class DataAccessObjectException extends Exception
 {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 2765458971937680247L;
+
     public DataAccessObjectException(String message)
     {
 	super(message);

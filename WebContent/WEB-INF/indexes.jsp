@@ -11,8 +11,8 @@
 <hr/>
 <h2>Tools</h2>
 <ul>
-	<li><a href="indexes?action=delete">Delete all</a></li>
-	<li><a href="indexes?action=reindex">Reindex all</a></li>
+	<!-- <li><a href="indexes?action=delete">Delete all</a></li>
+	<li><a href="indexes?action=reindex">Reindex all</a></li> -->
 </ul>
 <strong><em>Note: Must reindex images after deleting them.</em></strong>
 <hr/>

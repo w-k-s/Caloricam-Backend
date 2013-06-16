@@ -93,7 +93,7 @@ public class FileUtils {
     public static synchronized boolean deleteFiles(List<String> files)
     {
 	int deletedSuccessfully = 0;
-	Iterator fileIterator = files.iterator();
+	Iterator<String> fileIterator = files.iterator();
 	while(fileIterator.hasNext())
 	{
 	    if(deleteFile( (String) fileIterator.next()))

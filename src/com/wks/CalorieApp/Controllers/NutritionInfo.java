@@ -85,60 +85,65 @@ public class NutritionInfo extends HttpServlet
 	    return;
 	}
 
-	String responseJSON = getNutritionInfo(foodName, numResults);
-	out.println(responseJSON);
-
-    }
-
-    @SuppressWarnings("unchecked")
-    private String getNutritionInfo(String foodName, int numResults)
-    {
-	FatSecretAPI fatSecret = new FatSecretAPI(consumerKey, consumerSecret);
 	try
 	{
-	    String foodJSON = fatSecret.foodsSearch(foodName);
-	    List<FoodInfoItem> foodList = FoodInfoItemFactory.createFoodItemsFromJSON(foodJSON);
-
-	    if (foodList == null)
-	    {
-		logger.info("Nutrition Info Request. No nutrition information was retrieved for: " + foodName);
-		return new Response(false, Status.DATA_UNAVAILABLE.getMessage()).toJSON();
-	    }
-
-	    if (numResults == -1) numResults = foodList.size();
-	    JSONArray foodsArray = new JSONArray();
-	    for (int i = 0; i < numResults; i++)
-	    {
-		JSONObject food = new JSONObject();
-		food.put("name", foodList.get(i).getName());
-		food.put("type", foodList.get(i).getType());
-		food.put("calories", foodList.get(i).getCaloriesPer100g());
-		food.put("fat", "" + foodList.get(i).getFatPer100g());
-		food.put("proteins", "" + foodList.get(i).getGramProteinsPer100g());
-		food.put("carbohydrates", "" + foodList.get(i).getGramCarbsPer100g());
-		foodsArray.add(food);
-	    }
-
-	    logger.info("Nutrition Info Request. Nutrition information for " + foodName + " provided.");
-	    return new Response(true, foodsArray.toJSONString()).toJSON();
-
+	    String nutritionInfo = getNutritionInfo(foodName, numResults);
+	    out.println(new Response(true, nutritionInfo).toJSON());
 	} catch (FatSecretException e)
 	{
 	    logger.error("Nutrition Info Request. FatSecretException encountered for " + foodName, e);
-	    return new Response(false, Status.DATA_IRRETRIEVABLE.getMessage() + " Error Code: " + e.getCode()).toJSON();
+	    out.println(new Response(false, Status.DATA_IRRETRIEVABLE.getMessage() + " Error Code: " + e.getCode())
+		    .toJSON());
 
 	} catch (ParseException e)
 	{
 	    logger.error("Nutrition Info Request. JSONParser failed to parse JSON: " + foodName, e);
-	    return new Response(false, Status.DATA_IRRETRIEVABLE.getMessage()).toJSON();
+	    out.println(new Response(false, Status.DATA_IRRETRIEVABLE.getMessage()).toJSON());
 
 	} catch (IOException e)
 	{
 	    logger.error(
 		    "Nutrition Info Request. IOException encontered while retrieving information for: " + foodName, e);
-	    return new Response(false, Status.IO_ERROR.getMessage()).toJSON();
+	    out.println(new Response(false, Status.IO_ERROR.getMessage()).toJSON());
 
 	}
+
+    }
+
+    @SuppressWarnings("unchecked")
+    private String getNutritionInfo(String foodName, int numResults) throws FatSecretException, ParseException,
+	    IOException
+    {
+	FatSecretAPI fatSecret = new FatSecretAPI(consumerKey, consumerSecret);
+
+	String foodJSON = fatSecret.foodsSearch(foodName);
+	List<FoodInfoItem> foodList = FoodInfoItemFactory.createFoodItemsFromJSON(foodJSON);
+
+	if (foodList == null)
+	{
+	    logger.info("Nutrition Info Request. No nutrition information was retrieved for: " + foodName);
+	    return "";
+	}
+
+	//REFACTOR THIS CODE:
+	if (numResults == -1) numResults = foodList.size();
+	
+	JSONArray foodsArray = new JSONArray();
+	for (int i = 0; i < numResults; i++)
+	{
+	    JSONObject food = new JSONObject();
+	    food.put("name", foodList.get(i).getName());
+	    food.put("type", foodList.get(i).getType());
+	    food.put("calories", foodList.get(i).getCaloriesPer100g());
+	    food.put("fat", "" + foodList.get(i).getFatPer100g());
+	    food.put("proteins", "" + foodList.get(i).getGramProteinsPer100g());
+	    food.put("carbohydrates", "" + foodList.get(i).getGramCarbsPer100g());
+	    foodsArray.add(food);
+	}
+
+	logger.info("Nutrition Info Request. Nutrition information for " + foodName + " provided.");
+	return new Response(true, foodsArray.toJSONString()).toJSON();
+
     }
 
     enum Status

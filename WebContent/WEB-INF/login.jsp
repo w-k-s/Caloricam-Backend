@@ -23,6 +23,9 @@
 	<tr>
 		<td colspan="2">${status}</td>
 	</tr>
+	<tr>
+		<td>Deployed: ${initParam.is_deployed}</td>
+	</tr>
 </table>
 </form>
 <script type="text/javascript" src="js/login.js"></script>

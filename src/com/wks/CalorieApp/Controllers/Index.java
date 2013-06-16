@@ -17,10 +17,10 @@ import net.semanticmetadata.lire.DocumentBuilderFactory;
 
 import com.wks.calorieapp.daos.DataAccessObjectException;
 import com.wks.calorieapp.daos.ImageDataAccessObject;
-import com.wks.calorieapp.models.ImageItem;
+import com.wks.calorieapp.models.ImageDataTransferObject;
 import com.wks.calorieapp.models.Indexer;
 import com.wks.calorieapp.models.Response;
-import com.wks.calorieapp.utils.DatabaseUtil;
+import com.wks.calorieapp.utils.DatabaseUtils;
 import com.wks.calorieapp.utils.Environment;
 import com.wks.calorieapp.utils.RequestParameterUtil;
 
@@ -39,7 +39,7 @@ public class Index extends HttpServlet
     @Override
     public void init() throws ServletException
     {
-	connection = DatabaseUtil.getConnection();
+	connection = DatabaseUtils.getConnection();
 	imagesDir = Environment.getImagesDirectory(getServletContext());
 	indexesDir = Environment.getIndexesDirectory(getServletContext());
     }
@@ -133,7 +133,7 @@ public class Index extends HttpServlet
 	    return false;
 	
 	ImageDataAccessObject imageDb = new ImageDataAccessObject(connection);
-	ImageItem imageItem = new ImageItem();
+	ImageDataTransferObject imageItem = new ImageDataTransferObject();
 	imageItem.setImageId(imageFile.getName());
 	imageItem.setSize(imageFile.length());
 	imageItem.setFinalized(false);

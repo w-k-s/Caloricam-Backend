@@ -5,7 +5,7 @@ package com.wks.calorieapp.models;
  * @author Waqqas
  *
  */
-public class ImageItem {
+public class ImageDataTransferObject {
     private String imageId;
     private long foodId;
     private long size;

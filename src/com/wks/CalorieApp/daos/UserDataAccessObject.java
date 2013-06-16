@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.wks.calorieapp.models.User;
-import com.wks.calorieapp.utils.DatabaseUtil;
+import com.wks.calorieapp.utils.DatabaseUtils;
 
 public class UserDataAccessObject
 {
@@ -55,7 +55,7 @@ public class UserDataAccessObject
 	    throw new DataAccessObjectException(e);
 	} finally
 	{
-	    DatabaseUtil.close(statement);
+	    DatabaseUtils.close(statement);
 	}
 	return success;
     }
@@ -88,7 +88,7 @@ public class UserDataAccessObject
 	    throw new DataAccessObjectException(e);
 	} finally
 	{
-	    DatabaseUtil.close(statement, results);
+	    DatabaseUtils.close(statement, results);
 	}
 
 	return usersList;
@@ -112,7 +112,7 @@ public class UserDataAccessObject
 	    throw new DataAccessObjectException (e);
 	} finally
 	{
-	    DatabaseUtil.close(statement);
+	    DatabaseUtils.close(statement);
 	}
 
     }
@@ -132,7 +132,7 @@ public class UserDataAccessObject
 	    throw new DataAccessObjectException(e);
 	} finally
 	{
-	    DatabaseUtil.close(statement);
+	    DatabaseUtils.close(statement);
 	}
 
     }
@@ -164,14 +164,14 @@ public class UserDataAccessObject
 	    throw new DataAccessObjectException(e);
 	} finally
 	{
-	    DatabaseUtil.close(statement, result);
+	    DatabaseUtils.close(statement, result);
 	}
 	return user;
     }
 
     public void close()
     {
-	DatabaseUtil.close(connection);
+	DatabaseUtils.close(connection);
     }
 
 

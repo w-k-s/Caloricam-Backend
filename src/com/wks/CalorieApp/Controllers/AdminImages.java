@@ -33,13 +33,13 @@ public class AdminImages extends HttpServlet
     private static final String[] EXTENSIONS = { ".jpeg", ".jpg" };
     private static final String DEFAULT_MIME_TYPE = "image/jpeg";
     private static final String REDIRECT = "/calorieapp";
-    private static Logger logger = Logger.getLogger(Admin.class);
+    private static Logger logger = Logger.getLogger(AdminImages.class);
     private static Connection connection = null;
 
     @Override
     public void init() throws ServletException
     {
-	connection = DatabaseUtil.getConnection();
+	connection = DatabaseUtils.getConnection();
     }
 
     protected void doGet(javax.servlet.http.HttpServletRequest req, javax.servlet.http.HttpServletResponse resp)
@@ -69,10 +69,12 @@ public class AdminImages extends HttpServlet
 
 	if (!authenticated)
 	{
+	    
 	    // redirect to login page
 	    logger.info("Admin Image. Page requested. User not authenticated");
 	    resp.sendRedirect(REDIRECT + SRVLT_LOGIN);
 	    return;
+	    
 	}else
 	{
 	    logger.info("Admin Image. Page requested by "+username);

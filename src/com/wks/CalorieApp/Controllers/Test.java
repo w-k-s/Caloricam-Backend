@@ -2,6 +2,7 @@ package com.wks.calorieapp.controllers;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.Connection;
 import java.util.List;
 import java.util.Map;
 
@@ -21,11 +22,12 @@ import com.wks.calorieapp.api.fatsecret.FatSecretException;
 import com.wks.calorieapp.api.fatsecret.FoodInfoItem;
 import com.wks.calorieapp.api.fatsecret.FoodInfoItemFactory;
 import com.wks.calorieapp.api.fatsecret.Result;
-import com.wks.calorieapp.daos.ImageDataAccessObject;
+import com.wks.calorieapp.daos.GeneralDataAccessObject;
 import com.wks.calorieapp.daos.UserDataAccessObject;
-import com.wks.calorieapp.models.ImageItem;
+import com.wks.calorieapp.models.ImageDataTransferObject;
 import com.wks.calorieapp.models.User;
-import com.wks.calorieapp.utils.HTTPClient;
+import com.wks.calorieapp.utils.DatabaseUtils;
+import com.wks.calorieapp.utils.HttpClient;
 
 
 @SuppressWarnings("unused")
@@ -142,7 +144,7 @@ public class Test extends HttpServlet{
 	    // TODO Auto-generated catch block
 	    e.printStackTrace();
 	}*/
-	
+	/*
 	logger.info("Let the games begin!");
 	
 	try{
@@ -150,7 +152,12 @@ public class Test extends HttpServlet{
 	}catch(NumberFormatException e)
 	{
 	    logger.error(e);
-	}
+	}*/
+	/*
+	Connection connection = DatabaseUtil.getConnection();
+	GeneralDataAccessObject shit = new GeneralDataAccessObject(connection);
+	boolean b = shit.doQuery("INSERT INTO Users VALUES ('wks','2212')");
+	*/
     }
     
     @Override
