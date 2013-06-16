@@ -142,7 +142,7 @@ public class NutritionInfo extends HttpServlet
 	}
 
 	logger.info("Nutrition Info Request. Nutrition information for " + foodName + " provided.");
-	return new Response(true, foodsArray.toJSONString()).toJSON();
+	return foodsArray.toJSONString();
 
     }
 
