@@ -25,7 +25,7 @@ public class FoodInfoItemFactory
 
     private static JSONParser parser;
 
-    public static List<FoodInfoItem> createFoodItemsFromJSON(String jsonString) throws FatSecretException,
+    public static List<NutritionInfo> createFoodItemsFromJSON(String jsonString) throws FatSecretException,
 	    ParseException {
 	parser = new JSONParser();
 	JSONObject json = (JSONObject) parser.parse(jsonString);
@@ -37,7 +37,7 @@ public class FoodInfoItemFactory
 
 	if (errorJSON != null) throw createFatSecretException(errorJSON);
 
-	List<FoodInfoItem> foods = new ArrayList<FoodInfoItem>();
+	List<NutritionInfo> foods = new ArrayList<NutritionInfo>();
 	JSONArray foodJSON = (JSONArray) foodsJSON.get(JSON_FOOD_KEY);
 
 	if (foodJSON != null)
@@ -57,7 +57,7 @@ public class FoodInfoItemFactory
 		String foodType = (String) foodObject.get(JSON_FOOD_TYPE_KEY);
 		String foodURL = (String) foodObject.get(JSON_FOOD_URL_KEY);
 
-		FoodInfoItem foodInfoItem = new FoodInfoItem();
+		NutritionInfo foodInfoItem = new NutritionInfo();
 		foodInfoItem.setId(Long.parseLong(foodId));
 		foodInfoItem.setDescription(foodDescription);
 		foodInfoItem.setName(foodName);

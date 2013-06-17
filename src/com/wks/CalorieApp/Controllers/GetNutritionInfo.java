@@ -11,23 +11,22 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
 
 import com.wks.calorieapp.api.fatsecret.FatSecretAPI;
 import com.wks.calorieapp.api.fatsecret.FatSecretException;
-import com.wks.calorieapp.api.fatsecret.FoodInfoItem;
+import com.wks.calorieapp.api.fatsecret.NutritionInfo;
 import com.wks.calorieapp.api.fatsecret.FoodInfoItemFactory;
 import com.wks.calorieapp.models.Response;
 import com.wks.calorieapp.utils.RequestParameterUtil;
 
-public class NutritionInfo extends HttpServlet
+public class GetNutritionInfo extends HttpServlet
 {
 
     private static final long serialVersionUID = 2084144039896224805L;
     private static final String CONTENT_TYPE = "application/json";
     private static final int MIN_NUM_PARAMETERS = 2;
-    private static Logger logger = Logger.getLogger(NutritionInfo.class);
+    private static Logger logger = Logger.getLogger(GetNutritionInfo.class);
 
     private static String consumerKey;
     private static String consumerSecret;
@@ -117,7 +116,7 @@ public class NutritionInfo extends HttpServlet
 	FatSecretAPI fatSecret = new FatSecretAPI(consumerKey, consumerSecret);
 
 	String foodJSON = fatSecret.foodsSearch(foodName);
-	List<FoodInfoItem> foodList = FoodInfoItemFactory.createFoodItemsFromJSON(foodJSON);
+	List<NutritionInfo> foodList = FoodInfoItemFactory.createFoodItemsFromJSON(foodJSON);
 
 	if (foodList == null)
 	{
@@ -131,14 +130,7 @@ public class NutritionInfo extends HttpServlet
 	JSONArray foodsArray = new JSONArray();
 	for (int i = 0; i < numResults; i++)
 	{
-	    JSONObject food = new JSONObject();
-	    food.put("name", foodList.get(i).getName());
-	    food.put("type", foodList.get(i).getType());
-	    food.put("calories", foodList.get(i).getCaloriesPer100g());
-	    food.put("fat", "" + foodList.get(i).getFatPer100g());
-	    food.put("proteins", "" + foodList.get(i).getGramProteinsPer100g());
-	    food.put("carbohydrates", "" + foodList.get(i).getGramCarbsPer100g());
-	    foodsArray.add(food);
+	    foodsArray.add(foodList.get(i).toJSON());
 	}
 
 	logger.info("Nutrition Info Request. Nutrition information for " + foodName + " provided.");

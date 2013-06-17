@@ -19,7 +19,7 @@ import org.json.simple.parser.ParseException;
 import com.mysql.jdbc.exceptions.MySQLIntegrityConstraintViolationException;
 import com.wks.calorieapp.api.fatsecret.FatSecretAPI;
 import com.wks.calorieapp.api.fatsecret.FatSecretException;
-import com.wks.calorieapp.api.fatsecret.FoodInfoItem;
+import com.wks.calorieapp.api.fatsecret.NutritionInfo;
 import com.wks.calorieapp.api.fatsecret.FoodInfoItemFactory;
 import com.wks.calorieapp.api.fatsecret.Result;
 import com.wks.calorieapp.daos.GeneralDataAccessObject;

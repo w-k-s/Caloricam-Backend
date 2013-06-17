@@ -93,7 +93,7 @@
 
 	<servlet>
 		<servlet-name>nutrition_info</servlet-name>
-		<servlet-class>com.wks.calorieapp.controllers.NutritionInfo</servlet-class>
+		<servlet-class>com.wks.calorieapp.controllers.GetNutritionInfo</servlet-class>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>nutrition_info</servlet-name>

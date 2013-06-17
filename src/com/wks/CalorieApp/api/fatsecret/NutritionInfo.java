@@ -3,23 +3,36 @@ package com.wks.calorieapp.api.fatsecret;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.json.simple.JSONObject;
+
+import com.wks.calorieapp.models.JSONWriteable;
+
 /**
- * TODO: I think the calculation of nutrients per 100g is incorrent. Double check results.
+ * TODO: I think the calculation of nutrients per 100g is incorrent. Double
+ * check results.
  * 
  * @author Waqqas
- *
+ * 
  */
-public class FoodInfoItem
+public class NutritionInfo implements JSONWriteable
 {
 
     private static final String REGEX_SPACE = "\\s";
-   // private static final String REGEX_DESCRIPTION = "Per([0-9.]+?)g-Calories:([0-9.]+?)kcal|Fat:([0-9.]+?)g|Carbs:([0-9.]+?)g|Protein:([0-9.]+?)g";
+    // private static final String REGEX_DESCRIPTION =
+    // "Per([0-9.]+?)g-Calories:([0-9.]+?)kcal|Fat:([0-9.]+?)g|Carbs:([0-9.]+?)g|Protein:([0-9.]+?)g";
     private static final int NUM_MATCH_GROUPS = 5;
     private static final int MATCH_GROUP_SERVING_SIZE = 0;
     private static final int MATCH_GROUP_CALORIES = 1;
     private static final int MATCH_GROUP_FAT = 2;
     private static final int MATCH_GROUP_CARBS = 3;
     private static final int MATCH_GROUP_PROTEINS = 4;
+
+    public static final String KEY_FAT = "fat";
+    public static final String KEY_NAME = "name";
+    public static final String KEY_CARBS = "carbohydrates";
+    public static final String KEY_CALORIES = "calories";
+    public static final String KEY_TYPE = "type";
+    public static final String KEY_PROTEINS = "proteins";
 
     private long id;
     private String name;
@@ -31,85 +44,104 @@ public class FoodInfoItem
     private float gramCarbsPer100g = 0;
     private float gramProteinsPer100g = 0;
 
-    public FoodInfoItem()
+    public NutritionInfo()
     {
 
     }
 
-    public long getId() {
+    public long getId()
+    {
 	return id;
     }
 
-    public void setId(long id) {
+    public void setId(long id)
+    {
 	this.id = id;
     }
 
-    public String getName() {
+    public String getName()
+    {
 	return name;
     }
 
-    public void setName(String name) {
+    public void setName(String name)
+    {
 	this.name = name;
     }
 
-    public String getType() {
+    public String getType()
+    {
 	return type;
     }
 
-    public void setType(String type) {
+    public void setType(String type)
+    {
 	this.type = type;
     }
 
-    public float getCaloriesPer100g() {
+    public float getCaloriesPer100g()
+    {
 	return kiloCaloriesPer100g;
     }
 
-    public void setCaloriesPer100g(float caloriesPer100g) {
+    public void setCaloriesPer100g(float caloriesPer100g)
+    {
 	this.kiloCaloriesPer100g = caloriesPer100g;
     }
 
-    public float getFatPer100g() {
+    public float getFatPer100g()
+    {
 	return gramFatPer100g;
     }
 
-    public void setGramFatPer100g(float fatPer100g) {
+    public void setGramFatPer100g(float fatPer100g)
+    {
 	this.gramFatPer100g = fatPer100g;
     }
 
-    public float getGramCarbsPer100g() {
+    public float getGramCarbsPer100g()
+    {
 	return gramCarbsPer100g;
     }
 
-    public void setGramCarbsPer100g(float carbsPer100g) {
+    public void setGramCarbsPer100g(float carbsPer100g)
+    {
 	this.gramCarbsPer100g = carbsPer100g;
     }
 
-    public float getGramProteinsPer100g() {
+    public float getGramProteinsPer100g()
+    {
 	return gramProteinsPer100g;
     }
 
-    public void setGramProteinsPer100g(float proteinsPer100g) {
+    public void setGramProteinsPer100g(float proteinsPer100g)
+    {
 	this.gramProteinsPer100g = proteinsPer100g;
     }
 
-    public void setDescription(String description) {
+    public void setDescription(String description)
+    {
 	this.description = description;
 	parseDescription();
     }
 
-    public String getDescription() {
+    public String getDescription()
+    {
 	return description;
     }
 
-    public String getUrl() {
+    public String getUrl()
+    {
 	return url;
     }
 
-    public void setUrl(String url) {
+    public void setUrl(String url)
+    {
 	this.url = url;
     }
 
-    private boolean parseDescription() {
+    private boolean parseDescription()
+    {
 	if (this.description != null && description.length() != 0)
 	{
 	    // description looks like this:
@@ -178,7 +210,21 @@ public class FoodInfoItem
     }
 
     @Override
-    public String toString() {
+    public String toString()
+    {
 	return String.format("[id: %d,name: %s,type: %s,description: %s]", id, name, type, description);
+    }
+
+    @Override
+    public String toJSON()
+    {
+	JSONObject json = new JSONObject();
+	json.put(KEY_NAME, name);
+	json.put(KEY_TYPE, type);
+	json.put(KEY_CALORIES, kiloCaloriesPer100g);
+	json.put(KEY_FAT, gramFatPer100g);
+	json.put(KEY_CARBS, gramCarbsPer100g);
+	json.put(KEY_PROTEINS, gramProteinsPer100g);
+	return json.toJSONString();
     }
 }

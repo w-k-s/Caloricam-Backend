@@ -4,7 +4,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Connection;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -17,12 +19,14 @@ import net.semanticmetadata.lire.ImageSearcher;
 import net.semanticmetadata.lire.ImageSearcherFactory;
 
 import org.apache.log4j.Logger;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONValue;
 
 import com.wks.calorieapp.daos.DataAccessObjectException;
 import com.wks.calorieapp.daos.FoodDataAccessObject;
 import com.wks.calorieapp.daos.ImageDataAccessObject;
 import com.wks.calorieapp.models.FoodDataTransferObject;
+import com.wks.calorieapp.models.FoodSimilarity;
 import com.wks.calorieapp.models.Identifier;
 import com.wks.calorieapp.models.ImageDataTransferObject;
 import com.wks.calorieapp.models.Response;
@@ -109,48 +113,54 @@ public class Identify extends HttpServlet
 
 	try
 	{
-	    Map<Float, String> similarityImageMap = getSimilarImages(fileURI, maximumHits);  
-	    Map<Float, String> similarityFoodMap = new HashMap<Float, String>();
+	    Map<Float, String> similarityImageMap = getSimilarImages(fileURI, maximumHits);
+	    List<FoodSimilarity> foodSimilarityList = new ArrayList<FoodSimilarity>();
 	    for (Entry<Float, String> entry : similarityImageMap.entrySet())
 	    {
 		String imageName = entry.getValue();
 		String foodName = getFoodNameForImage(imageName);
-		
 
 		if (foodName != null && !foodName.isEmpty())
 		{
-		    similarityFoodMap.put(entry.getKey(), foodName);
+		   FoodSimilarity foodSimilarity = new FoodSimilarity();
+		   foodSimilarity.setFoodName(foodName);
+		   foodSimilarity.setSimilarity(entry.getKey());
+		   foodSimilarityList.add(foodSimilarity);
 		}
 
 	    }
 
-	    
 	    // convert hashmap into json
-	    String jsonSimilarityFoodMap = JSONValue.toJSONString(similarityFoodMap);
+	    JSONArray array = new JSONArray();
+	    for(FoodSimilarity fs : foodSimilarityList)
+		array.add(fs.toJSON());
 
 	    // retur resposne object.
-	    out.println(new Response(true, jsonSimilarityFoodMap).toJSON());
+	    System.out.println(foodSimilarityList);
+	    System.out.println(array.toJSONString());
+	    out.println(new Response(true, array.toJSONString()).toJSON());
 
 	} catch (LireResultsParseException e)
 	{
-	
-	    logger.error("Failure to parse LIRe image identification results.",e);
-	    out.println(new Response(false,Status.IDENTIFICATION_FAILED.getMessage()).toJSON());
+
+	    logger.error("Failure to parse LIRe image identification results.", e);
+	    out.println(new Response(false, Status.IDENTIFICATION_FAILED.getMessage()).toJSON());
 	} catch (DataAccessObjectException e)
 	{
-	    
-	    logger.error("Failure to load food name from database",e);
-	    out.println(new Response(false,Status.DB_ACCESS_ERROR.getMessage()).toJSON());
 
-	}catch(IOException e)
+	    logger.error("Failure to load food name from database", e);
+	    out.println(new Response(false, Status.DB_ACCESS_ERROR.getMessage()).toJSON());
+
+	} catch (IOException e)
 	{
-	    logger.error("IO Exception encountered while finding similar image.",e);
-	    out.println(new Response(false,Status.IO_ERROR.getMessage()).toJSON());
+	    logger.error("IO Exception encountered while finding similar image.", e);
+	    out.println(new Response(false, Status.IO_ERROR.getMessage()).toJSON());
 	}
 
     }
 
-    private HashMap<Float, String> getSimilarImages(String fileURI, int maximumHits) throws LireResultsParseException, IOException
+    private HashMap<Float, String> getSimilarImages(String fileURI, int maximumHits) throws LireResultsParseException,
+	    IOException
     {
 	// find similar images
 	HashMap<Float, String> similarityImageMap = new HashMap<Float, String>();
@@ -159,19 +169,18 @@ public class Identify extends HttpServlet
 
 	// Get list: similarity [0-1],image name.
 	String[] similarImages = identifier.findSimilarImages(fileURI, indexesDir, maximumHits);
-	
+
 	// parse list and add each result to map.
 	for (String similarImage : similarImages)
 	{
 	    System.out.println(similarImage);
-	    //if the user request more hits than matches actually found, 
-	    //matches array will be buffered with null.
-	    //e.g. if user requested max 5 hits and 2 found
-	    //results will be {hit1, hit2, null,null,null};
-	    
-	    if(similarImage == null)
-		continue;
-	    
+	    // if the user request more hits than matches actually found,
+	    // matches array will be buffered with null.
+	    // e.g. if user requested max 5 hits and 2 found
+	    // results will be {hit1, hit2, null,null,null};
+
+	    if (similarImage == null) break;
+
 	    // split similarity and image uri.
 	    String[] tokens = similarImage.split(SIMILAR_IMAGE_NAME_SIMILARITY_SEPERATOR);
 
@@ -186,7 +195,7 @@ public class Identify extends HttpServlet
 		    String fileUri = tokens[1];
 		    // get file name from uri.
 		    int indexFileSeperator = fileUri.lastIndexOf(File.separator);
-		    
+
 		    String fileName = fileUri.substring(indexFileSeperator + 1);
 		    similarityImageMap.put(similarity, fileName);
 		} catch (NumberFormatException e)
@@ -215,7 +224,8 @@ public class Identify extends HttpServlet
 	    if (imageDTO != null)
 	    {
 		FoodDataTransferObject foodDTO = foodDao.find(imageDTO.getFoodId());
-		foodName = foodDTO.getName();
+
+		if (foodDTO != null) foodName = foodDTO.getName();
 	    }
 
 	} else
