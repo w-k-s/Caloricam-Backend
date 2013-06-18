@@ -12,7 +12,7 @@ import java.util.Properties;
 
 public class DatabaseUtils
 {
-    private static final boolean appIsDeployed = false;
+    private static final boolean appIsDeployed = true;
     private static final String PARAM_DRIVER = "driver";
     private static final String PARAM_URL = "url";
     private static final String PARAM_USERNAME = "user";

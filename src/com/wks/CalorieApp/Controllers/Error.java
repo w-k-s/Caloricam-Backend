@@ -44,7 +44,7 @@ public class Error extends HttpServlet
        String time = format.format(cal.getTime());
        
        //display response.
-       out.println( new Response(false,time+" - "+"Web Service failed. Please report this incident.").toJSON() );
+       out.println( new Response(StatusCode.SERVICE_FAILED.getCode(),time+"-"+StatusCode.SERVICE_FAILED.getDescription()).toJSON() );
     }
     
     @Override

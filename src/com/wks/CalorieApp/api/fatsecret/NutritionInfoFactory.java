@@ -9,7 +9,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-public class FoodInfoItemFactory
+public class NutritionInfoFactory
 {
     private static final String JSON_FOODS_KEY = "foods";
     private static final String JSON_FOOD_KEY = "food";
@@ -25,7 +25,7 @@ public class FoodInfoItemFactory
 
     private static JSONParser parser;
 
-    public static List<NutritionInfo> createFoodItemsFromJSON(String jsonString) throws FatSecretException,
+    public static List<NutritionInfo> createNutritionInfoFromJSON(String jsonString) throws FatSecretException,
 	    ParseException {
 	parser = new JSONParser();
 	JSONObject json = (JSONObject) parser.parse(jsonString);

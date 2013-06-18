@@ -68,7 +68,7 @@ public class AdminLog extends HttpServlet
 	    String logUri = Environment.getLogFile(getServletContext());
 
 	    File logFile = new File(logUri);
-	    if (!logFile.exists()) return Status.FILE_NOT_FOUND.getMessage();
+	    if (!logFile.exists()) return StatusCode.FILE_NOT_FOUND.toString();
 
 	    // Log file exists, read it.
 	    BufferedReader reader = null;
@@ -85,12 +85,12 @@ public class AdminLog extends HttpServlet
 	    } catch (FileNotFoundException e)
 	    {
 		e.printStackTrace();
-		return Status.FILE_NOT_FOUND.getMessage() + ": " + e;
+		return StatusCode.FILE_NOT_FOUND.toString() + ": " + e;
 	    } catch (IOException e)
 	    {
 		// TODO Auto-generated catch block
 		e.printStackTrace();
-		return Status.IO_ERROR.getMessage() + ": " + e;
+		return StatusCode.FILE_IO_ERROR.toString() + ": " + e;
 	    } finally
 	    {
 		try
@@ -98,7 +98,7 @@ public class AdminLog extends HttpServlet
 		    if (reader != null) reader.close();
 		} catch (IOException e)
 		{
-		    return Status.IO_ERROR.getMessage() + ": " + e;
+		    return StatusCode.FILE_IO_ERROR.toString() + ": " + e;
 		}
 	    }
 	    return logText;
@@ -106,20 +106,4 @@ public class AdminLog extends HttpServlet
 
     }
 
-    enum Status
-    {
-	FILE_NOT_FOUND("No log file found. "), IO_ERROR("An IOException occured while reading log file.");
-
-	private final String message;
-
-	Status(String message)
-	{
-	    this.message = message;
-	}
-
-	public String getMessage()
-	{
-	    return message;
-	}
-    }
 }

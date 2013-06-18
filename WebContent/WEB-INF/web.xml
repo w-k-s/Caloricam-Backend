@@ -162,7 +162,7 @@
 
 	<context-param>
 		<param-name>is_deployed</param-name>
-		<param-value>false</param-value>
+		<param-value>true</param-value>
 	</context-param>
 
 	<!-- API KEYS -->

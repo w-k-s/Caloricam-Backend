@@ -75,14 +75,14 @@ public class AdminLogin extends HttpServlet
 	// if username and password submitted, validate
 	if (username != null && password != null)
 	{
-	    LoginStatus loginStatus;
+	    StatusCode loginStatus;
 	    try
 	    {
 		loginStatus = loginCredentialsAreValid(username, password);
 
 		switch (loginStatus)
 		{
-		case AUTHENTICATED:
+		case OK:
 		    logger.info(username + " has signed in.");
 		    session.setAttribute(Attribute.AUTHENTICATED.toString(), true);
 		    session.setAttribute(Attribute.USERNAME.toString(), username);
@@ -92,8 +92,8 @@ public class AdminLogin extends HttpServlet
 		    return;
 
 		default:
-		    logger.info(username + " - " + loginStatus.getMessage());
-		    req.setAttribute(Attribute.STATUS.toString(), loginStatus.getMessage());
+		    logger.info(username + " - " + loginStatus.getDescription());
+		    req.setAttribute(Attribute.STATUS.toString(), loginStatus.getDescription());
 		    RequestDispatcher login = req.getRequestDispatcher(JSP_LOGIN);
 		    login.forward(req, resp);
 		    return;
@@ -113,38 +113,19 @@ public class AdminLogin extends HttpServlet
 
     }
 
-    private LoginStatus loginCredentialsAreValid(String username, String password) throws DataAccessObjectException
+    private StatusCode loginCredentialsAreValid(String username, String password) throws DataAccessObjectException
     {
-	if (connection == null) return LoginStatus.DB_FAILURE;
+	if (connection == null) return StatusCode.DB_NULL_CONNECTION;
 
 	UserDataAccessObject usersDb = new UserDataAccessObject(connection);
 	User user = null;
 
 	user = usersDb.find(username);
 
-	if (user == null) return LoginStatus.NOT_REGISTERED;
-	if (user.getPassword().equals(password)) return LoginStatus.AUTHENTICATED;
-	return LoginStatus.INCORRECT_USERNAME_PASSWORD;
+	if (user == null) return StatusCode.NOT_REGISTERED;
+	if (user.getPassword().equals(password)) return StatusCode.OK;
+	return StatusCode.AUTHENTICATION_FAILED;
     }
 
-    enum LoginStatus
-    {
-	AUTHENTICATED("Username and password valid. You will be redirected to admin page."),
-	INCORRECT_USERNAME_PASSWORD("Username or password is not correct."),
-	NOT_REGISTERED("This username is not registered as admin."),
-	DB_FAILURE("Credentials can not be validated at this time. Please report this issue.");
-
-	private final String message;
-
-	LoginStatus(String message)
-	{
-	    this.message = message;
-	}
-
-	public String getMessage()
-	{
-	    return message;
-	}
-    }
 
 }

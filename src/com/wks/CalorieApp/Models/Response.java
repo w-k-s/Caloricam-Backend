@@ -5,26 +5,26 @@ import org.json.simple.JSONObject;
 
 public class Response implements JSONWriteable
 {
-    private static final String SUCCESS_KEY = "success";
-    private static final String MESSAGE_KEY = "message";
+    private static final String KEY_RESPONSE_CODE = "code";
+    private static final String KEY_MESSAGE = "message";
     
-    private boolean successful;
+    private int responseCode;
     private String message;
     
-    public Response(boolean successful, String message)
+    public Response(int responseCode, String message)
     {
-	this.successful = successful;
+	this.responseCode = responseCode;
 	this.message = message;
     }
     
-    public boolean isSuccessful()
+    public int getResponseCode()
     {
-	return successful;
+	return responseCode;
     }
     
-    public void setSuccessful(boolean successful)
+    public void setResponseCode(int responseCode)
     {
-	this.successful = successful;
+	this.responseCode = responseCode;
     }
     
     public String getMessage()
@@ -42,8 +42,8 @@ public class Response implements JSONWriteable
     public String toJSON()
     {
 	JSONObject response = new JSONObject();
-	response.put(SUCCESS_KEY, successful);
-	response.put(MESSAGE_KEY, message);
+	response.put(KEY_RESPONSE_CODE, responseCode);
+	response.put(KEY_MESSAGE, message);
 	return response.toJSONString();
     }
 

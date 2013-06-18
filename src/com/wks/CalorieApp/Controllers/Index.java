@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Connection;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -28,6 +29,7 @@ public class Index extends HttpServlet
 {
 
     private static final long serialVersionUID = 1L;
+    private static final String ARG_FORMAT = "/{string: imagename (required) }";
     private static final String CONTENT_TYPE = "application/json";
     private static final int MIN_NUM_PARAMETERS = 1;
     private static String imagesDir = "";
@@ -64,7 +66,7 @@ public class Index extends HttpServlet
 
 	if (parameters == null || parameters.length < MIN_NUM_PARAMETERS)
 	{
-	    out.println(new Response(false, Status.TOO_FEW_ARGS.getMessage()).toJSON());
+	    out.println(new Response(StatusCode.TOO_FEW_ARGS.getCode(), StatusCode.TOO_FEW_ARGS.getDescription()+":"+ARG_FORMAT).toJSON());
 	    return;
 	} else
 	    if (parameters.length > 1) fileName = parameters[1];
@@ -76,7 +78,7 @@ public class Index extends HttpServlet
 
 	if (!imageFile.exists())
 	{
-	    out.println( new Response(false, Status.FILE_NOT_FOUND.getMessage()).toJSON());
+	    out.println( new Response(StatusCode.FILE_NOT_FOUND.getCode(), StatusCode.FILE_NOT_FOUND.getDescription()+":"+imageFile).toJSON());
 	    logger.error("Index Request Failed. "+fileURI+" does not exist.");
 	    return;
 	}
@@ -91,28 +93,28 @@ public class Index extends HttpServlet
 	    logger.info("Index Request. "+fileURI+" has been recorded in the database.");
 	} catch (DataAccessObjectException e)
 	{
-	    out.println( new Response(false, Status.DB_INTEGRITY_VIOLATION.getMessage()).toJSON());
+	    out.println( new Response(StatusCode.DB_INTEGRITY_VIOLATION.getCode(), StatusCode.DB_INTEGRITY_VIOLATION.getDescription()).toJSON());
 	    logger.fatal("Index Request. DataAccessObjectException: File:"+fileURI+". Message: "+e.getMessage(),e);
 	}
 
 	if (!imageIsInserted)
 	{
-	    out.println( new Response(false,Status.DB_INSERT_FAILED.getMessage()).toJSON() );
+	    out.println( new Response(StatusCode.DB_INSERT_FAILED.getCode(),StatusCode.DB_INSERT_FAILED.getDescription()).toJSON() );
 	    return;
 	}
 
 	try
 	{
 	    indexImage(fileURI, indexesDir);
-	    out.println( new Response(true, Status.INDEXING_SUCCESSFUL.getMessage()).toJSON());
+	    out.println( new Response(StatusCode.OK.getCode(), StatusCode.OK.getDescription()).toJSON());
 	    logger.info("Index Request. "+fileURI+" has been indexed.");
 	} catch (FileNotFoundException e)
 	{
-	    out.println( new Response(false, Status.FILE_NOT_FOUND.getMessage()).toJSON());
+	    out.println( new Response(StatusCode.FILE_NOT_FOUND.getCode(), StatusCode.FILE_NOT_FOUND.getDescription()+":"+imageFile).toJSON());
 	    logger.error("Index Request. File not found exception encountered while indexing: "+fileURI,e);
 	} catch (IOException e)
 	{
-	    out.println( new Response(false, Status.IO_ERROR.getMessage()).toJSON());
+	    out.println( new Response(StatusCode.FILE_IO_ERROR.getCode(), StatusCode.FILE_IO_ERROR.getDescription()).toJSON());
 	    logger.error("Index Request. IOException encountered while indexing: "+fileURI,e);
 	} 
 
@@ -140,29 +142,5 @@ public class Index extends HttpServlet
 
 	boolean done = imageDb.create(imageItem);
 	return done;
-    }
-
-    enum Status
-    {
-	INDEXING_SUCCESSFUL("File Indexed Successfully."),
-	TOO_FEW_ARGS("Insufficient parameters provided.Service: index/{FileName}"),
-	IO_ERROR(""),
-	INDEX_ERROR(""),
-	IO_INDEX_ERROR("Error occured while reading or indexing image"),
-	FILE_NOT_FOUND("Indexing failed because file not found."),
-	DB_INTEGRITY_VIOLATION("Database Integrity Violation."),
-	DB_INSERT_FAILED("Image could not be added to database.");
-
-	private final String message;
-
-	Status(String message)
-	{
-	    this.message = message;
-	}
-
-	public String getMessage()
-	{
-	    return message;
-	}
     }
 }

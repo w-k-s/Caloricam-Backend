@@ -20,8 +20,6 @@ import net.semanticmetadata.lire.ImageSearcherFactory;
 
 import org.apache.log4j.Logger;
 import org.json.simple.JSONArray;
-import org.json.simple.JSONValue;
-
 import com.wks.calorieapp.daos.DataAccessObjectException;
 import com.wks.calorieapp.daos.FoodDataAccessObject;
 import com.wks.calorieapp.daos.ImageDataAccessObject;
@@ -44,6 +42,7 @@ public class Identify extends HttpServlet
 {
 
     private static final long serialVersionUID = 1L;
+    private static final String ARG_FORMAT = "/{string: imagename (required) }/{int: maxhits(optional)}";
     private static final String CONTENT_TYPE = "application/json";
     private static final String SIMILAR_IMAGE_NAME_SIMILARITY_SEPERATOR = ":";
 
@@ -73,6 +72,7 @@ public class Identify extends HttpServlet
 	doPost(req, resp);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException
     {
@@ -86,7 +86,7 @@ public class Identify extends HttpServlet
 
 	if (parameters == null || parameters.length < MIN_NUM_PARAMETERS)
 	{
-	    out.println(new Response(false, Status.TOO_FEW_ARGS.getMessage()).toJSON());
+	    out.println(new Response(StatusCode.TOO_FEW_ARGS.getCode(), StatusCode.TOO_FEW_ARGS.getDescription()+":"+ARG_FORMAT).toJSON());
 	    return;
 	} else
 	{
@@ -98,7 +98,7 @@ public class Identify extends HttpServlet
 		    maximumHits = Integer.parseInt(parameters[2]);
 		} catch (NumberFormatException e)
 		{
-		    out.println(new Response(false, Status.INVALID_MAX_HITS.getMessage()).toJSON());
+		    out.println(new Response(StatusCode.INVALID_ARG.getCode(), StatusCode.INVALID_ARG.getDescription()+":"+ARG_FORMAT).toJSON());
 		    logger.error("Identify Request. Invalid number of maximum Hits provided: " + parameters[2], e);
 		    return;
 		}
@@ -134,27 +134,24 @@ public class Identify extends HttpServlet
 	    JSONArray array = new JSONArray();
 	    for(FoodSimilarity fs : foodSimilarityList)
 		array.add(fs.toJSON());
-
-	    // retur resposne object.
-	    System.out.println(foodSimilarityList);
-	    System.out.println(array.toJSONString());
-	    out.println(new Response(true, array.toJSONString()).toJSON());
+	    
+	    out.println(new Response(StatusCode.OK.getCode(), array.toJSONString()).toJSON());
 
 	} catch (LireResultsParseException e)
 	{
 
 	    logger.error("Failure to parse LIRe image identification results.", e);
-	    out.println(new Response(false, Status.IDENTIFICATION_FAILED.getMessage()).toJSON());
+	    out.println(new Response(StatusCode.PARSE_ERROR.getCode(), StatusCode.PARSE_ERROR.getDescription()+":"+e).toJSON());
 	} catch (DataAccessObjectException e)
 	{
 
 	    logger.error("Failure to load food name from database", e);
-	    out.println(new Response(false, Status.DB_ACCESS_ERROR.getMessage()).toJSON());
+	    out.println(new Response(StatusCode.DB_SQL_EXCEPTION.getCode(), StatusCode.DB_SQL_EXCEPTION.getDescription()).toJSON());
 
 	} catch (IOException e)
 	{
 	    logger.error("IO Exception encountered while finding similar image.", e);
-	    out.println(new Response(false, Status.IO_ERROR.getMessage()).toJSON());
+	    out.println(new Response(StatusCode.FILE_IO_ERROR.getCode(), StatusCode.FILE_IO_ERROR.getDescription()).toJSON());
 	}
 
     }
