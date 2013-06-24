@@ -28,6 +28,7 @@
 	</tr>
 </table>
 </form>
+<p>Version ${initParam.app_version} </p>
 <script type="text/javascript" src="js/login.js"></script>
 </body>
 </html>

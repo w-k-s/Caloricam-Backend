@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
 
 import com.wks.calorieapp.models.Response;
+import com.wks.calorieapp.models.StatusCode;
 
 public class Error extends HttpServlet
 {

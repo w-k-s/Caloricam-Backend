@@ -27,6 +27,7 @@ public class NutritionInfo implements JSONWriteable
     private static final int MATCH_GROUP_CARBS = 3;
     private static final int MATCH_GROUP_PROTEINS = 4;
 
+    public static final String KEY_ID = "id";
     public static final String KEY_FAT = "fat";
     public static final String KEY_NAME = "name";
     public static final String KEY_CARBS = "carbohydrates";
@@ -219,6 +220,7 @@ public class NutritionInfo implements JSONWriteable
     public String toJSON()
     {
 	JSONObject json = new JSONObject();
+	json.put(KEY_ID, id);
 	json.put(KEY_NAME, name);
 	json.put(KEY_TYPE, type);
 	json.put(KEY_CALORIES, kiloCaloriesPer100g);

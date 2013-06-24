@@ -1,17 +1,26 @@
 package com.wks.calorieapp.controllers;
 
+import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Connection;
 
+import javax.imageio.ImageIO;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
+import org.apache.lucene.analysis.core.WhitespaceAnalyzer;
+import org.apache.lucene.document.Document;
+import org.apache.lucene.index.IndexWriter;
+import org.apache.lucene.index.IndexWriterConfig;
+import org.apache.lucene.store.FSDirectory;
+import org.apache.lucene.util.Version;
 
 import net.semanticmetadata.lire.DocumentBuilder;
 import net.semanticmetadata.lire.DocumentBuilderFactory;
@@ -21,13 +30,14 @@ import com.wks.calorieapp.daos.ImageDataAccessObject;
 import com.wks.calorieapp.models.ImageDataTransferObject;
 import com.wks.calorieapp.models.Indexer;
 import com.wks.calorieapp.models.Response;
+import com.wks.calorieapp.models.StatusCode;
 import com.wks.calorieapp.utils.DatabaseUtils;
 import com.wks.calorieapp.utils.Environment;
 import com.wks.calorieapp.utils.RequestParameterUtil;
 
 public class Index extends HttpServlet
 {
-
+    private static final Object lock = new Object();
     private static final long serialVersionUID = 1L;
     private static final String ARG_FORMAT = "/{string: imagename (required) }";
     private static final String CONTENT_TYPE = "application/json";
@@ -36,7 +46,6 @@ public class Index extends HttpServlet
     private static String indexesDir = "";
     private static Logger logger = Logger.getLogger(Index.class);
     private static Connection connection = null;
-    
 
     @Override
     public void init() throws ServletException
@@ -45,7 +54,7 @@ public class Index extends HttpServlet
 	imagesDir = Environment.getImagesDirectory(getServletContext());
 	indexesDir = Environment.getIndexesDirectory(getServletContext());
     }
-    
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException
     {
@@ -59,81 +68,114 @@ public class Index extends HttpServlet
 	resp.setContentType(CONTENT_TYPE);
 	PrintWriter out = resp.getWriter();
 
-
 	// seperate parameters
 	String fileName = "";
 	String[] parameters = RequestParameterUtil.getRequestParameters(req);
 
 	if (parameters == null || parameters.length < MIN_NUM_PARAMETERS)
 	{
-	    out.println(new Response(StatusCode.TOO_FEW_ARGS.getCode(), StatusCode.TOO_FEW_ARGS.getDescription()+":"+ARG_FORMAT).toJSON());
+	    out.println(new Response(StatusCode.TOO_FEW_ARGS.getCode(), StatusCode.TOO_FEW_ARGS.getDescription() + ":"
+		    + ARG_FORMAT).toJSON());
 	    return;
-	} else
-	    if (parameters.length > 1) fileName = parameters[1];
-	
-	String fileURI = imagesDir+fileName;
-	File imageFile = new File(fileURI);
-	
-	logger.info("Index Request. Image: "+fileURI);
+	} else if (parameters.length > 1) fileName = parameters[1];
+
+	String fileUri = imagesDir + fileName;
+	File imageFile = new File(fileUri);
+
+	logger.info("Index Request. Image: " + fileUri);
 
 	if (!imageFile.exists())
 	{
-	    out.println( new Response(StatusCode.FILE_NOT_FOUND.getCode(), StatusCode.FILE_NOT_FOUND.getDescription()+":"+imageFile).toJSON());
-	    logger.error("Index Request Failed. "+fileURI+" does not exist.");
+	    out.println(new Response(StatusCode.FILE_NOT_FOUND.getCode(), StatusCode.FILE_NOT_FOUND.getDescription()
+		    + ":" + imageFile).toJSON());
+	    logger.error("Index Request Failed. " + fileUri + " does not exist.");
 	    return;
 	}
 
-	
 	// add image to database
 	// Don't index image if you can't record it in db.
 	boolean imageIsInserted = false;
 	try
 	{
 	    imageIsInserted = insertImage(imageFile);
-	    logger.info("Index Request. "+fileURI+" has been recorded in the database.");
+	    logger.info("Index Request. " + fileUri + " has been recorded in the database.");
 	} catch (DataAccessObjectException e)
 	{
-	    out.println( new Response(StatusCode.DB_INTEGRITY_VIOLATION.getCode(), StatusCode.DB_INTEGRITY_VIOLATION.getDescription()).toJSON());
-	    logger.fatal("Index Request. DataAccessObjectException: File:"+fileURI+". Message: "+e.getMessage(),e);
+	    out.println(new Response(StatusCode.DB_INTEGRITY_VIOLATION.getCode(), StatusCode.DB_INTEGRITY_VIOLATION
+		    .getDescription()).toJSON());
+	    logger.fatal("Index Request. DataAccessObjectException: File:" + fileUri + ". Message: " + e.getMessage(),
+		    e);
 	}
 
 	if (!imageIsInserted)
 	{
-	    out.println( new Response(StatusCode.DB_INSERT_FAILED.getCode(),StatusCode.DB_INSERT_FAILED.getDescription()).toJSON() );
+	    out.println(new Response(StatusCode.DB_INSERT_FAILED.getCode(), StatusCode.DB_INSERT_FAILED
+		    .getDescription()).toJSON());
 	    return;
 	}
 
-	try
+	
+	synchronized (lock)
 	{
-	    indexImage(fileURI, indexesDir);
-	    out.println( new Response(StatusCode.OK.getCode(), StatusCode.OK.getDescription()).toJSON());
-	    logger.info("Index Request. "+fileURI+" has been indexed.");
-	} catch (FileNotFoundException e)
-	{
-	    out.println( new Response(StatusCode.FILE_NOT_FOUND.getCode(), StatusCode.FILE_NOT_FOUND.getDescription()+":"+imageFile).toJSON());
-	    logger.error("Index Request. File not found exception encountered while indexing: "+fileURI,e);
-	} catch (IOException e)
-	{
-	    out.println( new Response(StatusCode.FILE_IO_ERROR.getCode(), StatusCode.FILE_IO_ERROR.getDescription()).toJSON());
-	    logger.error("Index Request. IOException encountered while indexing: "+fileURI,e);
-	} 
+	    Response response = indexImage(fileUri);
+	    out.println(response.toJSON());
+	}
 
+	
     }
 
-    private void indexImage(String fileURI, String indexesDir) throws FileNotFoundException, IOException
+    private Response indexImage(String imageUri)
     {
-	// use auto color correlogram document builder
-	DocumentBuilder builder = DocumentBuilderFactory.getAutoColorCorrelogramDocumentBuilder();
-	Indexer indexer = new Indexer(builder);
+	IndexWriter indexWriter = null;
 
-	indexer.indexImage(fileURI, indexesDir);
+	try
+	{
+	    DocumentBuilder builder = DocumentBuilderFactory.getAutoColorCorrelogramDocumentBuilder();
+	    // Configure lucene index writer
+	    IndexWriterConfig config = new IndexWriterConfig(Version.LUCENE_40, new WhitespaceAnalyzer(
+		    Version.LUCENE_40));
+
+	    // create index writer and provide directory where indexes will be
+	    // saved.
+	    indexWriter = new IndexWriter(FSDirectory.open(new File(indexesDir)), config);
+
+	    // load image
+
+	    BufferedImage image = ImageIO.read(new FileInputStream(imageUri));
+	    Document document = builder.createDocument(image, imageUri);
+	    indexWriter.addDocument(document);
+
+	    logger.info("Index Request. " + imageUri + " has been indexed.");
+	    return new Response(StatusCode.OK.getCode(), StatusCode.OK.getDescription());
+
+	} catch (FileNotFoundException e)
+	{
+	    // TODO Auto-generated catch block
+	    logger.error("Index Request. File not found exception encountered while indexing: " + imageUri, e);
+	    return new Response(StatusCode.FILE_NOT_FOUND.getCode(), StatusCode.FILE_NOT_FOUND.getDescription() + ":"
+		    + imageUri);
+	} catch (IOException e)
+	{
+	    // TODO Auto-generated catch block
+	    logger.error("Index Request. IOException encountered while indexing: " + imageUri, e);
+	    return new Response(StatusCode.FILE_IO_ERROR.getCode(), StatusCode.FILE_IO_ERROR.getDescription());
+	} finally
+	{
+	    if (indexWriter != null) try
+	    {
+		indexWriter.close();
+	    } catch (IOException e)
+	    {
+		logger.error("Index Request. IOException encountered while closing IndexWriter: ", e);
+		e.printStackTrace();
+	    }
+	}
     }
 
     private boolean insertImage(File imageFile) throws DataAccessObjectException
     {
-	if(connection == null)
-	    return false;
-	
+	if (connection == null) return false;
+
 	ImageDataAccessObject imageDb = new ImageDataAccessObject(connection);
 	ImageDataTransferObject imageItem = new ImageDataTransferObject();
 	imageItem.setImageId(imageFile.getName());

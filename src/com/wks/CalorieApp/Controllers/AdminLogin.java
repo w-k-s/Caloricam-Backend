@@ -14,6 +14,7 @@ import org.apache.log4j.Logger;
 
 import com.wks.calorieapp.daos.DataAccessObjectException;
 import com.wks.calorieapp.daos.UserDataAccessObject;
+import com.wks.calorieapp.models.StatusCode;
 import com.wks.calorieapp.models.User;
 import com.wks.calorieapp.utils.DatabaseUtils;
 

@@ -19,7 +19,7 @@ td {
 </style>
 </head>
 <body>
-	<h1>ADMIN PANEL</h1>
+	<h1>ADMIN PANEL v. ${initParam.app_version} </h1>
 	<hr />
 	<h2>Navigation</h2>
 	<ul>

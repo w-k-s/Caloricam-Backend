@@ -28,6 +28,7 @@ import com.wks.calorieapp.models.FoodSimilarity;
 import com.wks.calorieapp.models.Identifier;
 import com.wks.calorieapp.models.ImageDataTransferObject;
 import com.wks.calorieapp.models.Response;
+import com.wks.calorieapp.models.StatusCode;
 import com.wks.calorieapp.utils.DatabaseUtils;
 import com.wks.calorieapp.utils.Environment;
 import com.wks.calorieapp.utils.RequestParameterUtil;

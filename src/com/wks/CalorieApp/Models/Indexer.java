@@ -47,19 +47,7 @@ public class Indexer
 	    FileNotFoundException
     {
 
-	// Configure lucene index writer
-	IndexWriterConfig config = new IndexWriterConfig(Version.LUCENE_40, new WhitespaceAnalyzer(Version.LUCENE_40));
-
-	// create index writer and provide directory where indexes will be
-	// saved.
-	IndexWriter indexWriter = new IndexWriter(FSDirectory.open(new File(indexesDir)), config);
-
-	// load image
-
-	BufferedImage image = ImageIO.read(new FileInputStream(imageURI));
-	Document document = getDocumentBuilder().createDocument(image, imageURI);
-	indexWriter.addDocument(document);
-	indexWriter.close();
+	
 
 	return true;
     }

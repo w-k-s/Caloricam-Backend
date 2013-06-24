@@ -18,6 +18,7 @@ import com.wks.calorieapp.api.fatsecret.FatSecretException;
 import com.wks.calorieapp.api.fatsecret.NutritionInfo;
 import com.wks.calorieapp.api.fatsecret.NutritionInfoFactory;
 import com.wks.calorieapp.models.Response;
+import com.wks.calorieapp.models.StatusCode;
 import com.wks.calorieapp.utils.RequestParameterUtil;
 
 public class GetNutritionInfo extends HttpServlet

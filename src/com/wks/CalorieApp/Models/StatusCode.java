@@ -1,4 +1,4 @@
-package com.wks.calorieapp.controllers;
+package com.wks.calorieapp.models;
 
 public enum StatusCode
 {
