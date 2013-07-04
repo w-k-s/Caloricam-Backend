@@ -57,7 +57,7 @@ public class GetNutritionInfo extends HttpServlet
 
 	if (parameters == null || parameters.length < MIN_NUM_PARAMETERS)
 	{
-	    out.println(new Response(StatusCode.TOO_FEW_ARGS.getCode(), StatusCode.TOO_FEW_ARGS.getDescription()+":"+ARG_FORMAT).toJSON());
+	    out.println(new Response(StatusCode.TOO_FEW_ARGS,ARG_FORMAT).toJSON());
 	    return;
 	} else
 	{
@@ -69,7 +69,7 @@ public class GetNutritionInfo extends HttpServlet
 		    numResults = Integer.parseInt(parameters[2]);
 		} catch (NumberFormatException e)
 		{
-		    out.println(new Response(StatusCode.INVALID_ARG.getCode(), StatusCode.INVALID_ARG.getDescription()+":"+ARG_FORMAT).toJSON());
+		    out.println(new Response(StatusCode.INVALID_ARG,ARG_FORMAT).toJSON());
 		    logger.error("Identify Request. Invalid number of maximum Hits provided: " + parameters[2], e);
 		    return;
 		}
@@ -81,7 +81,7 @@ public class GetNutritionInfo extends HttpServlet
 
 	if (consumerKey == null && consumerSecret == null)
 	{
-	    out.println(new Response(StatusCode.NULL_KEY.getCode(), StatusCode.NULL_KEY.getDescription()).toJSON());
+	    out.println(new Response(StatusCode.NULL_KEY).toJSON());
 	    logger.fatal("Nutrition Info Request. " + StatusCode.NULL_KEY.getDescription());
 	    return;
 	}
@@ -89,22 +89,22 @@ public class GetNutritionInfo extends HttpServlet
 	try
 	{
 	    String nutritionInfo = getNutritionInfo(foodName, numResults);
-	    out.println(new Response(StatusCode.OK.getCode(), nutritionInfo).toJSON());
+	    out.println(new Response(StatusCode.OK, nutritionInfo).toJSON());
 	} catch (FatSecretException e)
 	{
 	    logger.error("Nutrition Info Request. FatSecretException encountered for " + foodName, e);
-	    out.println(new Response(StatusCode.FAT_SECRET_ERROR.getCode(), StatusCode.FAT_SECRET_ERROR.getDescription() + ": " + e.getCode()).toJSON());
+	    out.println(new Response(StatusCode.FAT_SECRET_ERROR, StatusCode.FAT_SECRET_ERROR.getDescription(""+e.getCode())).toJSON());
 
 	} catch (ParseException e)
 	{
 	    logger.error("Nutrition Info Request. JSONParser failed to parse JSON: " + foodName, e);
-	    out.println(new Response(StatusCode.PARSE_ERROR.getCode(), StatusCode.PARSE_ERROR.getDescription()+": "+foodName).toJSON());
+	    out.println(new Response(StatusCode.PARSE_ERROR, StatusCode.PARSE_ERROR.getDescription(foodName)).toJSON());
 
 	} catch (IOException e)
 	{
 	    logger.error(
 		    "Nutrition Info Request. IOException encontered while retrieving information for: " + foodName, e);
-	    out.println(new Response(StatusCode.FILE_IO_ERROR.getCode(), StatusCode.FILE_IO_ERROR.getDescription() + ":"+e).toJSON());
+	    out.println(new Response(StatusCode.FILE_IO_ERROR, StatusCode.FILE_IO_ERROR.getDescription(e.toString())).toJSON());
 
 	}
 

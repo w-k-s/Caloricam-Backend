@@ -53,7 +53,7 @@ public class Upload extends HttpServlet
 	boolean isMultipart = ServletFileUpload.isMultipartContent(req);
 	if (!isMultipart)
 	{
-	    out.println(new Response(StatusCode.FILE_NOT_FOUND.getCode(), StatusCode.FILE_NOT_FOUND.getDescription()).toJSON());
+	    out.println(new Response(StatusCode.FILE_NOT_FOUND).toJSON());
 	    logger.info("Upload Request. "+StatusCode.FILE_NOT_FOUND.getDescription().toString());
 	    return;
 	}
@@ -78,7 +78,7 @@ public class Upload extends HttpServlet
 		    String extension = fileName.substring(fileName.lastIndexOf("."));
 		    if (!extension.equals(EXTENSION_JPEG) && !extension.equals(EXTENSION_JPG))
 		    {
-			out.println(new Response(StatusCode.FILE_TYPE_INVALID.getCode(), StatusCode.FILE_TYPE_INVALID.getDescription() + ": " + extension).toJSON());
+			out.println(new Response(StatusCode.FILE_TYPE_INVALID, StatusCode.FILE_TYPE_INVALID.getDescription(extension)).toJSON());
 			logger.error("Upload Request. Failed to upload " + fileName + ". Invalid file extension: " + extension);
 			return;
 		    }
@@ -94,7 +94,7 @@ public class Upload extends HttpServlet
 			indexer.forward(req, resp);
 		    } else
 		    {
-			out.println(new Response(StatusCode.FILE_UPLOAD_FAILED.getCode(), StatusCode.FILE_UPLOAD_FAILED.getDescription()).toJSON());
+			out.println(new Response(StatusCode.FILE_UPLOAD_FAILED).toJSON());
 			logger.error("Upload Request. File failed to upload: "+fileName);
 		    }
 		}
@@ -102,11 +102,11 @@ public class Upload extends HttpServlet
 
 	} catch (FileUploadException e)
 	{
-	    out.println(new Response(StatusCode.FILE_NOT_FOUND.getCode(), StatusCode.FILE_NOT_FOUND.getDescription()).toJSON());
+	    out.println(new Response(StatusCode.FILE_NOT_FOUND).toJSON());
 	    logger.error("Upload Request. FileUploadException encountered.",e);
 	} catch (IOException e)
 	{
-	    out.println(new Response(StatusCode.FILE_IO_ERROR.getCode(), StatusCode.FILE_IO_ERROR.getDescription()).toJSON());
+	    out.println(new Response(StatusCode.FILE_IO_ERROR).toJSON());
 	    logger.error("Upload Request. IOException encountered.",e);
 	}
 

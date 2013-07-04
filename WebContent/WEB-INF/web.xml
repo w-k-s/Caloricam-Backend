@@ -99,6 +99,15 @@
 		<servlet-name>nutrition_info</servlet-name>
 		<url-pattern>/nutrition_info/*</url-pattern>
 	</servlet-mapping>
+	
+	<servlet>
+		<servlet-name>update</servlet-name>
+		<servlet-class>com.wks.calorieapp.controllers.Update</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>update</servlet-name>
+		<url-pattern>/update/*</url-pattern>
+	</servlet-mapping>
 
 	<servlet>
 		<servlet-name>error</servlet-name>
@@ -132,6 +141,7 @@
 		</init-param>
 		<load-on-startup>1</load-on-startup>
 	</servlet>
+
 
 	<!-- CONTEXT -->
 
@@ -167,7 +177,7 @@
 	
 	<context-param>
 		<param-name>app_version</param-name>
-		<param-value>1.25</param-value>
+		<param-value>1.26</param-value>
 	</context-param>
 
 	<!-- API KEYS -->

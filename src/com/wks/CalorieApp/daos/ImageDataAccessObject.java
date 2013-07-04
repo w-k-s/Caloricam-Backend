@@ -115,9 +115,9 @@ public class ImageDataAccessObject
 	{
 	    // connection = DatabaseUtils.getConnection();
 	    statement = connection.prepareStatement(UPDATE_QUERY);
-	    if (image.getFoodId() == 0) statement.setNull(2, java.sql.Types.NULL);
+	    if (image.getFoodId() == 0) statement.setNull(1, java.sql.Types.NULL);
 	    else
-		statement.setLong(2, image.getFoodId());
+		statement.setLong(1, image.getFoodId());
 	    statement.setLong(2, image.getSize());
 	    statement.setBoolean(3, image.isFinalized());
 	    statement.setString(4, image.getImageId());

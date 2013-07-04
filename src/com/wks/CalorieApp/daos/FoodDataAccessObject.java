@@ -24,9 +24,13 @@ public class FoodDataAccessObject
     private static final String UPDATE_QUERY = "UPDATE " + TABLE_FOODS + " SET " + COLUMN_FOOD_NAME + "=? WHERE "
 	    + COLUMN_FOOD_ID + " = ?";
     private static final String DELETE_QUERY = "DELETE FROM " + TABLE_FOODS + " WHERE " + COLUMN_FOOD_ID + " = ?";
-    private static final String FIND_QUERY = "SELECT " + COLUMN_FOOD_ID + ", " + COLUMN_FOOD_NAME + " FROM "
+    private static final String FIND_BY_ID_QUERY = "SELECT " + COLUMN_FOOD_ID + ", " + COLUMN_FOOD_NAME + " FROM "
 	    + TABLE_FOODS + " WHERE " + COLUMN_FOOD_ID + " = ?";
-
+    
+    private static final String FIND_BY_NAME_QUERY = "SELECT "+COLUMN_FOOD_ID + ", "+COLUMN_FOOD_NAME + " FROM "
+	    +TABLE_FOODS+" WHERE "+COLUMN_FOOD_NAME + " = ?";
+    
+    
     private Connection connection = null;
 
     public FoodDataAccessObject(Connection connection) throws IllegalStateException
@@ -147,7 +151,6 @@ public class FoodDataAccessObject
 
     public FoodDataTransferObject find(long id) throws DataAccessObjectException
     {
-	// Connection connection = null;
 	PreparedStatement statement = null;
 	ResultSet result = null;
 	FoodDataTransferObject foodItem = null;
@@ -155,7 +158,7 @@ public class FoodDataAccessObject
 	try
 	{
 
-	    statement = connection.prepareStatement(FIND_QUERY);
+	    statement = connection.prepareStatement(FIND_BY_ID_QUERY);
 	    statement.setLong(1, id);
 	    statement.execute();
 
@@ -175,7 +178,36 @@ public class FoodDataAccessObject
 	}
 
 	return foodItem;
+    }
+    
+    public FoodDataTransferObject find(String name) throws DataAccessObjectException
+    {
+	PreparedStatement statement = null;
+	ResultSet result = null;
+	FoodDataTransferObject foodItem = null;
 
+	try
+	{
+	    statement = connection.prepareStatement(FIND_BY_NAME_QUERY);
+	    statement.setString(1, name);
+	    statement.execute();
+
+	    result = statement.getResultSet();
+	    if (result != null && result.next())
+	    {
+		foodItem = new FoodDataTransferObject();
+		foodItem.setFoodId(result.getLong(COLUMN_FOOD_ID));
+		foodItem.setName(result.getString(COLUMN_FOOD_NAME));
+	    }
+	} catch (SQLException e)
+	{
+	    throw new DataAccessObjectException(e);
+	} finally
+	{
+	    DatabaseUtils.close(statement,result);
+	}
+
+	return foodItem;
     }
 
     public void close() 

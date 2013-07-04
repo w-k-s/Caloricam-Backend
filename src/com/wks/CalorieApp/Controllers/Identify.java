@@ -87,7 +87,7 @@ public class Identify extends HttpServlet
 
 	if (parameters == null || parameters.length < MIN_NUM_PARAMETERS)
 	{
-	    out.println(new Response(StatusCode.TOO_FEW_ARGS.getCode(), StatusCode.TOO_FEW_ARGS.getDescription()+":"+ARG_FORMAT).toJSON());
+	    out.println(new Response(StatusCode.TOO_FEW_ARGS, StatusCode.TOO_FEW_ARGS.getDescription(ARG_FORMAT)).toJSON());
 	    return;
 	} else
 	{
@@ -99,7 +99,7 @@ public class Identify extends HttpServlet
 		    maximumHits = Integer.parseInt(parameters[2]);
 		} catch (NumberFormatException e)
 		{
-		    out.println(new Response(StatusCode.INVALID_ARG.getCode(), StatusCode.INVALID_ARG.getDescription()+":"+ARG_FORMAT).toJSON());
+		    out.println(new Response(StatusCode.INVALID_ARG, StatusCode.INVALID_ARG.getDescription(ARG_FORMAT)).toJSON());
 		    logger.error("Identify Request. Invalid number of maximum Hits provided: " + parameters[2], e);
 		    return;
 		}
@@ -136,23 +136,23 @@ public class Identify extends HttpServlet
 	    for(FoodSimilarity fs : foodSimilarityList)
 		array.add(fs.toJSON());
 	    
-	    out.println(new Response(StatusCode.OK.getCode(), array.toJSONString()).toJSON());
+	    out.println(new Response(StatusCode.OK, array.toJSONString()).toJSON());
 
 	} catch (LireResultsParseException e)
 	{
 
 	    logger.error("Failure to parse LIRe image identification results.", e);
-	    out.println(new Response(StatusCode.PARSE_ERROR.getCode(), StatusCode.PARSE_ERROR.getDescription()+":"+e).toJSON());
+	    out.println(new Response(StatusCode.PARSE_ERROR, StatusCode.PARSE_ERROR.getDescription(e.toString())).toJSON());
 	} catch (DataAccessObjectException e)
 	{
 
 	    logger.error("Failure to load food name from database", e);
-	    out.println(new Response(StatusCode.DB_SQL_EXCEPTION.getCode(), StatusCode.DB_SQL_EXCEPTION.getDescription()).toJSON());
+	    out.println(new Response(StatusCode.DB_SQL_EXCEPTION).toJSON());
 
 	} catch (IOException e)
 	{
 	    logger.error("IO Exception encountered while finding similar image.", e);
-	    out.println(new Response(StatusCode.FILE_IO_ERROR.getCode(), StatusCode.FILE_IO_ERROR.getDescription()).toJSON());
+	    out.println(new Response(StatusCode.FILE_IO_ERROR).toJSON());
 	}
 
     }

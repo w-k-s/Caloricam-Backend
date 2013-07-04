@@ -11,9 +11,14 @@ public class Response implements JSONWriteable
     private int responseCode;
     private String message;
     
-    public Response(int responseCode, String message)
+    public Response(StatusCode code)
     {
-	this.responseCode = responseCode;
+	this(code,code.getDescription());
+    }
+    
+    public Response(StatusCode code, String message)
+    {
+	this.responseCode = code.getCode();
 	this.message = message;
     }
     

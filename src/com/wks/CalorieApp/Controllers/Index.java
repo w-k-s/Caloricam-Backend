@@ -74,8 +74,7 @@ public class Index extends HttpServlet
 
 	if (parameters == null || parameters.length < MIN_NUM_PARAMETERS)
 	{
-	    out.println(new Response(StatusCode.TOO_FEW_ARGS.getCode(), StatusCode.TOO_FEW_ARGS.getDescription() + ":"
-		    + ARG_FORMAT).toJSON());
+	    out.println(new Response(StatusCode.TOO_FEW_ARGS, StatusCode.TOO_FEW_ARGS.getDescription(ARG_FORMAT)).toJSON());
 	    return;
 	} else if (parameters.length > 1) fileName = parameters[1];
 
@@ -86,8 +85,7 @@ public class Index extends HttpServlet
 
 	if (!imageFile.exists())
 	{
-	    out.println(new Response(StatusCode.FILE_NOT_FOUND.getCode(), StatusCode.FILE_NOT_FOUND.getDescription()
-		    + ":" + imageFile).toJSON());
+	    out.println(new Response(StatusCode.FILE_NOT_FOUND, StatusCode.FILE_NOT_FOUND.getDescription(imageFile.getAbsolutePath())).toJSON());
 	    logger.error("Index Request Failed. " + fileUri + " does not exist.");
 	    return;
 	}
@@ -101,16 +99,14 @@ public class Index extends HttpServlet
 	    logger.info("Index Request. " + fileUri + " has been recorded in the database.");
 	} catch (DataAccessObjectException e)
 	{
-	    out.println(new Response(StatusCode.DB_INTEGRITY_VIOLATION.getCode(), StatusCode.DB_INTEGRITY_VIOLATION
-		    .getDescription()).toJSON());
+	    out.println(new Response(StatusCode.DB_INTEGRITY_VIOLATION).toJSON());
 	    logger.fatal("Index Request. DataAccessObjectException: File:" + fileUri + ". Message: " + e.getMessage(),
 		    e);
 	}
 
 	if (!imageIsInserted)
 	{
-	    out.println(new Response(StatusCode.DB_INSERT_FAILED.getCode(), StatusCode.DB_INSERT_FAILED
-		    .getDescription()).toJSON());
+	    out.println(new Response(StatusCode.DB_INSERT_FAILED).toJSON());
 	    return;
 	}
 
@@ -146,19 +142,18 @@ public class Index extends HttpServlet
 	    indexWriter.addDocument(document);
 
 	    logger.info("Index Request. " + imageUri + " has been indexed.");
-	    return new Response(StatusCode.OK.getCode(), StatusCode.OK.getDescription());
+	    return new Response(StatusCode.OK);
 
 	} catch (FileNotFoundException e)
 	{
 	    // TODO Auto-generated catch block
 	    logger.error("Index Request. File not found exception encountered while indexing: " + imageUri, e);
-	    return new Response(StatusCode.FILE_NOT_FOUND.getCode(), StatusCode.FILE_NOT_FOUND.getDescription() + ":"
-		    + imageUri);
+	    return new Response(StatusCode.FILE_NOT_FOUND, StatusCode.FILE_NOT_FOUND.getDescription(imageUri));
 	} catch (IOException e)
 	{
 	    // TODO Auto-generated catch block
 	    logger.error("Index Request. IOException encountered while indexing: " + imageUri, e);
-	    return new Response(StatusCode.FILE_IO_ERROR.getCode(), StatusCode.FILE_IO_ERROR.getDescription());
+	    return new Response(StatusCode.FILE_IO_ERROR);
 	} finally
 	{
 	    if (indexWriter != null) try
