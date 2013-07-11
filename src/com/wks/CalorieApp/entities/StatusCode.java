@@ -21,7 +21,7 @@ public enum StatusCode
     DB_SQL_EXCEPTION(16,"Database could not be queried"),
     DB_INTEGRITY_VIOLATION(17,"Query could not be completed because of violation with db constraints"),
     DB_INSERT_FAILED(18,"Insertion to db failed possibly because record already exists."),
-    UPDATE_FAILED(19,"Image could not be linked with food.");
+    UPDATE_FAILED(20,"Image could not be linked with food.");
     
     private final int code;
     private final String description;

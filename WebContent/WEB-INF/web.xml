@@ -101,6 +101,15 @@
 	</servlet-mapping>
 	
 	<servlet>
+		<servlet-name>recognize</servlet-name>
+		<servlet-class>com.wks.calorieapp.controllers.Recognize</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>recognize</servlet-name>
+		<url-pattern>/recognize/*</url-pattern>
+	</servlet-mapping>
+	
+	<servlet>
 		<servlet-name>update</servlet-name>
 		<servlet-class>com.wks.calorieapp.controllers.Update</servlet-class>
 	</servlet>
@@ -126,6 +135,9 @@
 		<servlet-name>log</servlet-name>
 		<url-pattern>/log</url-pattern>
 	</servlet-mapping>
+	
+	
+	
 	<!-- LOGGING -->
 
 	<servlet>
@@ -175,12 +187,12 @@
 	</context-param>
 	<context-param>
 		<param-name>is_deployed</param-name>
-		<param-value>false</param-value>
+		<param-value>true</param-value>
 	</context-param>
 	
 	<context-param>
 		<param-name>app_version</param-name>
-		<param-value>1.28</param-value>
+		<param-value>1.30</param-value>
 	</context-param>
 
 	<!-- API KEYS -->
