@@ -1,34 +1,21 @@
 package com.wks.calorieapp.controllers;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Connection;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import net.semanticmetadata.lire.ImageSearcher;
-import net.semanticmetadata.lire.ImageSearcherFactory;
-
 import org.apache.log4j.Logger;
-import org.json.simple.JSONArray;
+import org.json.simple.JSONValue;
+
 import com.wks.calorieapp.daos.DataAccessObjectException;
-import com.wks.calorieapp.daos.FoodDataAccessObject;
-import com.wks.calorieapp.daos.ImageDataAccessObject;
-import com.wks.calorieapp.models.FoodDataTransferObject;
-import com.wks.calorieapp.models.FoodSimilarity;
-import com.wks.calorieapp.models.Identifier;
-import com.wks.calorieapp.models.ImageDataTransferObject;
-import com.wks.calorieapp.models.Response;
-import com.wks.calorieapp.models.StatusCode;
+import com.wks.calorieapp.entities.Response;
+import com.wks.calorieapp.entities.StatusCode;
+import com.wks.calorieapp.services.Identifier;
 import com.wks.calorieapp.utils.DatabaseUtils;
 import com.wks.calorieapp.utils.Environment;
 import com.wks.calorieapp.utils.RequestParameterUtil;
@@ -43,18 +30,20 @@ public class Identify extends HttpServlet
 {
 
     private static final long serialVersionUID = 1L;
-    private static final String ARG_FORMAT = "/{string: imagename (required) }/{int: maxhits(optional)}";
+    private static final String ARG_FORMAT = "/{string: imagename (required) }/{float: minSimilarity(optional)}/{int: maxhits(optional)}";
     private static final String CONTENT_TYPE = "application/json";
-    private static final String SIMILAR_IMAGE_NAME_SIMILARITY_SEPERATOR = ":";
+
 
     private static final int MIN_NUM_PARAMETERS = 2;
     private static final int DEFAULT_MAX_HITS = 10;
+    private static final float DEFAULT_MIN_SIMILARITY = 0F;
 
     private static Connection connection = null;
 
     private static String imagesDir = "";
     private static String indexesDir = "";
     private static int defaultMaxHits = DEFAULT_MAX_HITS;
+    private static float defaultMinSimilarity = DEFAULT_MIN_SIMILARITY;
     private static Logger logger = Logger.getLogger(Identify.class);
 
     @Override
@@ -63,6 +52,8 @@ public class Identify extends HttpServlet
 	imagesDir = Environment.getImagesDirectory(getServletContext());
 	indexesDir = Environment.getIndexesDirectory(getServletContext());
 	defaultMaxHits = Integer.parseInt(getServletContext().getInitParameter(Parameter.DEFAULT_MAX_HITS.toString()));
+	defaultMinSimilarity = Float.parseFloat(getServletContext().getInitParameter(
+		Parameter.DEFAULT_MIN_SIMILARITY.toString()));
 	connection = DatabaseUtils.getConnection();
     }
 
@@ -73,7 +64,6 @@ public class Identify extends HttpServlet
 	doPost(req, resp);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException
     {
@@ -83,28 +73,28 @@ public class Identify extends HttpServlet
 
 	String fileName = "";
 	int maximumHits = defaultMaxHits;
+	float minimumSimilarity = defaultMinSimilarity;
+
 	String[] parameters = RequestParameterUtil.getRequestParameters(req);
 
 	if (parameters == null || parameters.length < MIN_NUM_PARAMETERS)
 	{
-	    out.println(new Response(StatusCode.TOO_FEW_ARGS, StatusCode.TOO_FEW_ARGS.getDescription(ARG_FORMAT)).toJSON());
+	    out.println(new Response(StatusCode.TOO_FEW_ARGS, StatusCode.TOO_FEW_ARGS.getDescription(ARG_FORMAT))
+		    .toJSON());
 	    return;
-	} else
+	}
+
+	try
 	{
 	    if (parameters.length > 1) fileName = parameters[1];
-	    if (parameters.length > 2)
-	    {
-		try
-		{
-		    maximumHits = Integer.parseInt(parameters[2]);
-		} catch (NumberFormatException e)
-		{
-		    out.println(new Response(StatusCode.INVALID_ARG, StatusCode.INVALID_ARG.getDescription(ARG_FORMAT)).toJSON());
-		    logger.error("Identify Request. Invalid number of maximum Hits provided: " + parameters[2], e);
-		    return;
-		}
-	    }
-
+	    if (parameters.length > 2) minimumSimilarity = Float.parseFloat(parameters[2]);
+	    if (parameters.length > 3) maximumHits = Integer.parseInt(parameters[3]);
+	} catch (NumberFormatException e)
+	{
+	    out.println(new Response(StatusCode.INVALID_ARG, StatusCode.INVALID_ARG.getDescription(ARG_FORMAT))
+		    .toJSON());
+	    logger.error("Identify Request. Invalid number of maximum Hits provided: " + parameters[2], e);
+	    return;
 	}
 
 	// check that file exists
@@ -114,35 +104,13 @@ public class Identify extends HttpServlet
 
 	try
 	{
-	    Map<Float, String> similarityImageMap = getSimilarImages(fileURI, maximumHits);
-	    List<FoodSimilarity> foodSimilarityList = new ArrayList<FoodSimilarity>();
-	    for (Entry<Float, String> entry : similarityImageMap.entrySet())
-	    {
-		String imageName = entry.getValue();
-		String foodName = getFoodNameForImage(imageName);
-
-		if (foodName != null && !foodName.isEmpty())
-		{
-		   FoodSimilarity foodSimilarity = new FoodSimilarity();
-		   foodSimilarity.setFoodName(foodName);
-		   foodSimilarity.setSimilarity(entry.getKey());
-		   foodSimilarityList.add(foodSimilarity);
-		}
-
-	    }
-
-	    // convert hashmap into json
-	    JSONArray array = new JSONArray();
-	    for(FoodSimilarity fs : foodSimilarityList)
-		array.add(fs.toJSON());
+	    Identifier identifier = Identifier.getInstance(connection);
+	    Map<String,Float> foodNameSimilarity = identifier.getPossibleFoodsForImage(fileURI, indexesDir, minimumSimilarity, maximumHits);
 	    
-	    out.println(new Response(StatusCode.OK, array.toJSONString()).toJSON());
+	    String jsonMap = JSONValue.toJSONString(foodNameSimilarity);
 
-	} catch (LireResultsParseException e)
-	{
+	    out.println(new Response(StatusCode.OK, jsonMap).toJSON());
 
-	    logger.error("Failure to parse LIRe image identification results.", e);
-	    out.println(new Response(StatusCode.PARSE_ERROR, StatusCode.PARSE_ERROR.getDescription(e.toString())).toJSON());
 	} catch (DataAccessObjectException e)
 	{
 
@@ -155,81 +123,6 @@ public class Identify extends HttpServlet
 	    out.println(new Response(StatusCode.FILE_IO_ERROR).toJSON());
 	}
 
-    }
-
-    private HashMap<Float, String> getSimilarImages(String fileURI, int maximumHits) throws LireResultsParseException,
-	    IOException
-    {
-	// find similar images
-	HashMap<Float, String> similarityImageMap = new HashMap<Float, String>();
-	ImageSearcher searcher = ImageSearcherFactory.createAutoColorCorrelogramImageSearcher(maximumHits);
-	Identifier identifier = new Identifier(searcher);
-
-	// Get list: similarity [0-1],image name.
-	String[] similarImages = identifier.findSimilarImages(fileURI, indexesDir, maximumHits);
-
-	// parse list and add each result to map.
-	for (String similarImage : similarImages)
-	{
-	    System.out.println(similarImage);
-	    // if the user request more hits than matches actually found,
-	    // matches array will be buffered with null.
-	    // e.g. if user requested max 5 hits and 2 found
-	    // results will be {hit1, hit2, null,null,null};
-
-	    if (similarImage == null) break;
-
-	    // split similarity and image uri.
-	    String[] tokens = similarImage.split(SIMILAR_IMAGE_NAME_SIMILARITY_SEPERATOR);
-
-	    // check both elements are present
-	    if (tokens.length >= 2)
-	    {
-		try
-		{
-		    // the first element is the similarity (float type)
-		    float similarity = Float.parseFloat(tokens[0]);
-		    // second value is uri.
-		    String fileUri = tokens[1];
-		    // get file name from uri.
-		    int indexFileSeperator = fileUri.lastIndexOf(File.separator);
-
-		    String fileName = fileUri.substring(indexFileSeperator + 1);
-		    similarityImageMap.put(similarity, fileName);
-		} catch (NumberFormatException e)
-		{
-		    throw new LireResultsParseException("Lire Results did not match format %g:%s" + similarImage);
-		}
-	    } else
-		throw new LireResultsParseException("Failure to parse results: " + similarImage);
-	}
-
-	return similarityImageMap;
-    }
-
-    private String getFoodNameForImage(String string) throws DataAccessObjectException
-    {
-	String foodName = null;
-
-	if (connection != null)
-	{
-	    // TODO REFACTOR THIS LATER!!! I don't believe this is a very
-	    // efficient approach
-	    ImageDataAccessObject imageDao = new ImageDataAccessObject(connection);
-	    FoodDataAccessObject foodDao = new FoodDataAccessObject(connection);
-
-	    ImageDataTransferObject imageDTO = imageDao.find(string);
-	    if (imageDTO != null)
-	    {
-		FoodDataTransferObject foodDTO = foodDao.find(imageDTO.getFoodId());
-
-		if (foodDTO != null) foodName = foodDTO.getName();
-	    }
-
-	} else
-	    throw new IllegalStateException("Null Connection");
-
-	return foodName;
     }
 
     enum Status

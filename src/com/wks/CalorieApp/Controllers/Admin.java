@@ -13,7 +13,7 @@ import javax.servlet.http.HttpSession;
 import org.apache.log4j.Logger;
 
 import com.wks.calorieapp.daos.DataAccessObjectException;
-import com.wks.calorieapp.daos.GeneralDataAccessObject;
+import com.wks.calorieapp.daos.GeneralDAO;
 import com.wks.calorieapp.utils.DatabaseUtils;
 
 public class Admin extends HttpServlet
@@ -58,7 +58,7 @@ public class Admin extends HttpServlet
 		try
 		{
 		    logger.info("Executing query: " + query);
-		    GeneralDataAccessObject gdao = new GeneralDataAccessObject(connection);
+		    GeneralDAO gdao = new GeneralDAO(connection);
 		    boolean isOk = gdao.doQuery(query);
 		    req.setAttribute("query", isOk);
 

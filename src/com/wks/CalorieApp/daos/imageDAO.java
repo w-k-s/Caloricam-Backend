@@ -8,10 +8,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.mysql.jdbc.exceptions.MySQLIntegrityConstraintViolationException;
-import com.wks.calorieapp.models.ImageDataTransferObject;
+import com.wks.calorieapp.entities.ImageEntry;
 import com.wks.calorieapp.utils.DatabaseUtils;
 
-public class ImageDataAccessObject
+public class imageDAO
 {
 
     private static final String TABLE_IMAGES = "images";
@@ -32,14 +32,14 @@ public class ImageDataAccessObject
 
     private Connection connection;
 
-    public ImageDataAccessObject(Connection connection)
+    public imageDAO(Connection connection)
     {
 
 	if (connection == null) throw new IllegalStateException("Null Connection");
 	this.connection = connection;
     }
 
-    public boolean create(ImageDataTransferObject image) throws DataAccessObjectException
+    public boolean create(ImageEntry image) throws DataAccessObjectException
     {
 	// Connection connection = null;
 	PreparedStatement statement = null;
@@ -70,10 +70,10 @@ public class ImageDataAccessObject
 
     }
 
-    public List<ImageDataTransferObject> read() throws DataAccessObjectException
+    public List<ImageEntry> read() throws DataAccessObjectException
     {
-	List<ImageDataTransferObject> imageItems = new ArrayList<ImageDataTransferObject>();
-	ImageDataTransferObject imageItem = null;
+	List<ImageEntry> imageItems = new ArrayList<ImageEntry>();
+	ImageEntry imageItem = null;
 	// Connection connection = null;
 	PreparedStatement statement = null;
 	ResultSet results = null;
@@ -86,7 +86,7 @@ public class ImageDataAccessObject
 
 	    while (results.next())
 	    {
-		imageItem = new ImageDataTransferObject();
+		imageItem = new ImageEntry();
 		imageItem.setImageId(results.getString(COLUMN_IMAGE_ID));
 		imageItem.setFoodId(results.getLong(COLUMN_FOOD_ID));
 		imageItem.setSize(results.getLong(COLUMN_SIZE));
@@ -106,7 +106,7 @@ public class ImageDataAccessObject
 
     }
 
-    public boolean update(ImageDataTransferObject image) throws DataAccessObjectException
+    public boolean update(ImageEntry image) throws DataAccessObjectException
     {
 	// Connection connection = null;
 	PreparedStatement statement = null;
@@ -154,12 +154,12 @@ public class ImageDataAccessObject
 	}
     }
 
-    public ImageDataTransferObject find(String id) throws DataAccessObjectException
+    public ImageEntry find(String id) throws DataAccessObjectException
     {
 	// Connection connection = null;
 	PreparedStatement statement = null;
 	ResultSet result = null;
-	ImageDataTransferObject image = null;
+	ImageEntry image = null;
 
 	try
 	{
@@ -170,7 +170,7 @@ public class ImageDataAccessObject
 	    result = statement.getResultSet();
 	    if (result.next() && result != null)
 	    {
-		image = new ImageDataTransferObject();
+		image = new ImageEntry();
 		image.setImageId(result.getString(COLUMN_IMAGE_ID));
 		image.setFoodId(result.getLong(COLUMN_FOOD_ID));
 		image.setSize(result.getLong(COLUMN_SIZE));

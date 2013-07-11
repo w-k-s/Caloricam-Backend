@@ -7,10 +7,10 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.wks.calorieapp.models.User;
+import com.wks.calorieapp.entities.User;
 import com.wks.calorieapp.utils.DatabaseUtils;
 
-public class UserDataAccessObject
+public class UserDAO
 {
 
     private static final String TABLE_USERS = "users";
@@ -29,7 +29,7 @@ public class UserDataAccessObject
 
     private Connection connection = null;
 
-    public UserDataAccessObject(Connection connection)
+    public UserDAO(Connection connection)
     {
 	if (connection == null)
 	    throw new IllegalStateException("Null Connection");

@@ -1,11 +1,11 @@
-package com.wks.calorieapp.models;
+package com.wks.calorieapp.entities;
 
 /**
  * POJO representing Image row in images database
  * @author Waqqas
  *
  */
-public class ImageDataTransferObject {
+public class ImageEntry {
     private String imageId;
     private long foodId;
     private long size;

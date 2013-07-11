@@ -1,4 +1,4 @@
-package com.wks.calorieapp.models;
+package com.wks.calorieapp.entities;
 
 import org.json.simple.JSONObject;
 

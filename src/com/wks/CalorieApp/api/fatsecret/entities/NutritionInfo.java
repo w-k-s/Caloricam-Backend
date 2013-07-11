@@ -1,11 +1,11 @@
-package com.wks.calorieapp.api.fatsecret;
+package com.wks.calorieapp.api.fatsecret.entities;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.json.simple.JSONObject;
 
-import com.wks.calorieapp.models.JSONWriteable;
+import com.wks.calorieapp.entities.JSONWriteable;
 
 /**
  * TODO: I think the calculation of nutrients per 100g is incorrent. Double
@@ -14,7 +14,7 @@ import com.wks.calorieapp.models.JSONWriteable;
  * @author Waqqas
  * 
  */
-public class NutritionInfo implements JSONWriteable
+public class NutritionInfo extends FSResponse implements JSONWriteable
 {
 
     private static final String REGEX_SPACE = "\\s";
@@ -40,10 +40,10 @@ public class NutritionInfo implements JSONWriteable
     private String type;
     private String description;
     private String url;
-    private float kiloCaloriesPer100g = 0;
-    private float gramFatPer100g = 0;
-    private float gramCarbsPer100g = 0;
-    private float gramProteinsPer100g = 0;
+    private float calories = 0;
+    private float gramsFat = 0;
+    private float gramsCarbs = 0;
+    private float gramsProtein = 0;
 
     public NutritionInfo()
     {
@@ -80,44 +80,44 @@ public class NutritionInfo implements JSONWriteable
 	this.type = type;
     }
 
-    public float getCaloriesPer100g()
+    public float getCalories()
     {
-	return kiloCaloriesPer100g;
+	return calories;
     }
 
-    public void setCaloriesPer100g(float caloriesPer100g)
+    public void setCalories(float calories)
     {
-	this.kiloCaloriesPer100g = caloriesPer100g;
+	this.calories = calories;
     }
 
-    public float getFatPer100g()
+    public float getGramFat()
     {
-	return gramFatPer100g;
+	return gramsFat;
     }
 
-    public void setGramFatPer100g(float fatPer100g)
+    public void setGramFat(float fat)
     {
-	this.gramFatPer100g = fatPer100g;
+	this.gramsFat = fat;
     }
 
-    public float getGramCarbsPer100g()
+    public float getGramCarbs()
     {
-	return gramCarbsPer100g;
+	return gramsCarbs;
     }
 
-    public void setGramCarbsPer100g(float carbsPer100g)
+    public void setGramCarbs(float carbs)
     {
-	this.gramCarbsPer100g = carbsPer100g;
+	this.gramsCarbs = carbs;
     }
 
-    public float getGramProteinsPer100g()
+    public float getGramProteins()
     {
-	return gramProteinsPer100g;
+	return gramsProtein;
     }
 
-    public void setGramProteinsPer100g(float proteinsPer100g)
+    public void setGramProteins(float proteins)
     {
-	this.gramProteinsPer100g = proteinsPer100g;
+	this.gramsProtein = proteins;
     }
 
     public void setDescription(String description)
@@ -167,12 +167,21 @@ public class NutritionInfo implements JSONWriteable
 		    Matcher matcher = pattern.matcher(tokens[i]);
 		    if (matcher.find()) values[i] = Float.valueOf(matcher.group(0));
 		}
+		
+		
+		setCalories(values[MATCH_GROUP_CALORIES]);
+		setGramFat(values[MATCH_GROUP_FAT]);
+		setGramProteins(values[MATCH_GROUP_PROTEINS]);
+		setGramCarbs(values[MATCH_GROUP_CARBS]);
+		
+		/*
 		// @formatter:off
-		setCaloriesPer100g((values[MATCH_GROUP_CALORIES] / values[MATCH_GROUP_SERVING_SIZE]) * 100);
-		setGramFatPer100g((values[MATCH_GROUP_FAT] / values[MATCH_GROUP_SERVING_SIZE]) * 100);
-		setGramProteinsPer100g((values[MATCH_GROUP_PROTEINS] / values[MATCH_GROUP_SERVING_SIZE]) * 100);
-		setGramCarbsPer100g((values[MATCH_GROUP_CARBS] / values[MATCH_GROUP_SERVING_SIZE]) * 100);
+		setCalories((values[MATCH_GROUP_CALORIES] / values[MATCH_GROUP_SERVING_SIZE]) * 100);
+		setGramFat((values[MATCH_GROUP_FAT] / values[MATCH_GROUP_SERVING_SIZE]) * 100);
+		setGramProteins((values[MATCH_GROUP_PROTEINS] / values[MATCH_GROUP_SERVING_SIZE]) * 100);
+		setGramCarbs((values[MATCH_GROUP_CARBS] / values[MATCH_GROUP_SERVING_SIZE]) * 100);
 		// @formatter:on
+	    	*/
 	    }
 
 	    /*
@@ -213,9 +222,10 @@ public class NutritionInfo implements JSONWriteable
     @Override
     public String toString()
     {
-	return String.format("[id: %d,name: %s,type: %s,description: %s]", id, name, type, description);
+	return this.toJSON();
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public String toJSON()
     {
@@ -223,10 +233,10 @@ public class NutritionInfo implements JSONWriteable
 	json.put(KEY_ID, id);
 	json.put(KEY_NAME, name);
 	json.put(KEY_TYPE, type);
-	json.put(KEY_CALORIES, kiloCaloriesPer100g);
-	json.put(KEY_FAT, gramFatPer100g);
-	json.put(KEY_CARBS, gramCarbsPer100g);
-	json.put(KEY_PROTEINS, gramProteinsPer100g);
+	json.put(KEY_CALORIES, calories);
+	json.put(KEY_FAT, gramsFat);
+	json.put(KEY_CARBS, gramsCarbs);
+	json.put(KEY_PROTEINS, gramsProtein);
 	return json.toJSONString();
     }
 }

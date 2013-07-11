@@ -26,11 +26,11 @@ import net.semanticmetadata.lire.DocumentBuilder;
 import net.semanticmetadata.lire.DocumentBuilderFactory;
 
 import com.wks.calorieapp.daos.DataAccessObjectException;
-import com.wks.calorieapp.daos.ImageDataAccessObject;
-import com.wks.calorieapp.models.ImageDataTransferObject;
-import com.wks.calorieapp.models.Indexer;
-import com.wks.calorieapp.models.Response;
-import com.wks.calorieapp.models.StatusCode;
+import com.wks.calorieapp.daos.imageDAO;
+import com.wks.calorieapp.entities.ImageEntry;
+import com.wks.calorieapp.entities.Response;
+import com.wks.calorieapp.entities.StatusCode;
+import com.wks.calorieapp.services.Indexer;
 import com.wks.calorieapp.utils.DatabaseUtils;
 import com.wks.calorieapp.utils.Environment;
 import com.wks.calorieapp.utils.RequestParameterUtil;
@@ -171,8 +171,8 @@ public class Index extends HttpServlet
     {
 	if (connection == null) return false;
 
-	ImageDataAccessObject imageDb = new ImageDataAccessObject(connection);
-	ImageDataTransferObject imageItem = new ImageDataTransferObject();
+	imageDAO imageDb = new imageDAO(connection);
+	ImageEntry imageItem = new ImageEntry();
 	imageItem.setImageId(imageFile.getName());
 	imageItem.setSize(imageFile.length());
 	imageItem.setFinalized(false);

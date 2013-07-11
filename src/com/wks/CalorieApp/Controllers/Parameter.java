@@ -8,7 +8,8 @@ public enum Parameter
     CONSUMER_SECRET("consumer_secret"),
     DEFAULT_MAX_HITS("default_max_hits"),
     ACTION("action"),
-    IMAGE("img");
+    IMAGE("img"), 
+    DEFAULT_MIN_SIMILARITY("default_min_similarity");
     
     private final String value;
     

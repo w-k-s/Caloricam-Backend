@@ -17,7 +17,7 @@ import javax.servlet.http.HttpSession;
 import org.apache.log4j.Logger;
 
 import com.wks.calorieapp.daos.DataAccessObjectException;
-import com.wks.calorieapp.daos.ImageDataAccessObject;
+import com.wks.calorieapp.daos.imageDAO;
 import com.wks.calorieapp.utils.*;
 
 public class AdminImages extends HttpServlet
@@ -116,7 +116,7 @@ public class AdminImages extends HttpServlet
 		return false;
 	    
 	    
-	    ImageDataAccessObject imageDao = new ImageDataAccessObject( connection);
+	    imageDAO imageDao = new imageDAO( connection);
 	    boolean recordDeleted = imageDao.delete(fileName);
 	    logger.info("Record for image \'"+fileName+"\' deleted: "+recordDeleted);
 	    return recordDeleted;

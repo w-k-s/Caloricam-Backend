@@ -19,18 +19,5 @@ public class RequestParameterUtil
 	return params;	
     }
     
-    public static boolean parametersMatchFormats(String[] parameters,String[] patterns)
-    {
-	if(parameters.length != patterns.length)
-	    throw new IllegalArgumentException("The pattern array should contain a regex for each parameter in the parameters array");
-	    
-	int parametersMatched = 0;
-	for(int i=0;i<parameters.length;i++)
-	{
-	    if(parameters[i].matches(patterns[i]))
-		parametersMatched++;
-	}
-	
-	return (parameters.length == parametersMatched);
-    }
+
 }

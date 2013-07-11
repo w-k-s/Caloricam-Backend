@@ -17,15 +17,16 @@ import org.json.simple.parser.ParseException;
 
 
 import com.mysql.jdbc.exceptions.MySQLIntegrityConstraintViolationException;
+import com.wks.calorieapp.api.fatsecret.FSWebService;
 import com.wks.calorieapp.api.fatsecret.FatSecretAPI;
-import com.wks.calorieapp.api.fatsecret.FatSecretException;
-import com.wks.calorieapp.api.fatsecret.NutritionInfo;
-import com.wks.calorieapp.api.fatsecret.NutritionInfoFactory;
-import com.wks.calorieapp.api.fatsecret.Result;
-import com.wks.calorieapp.daos.GeneralDataAccessObject;
-import com.wks.calorieapp.daos.UserDataAccessObject;
-import com.wks.calorieapp.models.ImageDataTransferObject;
-import com.wks.calorieapp.models.User;
+import com.wks.calorieapp.api.fatsecret.entities.FSError;
+import com.wks.calorieapp.api.fatsecret.entities.FSFoods;
+import com.wks.calorieapp.api.fatsecret.entities.NutritionInfo;
+import com.wks.calorieapp.api.fatsecret.entities.Result;
+import com.wks.calorieapp.daos.GeneralDAO;
+import com.wks.calorieapp.daos.UserDAO;
+import com.wks.calorieapp.entities.ImageEntry;
+import com.wks.calorieapp.entities.User;
 import com.wks.calorieapp.utils.DatabaseUtils;
 import com.wks.calorieapp.utils.HttpClient;
 
@@ -157,7 +158,18 @@ public class Test extends HttpServlet{
 	Connection connection = DatabaseUtil.getConnection();
 	GeneralDataAccessObject shit = new GeneralDataAccessObject(connection);
 	boolean b = shit.doQuery("INSERT INTO Users VALUES ('wks','2212')");
-	*/
+	
+	
+	FSWebService ws = new FSWebService("ea0d6a946b3e4b3a8d5cbdb0a55900dd","49704a68e7114143925f6390aeca8b42");
+	try
+	{
+	    List<NutritionInfo> l = ws.searchFood("chicken");
+	    System.out.println(l);
+	} catch (ParseException e)
+	{
+	    // TODO Auto-generated catch block
+	    e.printStackTrace();
+	}*/
     }
     
     @Override

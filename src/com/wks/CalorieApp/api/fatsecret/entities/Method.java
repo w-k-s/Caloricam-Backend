@@ -1,4 +1,4 @@
-package com.wks.calorieapp.api.fatsecret;
+package com.wks.calorieapp.api.fatsecret.entities;
 
 public enum Method {
     FOODS_SEARCH("foods.search"),

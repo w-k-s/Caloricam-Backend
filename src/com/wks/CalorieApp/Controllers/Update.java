@@ -13,12 +13,12 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
 
 import com.wks.calorieapp.daos.DataAccessObjectException;
-import com.wks.calorieapp.daos.FoodDataAccessObject;
-import com.wks.calorieapp.daos.ImageDataAccessObject;
-import com.wks.calorieapp.models.FoodDataTransferObject;
-import com.wks.calorieapp.models.ImageDataTransferObject;
-import com.wks.calorieapp.models.Response;
-import com.wks.calorieapp.models.StatusCode;
+import com.wks.calorieapp.daos.FoodDAO;
+import com.wks.calorieapp.daos.imageDAO;
+import com.wks.calorieapp.entities.FoodEntry;
+import com.wks.calorieapp.entities.ImageEntry;
+import com.wks.calorieapp.entities.Response;
+import com.wks.calorieapp.entities.StatusCode;
 import com.wks.calorieapp.utils.DatabaseUtils;
 import com.wks.calorieapp.utils.Environment;
 import com.wks.calorieapp.utils.RequestParameterUtil;
@@ -61,47 +61,47 @@ public class Update extends HttpServlet
 	if (parameters != null && parameters.length < MIN_NUM_PARAMETERS)
 	{
 	    out.println(new Response(StatusCode.TOO_FEW_ARGS).toJSON());
+	    return;
+	}
 
-	} else
+	imageName = parameters[1];
+	foodName = parameters[2];
+
+	File imageFile = new File(imagesDir + imageName);
+	if (!imageFile.exists())
 	{
-	    imageName = parameters[1];
-	    foodName = parameters[2];
+	    out.println(new Response(StatusCode.FILE_NOT_FOUND, StatusCode.FILE_NOT_FOUND.getDescription(imageName))
+		    .toJSON());
+	    logger.info("Update request failed. " + imageFile.getAbsolutePath() + " does not exist.");
+	    return;
+	}
 
-	    File imageFile = new File(imagesDir + imageName);
-	    if (imageFile.exists())
+	try
+	{
+	    long foodId = getFoodId(foodName);
+	    String imageId = getImageId(imageFile);
+	    if (foodId != -1 && imageId != null)
 	    {
-		try
+		if (linkImageWithFood(imageName, foodId))
 		{
-		    long foodId = getFoodId(foodName);
-		    String imageId = getImageId(imageFile);
-		    if (foodId != -1 && imageId != null)
-		    {
-			if (linkImageWithFood(imageName, foodId))
-			{
-			    out.println(new Response(StatusCode.OK).toJSON());
-			} else
-			{
-			    String details = "image: " + imageName + ", foodName: " + foodName;
-			    out.println(new Response(StatusCode.UPDATE_FAILED, StatusCode.UPDATE_FAILED
-				    .getDescription(details)).toJSON());
-			}
-		    } else
-		    {
-			throw new DataAccessObjectException(foodName + " could not be inserted into db. FoodId = "
-				+ foodId + ", imageId=" + imageName);
-		    }
-		} catch (DataAccessObjectException e)
+		    out.println(new Response(StatusCode.OK).toJSON());
+		} else
 		{
-		    out.println(new Response(StatusCode.DB_INSERT_FAILED).toJSON());
-		    logger.error("Update request Failed. Food Item " + foodName + " could not be inserted into db.", e);
+		    String details = "image: " + imageName + ", foodName: " + foodName;
+		    out.println(new Response(StatusCode.UPDATE_FAILED, StatusCode.UPDATE_FAILED.getDescription(details))
+			    .toJSON());
 		}
 	    } else
 	    {
-		out.println(new Response(StatusCode.FILE_NOT_FOUND, StatusCode.FILE_NOT_FOUND.getDescription(imageName))
-			.toJSON());
-		logger.info("Update request failed. " + imageFile.getAbsolutePath() + " does not exist.");
+		throw new DataAccessObjectException(foodName + " could not be inserted into db. FoodId = " + foodId
+			+ ", imageId=" + imageName);
 	    }
+	} catch (DataAccessObjectException e)
+	{
+	    out.println(new Response(StatusCode.DB_INSERT_FAILED).toJSON());
+	    logger.error("Update request Failed. Food Item " + foodName + " could not be inserted into db.", e);
 	}
+
     }
 
     private long getFoodId(String foodName) throws DataAccessObjectException
@@ -109,14 +109,14 @@ public class Update extends HttpServlet
 	long foodId = -1;
 	if (connection != null)
 	{
-	    FoodDataAccessObject foodDao = new FoodDataAccessObject(connection);
-	    FoodDataTransferObject foodDto = foodDao.find(foodName);
+	    FoodDAO foodDao = new FoodDAO(connection);
+	    FoodEntry foodDto = foodDao.find(foodName);
 	    if (foodDto != null)
 	    {
 		foodId = foodDto.getFoodId();
 	    } else
 	    {
-		foodDto = new FoodDataTransferObject();
+		foodDto = new FoodEntry();
 		foodDto.setName(foodName);
 		foodId = foodDao.create(foodDto);
 	    }
@@ -131,14 +131,14 @@ public class Update extends HttpServlet
 	String imageId = null;
 	if (connection != null)
 	{
-	    ImageDataAccessObject imageDao = new ImageDataAccessObject(connection);
-	    ImageDataTransferObject imageDto = imageDao.find(imageFile.getName());
+	    imageDAO imageDao = new imageDAO(connection);
+	    ImageEntry imageDto = imageDao.find(imageFile.getName());
 	    if (imageDto != null)
 	    {
 		imageId = imageDto.getImageId();
 	    } else
 	    {
-		imageDto = new ImageDataTransferObject();
+		imageDto = new ImageEntry();
 		imageDto.setImageId(imageFile.getName());
 		imageDto.setSize(imageFile.length());
 		imageDto.setFinalized(false);
@@ -151,13 +151,17 @@ public class Update extends HttpServlet
     private boolean linkImageWithFood(String imageId, long foodId) throws DataAccessObjectException
     {
 	boolean success = false;
-	ImageDataAccessObject imageDao = new ImageDataAccessObject(connection);
-	ImageDataTransferObject imageDto = imageDao.find(imageId);
-	if (imageDto != null)
+	if (connection != null)
 	{
-	    imageDto.setFoodId(foodId);
-	    success = imageDao.update(imageDto);
+	    imageDAO imageDao = new imageDAO(connection);
+	    ImageEntry imageDto = imageDao.find(imageId);
+	    if (imageDto != null)
+	    {
+		imageDto.setFoodId(foodId);
+		success = imageDao.update(imageDto);
+	    }
 	}
+
 	return success;
     }
 }

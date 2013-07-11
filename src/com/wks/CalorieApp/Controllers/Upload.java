@@ -13,8 +13,8 @@ import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.log4j.Logger;
 
-import com.wks.calorieapp.models.Response;
-import com.wks.calorieapp.models.StatusCode;
+import com.wks.calorieapp.entities.Response;
+import com.wks.calorieapp.entities.StatusCode;
 import com.wks.calorieapp.utils.Environment;
 import com.wks.calorieapp.utils.FileUtils;
 

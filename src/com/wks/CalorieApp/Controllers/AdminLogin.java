@@ -13,9 +13,9 @@ import javax.servlet.http.HttpSession;
 import org.apache.log4j.Logger;
 
 import com.wks.calorieapp.daos.DataAccessObjectException;
-import com.wks.calorieapp.daos.UserDataAccessObject;
-import com.wks.calorieapp.models.StatusCode;
-import com.wks.calorieapp.models.User;
+import com.wks.calorieapp.daos.UserDAO;
+import com.wks.calorieapp.entities.StatusCode;
+import com.wks.calorieapp.entities.User;
 import com.wks.calorieapp.utils.DatabaseUtils;
 
 public class AdminLogin extends HttpServlet
@@ -118,7 +118,7 @@ public class AdminLogin extends HttpServlet
     {
 	if (connection == null) return StatusCode.DB_NULL_CONNECTION;
 
-	UserDataAccessObject usersDb = new UserDataAccessObject(connection);
+	UserDAO usersDb = new UserDAO(connection);
 	User user = null;
 
 	user = usersDb.find(username);

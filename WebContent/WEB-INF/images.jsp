@@ -1,5 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
-    pageEncoding="ISO-8859-1" import="java.util.*,java.io.File, com.wks.calorieapp.controllers.Attribute, com.wks.calorieapp.utils.Environment"%>
+    pageEncoding="ISO-8859-1" import="java.util.*,java.io.File,com.wks.calorieapp.controllers.Attribute, com.wks.calorieapp.utils.Environment"%>
 <%!
 
 	private static final String HREF_VIEW = "images?action=view&img=";

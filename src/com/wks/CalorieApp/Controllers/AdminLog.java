@@ -13,7 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import com.wks.calorieapp.models.StatusCode;
+import com.wks.calorieapp.entities.StatusCode;
 import com.wks.calorieapp.utils.Environment;
 
 public class AdminLog extends HttpServlet

@@ -169,15 +169,18 @@
 		<param-name>default_max_hits</param-name>
 		<param-value>10</param-value>
 	</context-param>
-
+	<context-param>
+		<param-name>default_min_similarity</param-name>
+		<param-value>0</param-value>
+	</context-param>
 	<context-param>
 		<param-name>is_deployed</param-name>
-		<param-value>true</param-value>
+		<param-value>false</param-value>
 	</context-param>
 	
 	<context-param>
 		<param-name>app_version</param-name>
-		<param-value>1.26</param-value>
+		<param-value>1.28</param-value>
 	</context-param>
 
 	<!-- API KEYS -->

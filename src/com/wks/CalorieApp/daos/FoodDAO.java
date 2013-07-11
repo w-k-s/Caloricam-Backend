@@ -8,10 +8,10 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.wks.calorieapp.models.FoodDataTransferObject;
+import com.wks.calorieapp.entities.FoodEntry;
 import com.wks.calorieapp.utils.DatabaseUtils;
 
-public class FoodDataAccessObject
+public class FoodDAO
 {
 
     private static final String TABLE_FOODS = "foods";
@@ -33,7 +33,7 @@ public class FoodDataAccessObject
     
     private Connection connection = null;
 
-    public FoodDataAccessObject(Connection connection) throws IllegalStateException
+    public FoodDAO(Connection connection) throws IllegalStateException
     {
 
 	if (connection == null) throw new IllegalStateException("Null Connection");
@@ -41,7 +41,7 @@ public class FoodDataAccessObject
 	this.connection = connection;
     }
 
-    public long create(FoodDataTransferObject item) throws DataAccessObjectException
+    public long create(FoodEntry item) throws DataAccessObjectException
     {
 	// Connection connection = null;
 	PreparedStatement statement = null;
@@ -69,14 +69,14 @@ public class FoodDataAccessObject
 
     }
 
-    public List<FoodDataTransferObject> read() throws DataAccessObjectException
+    public List<FoodEntry> read() throws DataAccessObjectException
     {
 	// Connection connection = null;
 	PreparedStatement statement = null;
 	ResultSet results = null;
 
-	List<FoodDataTransferObject> foodItems = new ArrayList<FoodDataTransferObject>();
-	FoodDataTransferObject foodItem = null;
+	List<FoodEntry> foodItems = new ArrayList<FoodEntry>();
+	FoodEntry foodItem = null;
 
 	try
 	{
@@ -87,7 +87,7 @@ public class FoodDataAccessObject
 	    results = statement.getResultSet();
 	    while (results != null && results.next())
 	    {
-		foodItem = new FoodDataTransferObject();
+		foodItem = new FoodEntry();
 		foodItem.setFoodId(results.getLong(COLUMN_FOOD_ID));
 		foodItem.setName(results.getString(COLUMN_FOOD_NAME));
 		foodItems.add(foodItem);
@@ -104,7 +104,7 @@ public class FoodDataAccessObject
 
     }
 
-    public boolean update(FoodDataTransferObject item) throws DataAccessObjectException
+    public boolean update(FoodEntry item) throws DataAccessObjectException
     {
 	// Connection connection = null;
 	PreparedStatement statement = null;
@@ -149,11 +149,11 @@ public class FoodDataAccessObject
 
     }
 
-    public FoodDataTransferObject find(long id) throws DataAccessObjectException
+    public FoodEntry find(long id) throws DataAccessObjectException
     {
 	PreparedStatement statement = null;
 	ResultSet result = null;
-	FoodDataTransferObject foodItem = null;
+	FoodEntry foodItem = null;
 
 	try
 	{
@@ -165,7 +165,7 @@ public class FoodDataAccessObject
 	    result = statement.getResultSet();
 	    if (result != null && result.next())
 	    {
-		foodItem = new FoodDataTransferObject();
+		foodItem = new FoodEntry();
 		foodItem.setFoodId(result.getLong(COLUMN_FOOD_ID));
 		foodItem.setName(result.getString(COLUMN_FOOD_NAME));
 	    }
@@ -180,11 +180,11 @@ public class FoodDataAccessObject
 	return foodItem;
     }
     
-    public FoodDataTransferObject find(String name) throws DataAccessObjectException
+    public FoodEntry find(String name) throws DataAccessObjectException
     {
 	PreparedStatement statement = null;
 	ResultSet result = null;
-	FoodDataTransferObject foodItem = null;
+	FoodEntry foodItem = null;
 
 	try
 	{
@@ -195,7 +195,7 @@ public class FoodDataAccessObject
 	    result = statement.getResultSet();
 	    if (result != null && result.next())
 	    {
-		foodItem = new FoodDataTransferObject();
+		foodItem = new FoodEntry();
 		foodItem.setFoodId(result.getLong(COLUMN_FOOD_ID));
 		foodItem.setName(result.getString(COLUMN_FOOD_NAME));
 	    }

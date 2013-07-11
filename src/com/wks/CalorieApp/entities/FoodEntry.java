@@ -1,11 +1,11 @@
-package com.wks.calorieapp.models;
+package com.wks.calorieapp.entities;
 
 /**
  * POJO representing Food Item in Foods database.
  * @author Waqqas
  *
  */
-public class FoodDataTransferObject {
+public class FoodEntry {
     private long foodId;
     private String name;
     

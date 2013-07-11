@@ -5,6 +5,10 @@ import java.util.Map.Entry;
 import java.io.IOException;
 import java.net.URL;
 
+import com.wks.calorieapp.api.fatsecret.entities.Method;
+import com.wks.calorieapp.api.fatsecret.entities.OAuthBase;
+import com.wks.calorieapp.api.fatsecret.entities.Parameter;
+import com.wks.calorieapp.api.fatsecret.entities.Result;
 import com.wks.calorieapp.utils.HttpClient;
 
 public class FatSecretAPI
@@ -61,7 +65,7 @@ public class FatSecretAPI
 	return jsonResults;
     }
 
-    // TODO make a more general method rather than this concrete one.
+    // Convenience method for doing a REST call to the FatSecret Search method.
     public String foodsSearch(String searchExpression) throws IOException {
 
 	HashMap<Parameter, String> parameters = new HashMap<Parameter, String>();

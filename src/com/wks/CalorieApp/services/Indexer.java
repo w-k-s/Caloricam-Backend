@@ -1,4 +1,4 @@
-package com.wks.calorieapp.models;
+package com.wks.calorieapp.services;
 
 import java.awt.image.BufferedImage;
 import java.io.File;

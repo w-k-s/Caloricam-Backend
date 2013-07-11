@@ -17,7 +17,7 @@ import net.semanticmetadata.lire.DocumentBuilderFactory;
 
 import org.apache.log4j.Logger;
 
-import com.wks.calorieapp.models.Indexer;
+import com.wks.calorieapp.services.Indexer;
 import com.wks.calorieapp.utils.Environment;
 import com.wks.calorieapp.utils.FileUtils;
 
