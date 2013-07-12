@@ -10,14 +10,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.json.simple.JSONArray;
 import org.json.simple.JSONValue;
 import org.json.simple.parser.ParseException;
 
 import com.wks.calorieapp.api.fatsecret.FSWebService;
-import com.wks.calorieapp.api.fatsecret.FatSecretAPI;
-import com.wks.calorieapp.api.fatsecret.entities.FSError;
-import com.wks.calorieapp.api.fatsecret.entities.FSFoods;
 import com.wks.calorieapp.api.fatsecret.entities.NutritionInfo;
 import com.wks.calorieapp.entities.Response;
 import com.wks.calorieapp.entities.StatusCode;
@@ -85,7 +81,7 @@ public class GetNutritionInfo extends HttpServlet
 	{
 	    FSWebService fsWebService = new FSWebService(consumerKey,consumerSecret);
 	    List<NutritionInfo> nutritionInfo = fsWebService.searchFood(foodName);
-	    out.println(JSONValue.toJSONString(nutritionInfo));
+	    out.println(new Response(StatusCode.OK,JSONValue.toJSONString(nutritionInfo)).toJSON());
 	}catch (ParseException e)
 	{
 	    logger.error("Nutrition Info Request. JSONParser failed to parse JSON: " + foodName, e);

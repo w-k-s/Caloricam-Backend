@@ -172,12 +172,16 @@ public class Index extends HttpServlet
 	if (connection == null) return false;
 
 	imageDAO imageDb = new imageDAO(connection);
+	
+	//if image already exists, dont add again.
+	if(imageDb.find(imageFile.getName()) != null) return true;
+	
 	ImageEntry imageItem = new ImageEntry();
 	imageItem.setImageId(imageFile.getName());
 	imageItem.setSize(imageFile.length());
 	imageItem.setFinalized(false);
 
-	boolean done = imageDb.create(imageItem);
-	return done;
+	return imageDb.create(imageItem);
+	
     }
 }

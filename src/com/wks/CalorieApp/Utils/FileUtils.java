@@ -1,6 +1,7 @@
 package com.wks.calorieapp.utils;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -25,8 +26,8 @@ public class FileUtils {
      * @return true if uploaded successfully
      * @throws IOException
      */
-    public static synchronized boolean upload(String path, FileItemStream item)
-	    throws IOException {
+    public static synchronized boolean upload(String path, FileItemStream item) throws IOException
+	   {
 
 	
 	// create file
@@ -38,27 +39,49 @@ public class FileUtils {
 	File savedFile = new File(images.getAbsolutePath() + File.separator
 		+ item.getName());
 
-	// if file has already been uploaded to server, abort.
-	// if(savedFile.exists())
-	// ???
+	if(!savedFile.exists())
+	{
+	 // create input stream to read uploaded file
+		InputStream is = null;
+		// create output stream to write file to server.
+		FileOutputStream fos= null;
+		try
+		{
+		    is = item.openStream();
 
-	// create input stream to read uploaded file
-	InputStream is = item.openStream();
+		    fos = new FileOutputStream(savedFile);
 
-	// create output stream to write file to server.
-	FileOutputStream fos = new FileOutputStream(savedFile);
+		    // copy bytes from input stream to output stream.
+		    int data = 0;
+		    byte[] bytes = new byte[1024];
+		    while ((data = is.read(bytes)) != -1) {
+		        fos.write(bytes, 0, data);
+		    }
+		} catch (FileNotFoundException e)
+		{
+		    throw e;
+		} catch (IOException e)
+		{
+		    throw e;
+		}finally{
+		    try
+		    {
+			if(fos != null)
+			{
+			    fos.flush();
+			    fos.close();
+			}
+			
+			if(is != null)
+			is.close();
+		} catch (IOException e)
+		    {
+			throw e;
+		    }
+		}
 
-	// copy bytes from input stream to output stream.
-	int data = 0;
-	byte[] bytes = new byte[1024];
-	while ((data = is.read(bytes)) != -1) {
-	    fos.write(bytes, 0, data);
 	}
 
-	// close streams
-	fos.flush();
-	fos.close();
-	is.close();
 
 	return true;
     }
