@@ -3,6 +3,7 @@ package com.wks.calorieapp.controllers;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.URLDecoder;
 import java.sql.Connection;
 
 import javax.servlet.ServletException;
@@ -65,7 +66,7 @@ public class Update extends HttpServlet
 	}
 
 	imageName = parameters[1];
-	foodName = parameters[2];
+	foodName = URLDecoder.decode(parameters[2],"UTF-8");
 
 	File imageFile = new File(imagesDir + imageName);
 	if (!imageFile.exists())
@@ -110,7 +111,7 @@ public class Update extends HttpServlet
 	if (connection != null)
 	{
 	    FoodDAO foodDao = new FoodDAO(connection);
-	    FoodEntry foodDto = foodDao.find(foodName);
+	    FoodEntry foodDto = foodDao.read(foodName);
 	    if (foodDto != null)
 	    {
 		foodId = foodDto.getFoodId();

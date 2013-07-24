@@ -58,7 +58,7 @@ public class FoodDAO
 	    {
 		return result.getLong(1);
 	    } else
-		return -1;
+		return -1L;
 	} catch (SQLException e)
 	{
 	    throw new DataAccessObjectException(e);
@@ -104,52 +104,7 @@ public class FoodDAO
 
     }
 
-    public boolean update(FoodEntry item) throws DataAccessObjectException
-    {
-	// Connection connection = null;
-	PreparedStatement statement = null;
-
-	try
-	{
-	    // connection = DatabaseUtils.getConnection();
-	    statement = connection.prepareStatement(UPDATE_QUERY);
-	    statement.setString(1, item.getName());
-	    statement.setLong(2, item.getFoodId());
-	    statement.execute();
-	    return true;
-	} catch (SQLException e)
-	{
-	    throw new DataAccessObjectException(e);
-	} finally
-	{
-	    DatabaseUtils.close(statement);
-	}
-
-    }
-
-    public boolean delete(long id) throws DataAccessObjectException
-    {
-	// Connection connection = null;
-	PreparedStatement statement = null;
-
-	try
-	{
-	    // connection = DatabaseUtils.getConnection();
-	    statement = connection.prepareStatement(DELETE_QUERY);
-	    statement.setLong(1, id);
-	    statement.execute();
-	    return true;
-	} catch (SQLException e)
-	{
-	   throw new DataAccessObjectException(e);
-	} finally
-	{
-	    DatabaseUtils.close(statement);
-	}
-
-    }
-
-    public FoodEntry find(long id) throws DataAccessObjectException
+    public FoodEntry read(long id) throws DataAccessObjectException
     {
 	PreparedStatement statement = null;
 	ResultSet result = null;
@@ -180,7 +135,7 @@ public class FoodDAO
 	return foodItem;
     }
     
-    public FoodEntry find(String name) throws DataAccessObjectException
+    public FoodEntry read(String name) throws DataAccessObjectException
     {
 	PreparedStatement statement = null;
 	ResultSet result = null;
@@ -209,6 +164,53 @@ public class FoodDAO
 
 	return foodItem;
     }
+    
+    public boolean update(FoodEntry item) throws DataAccessObjectException
+    {
+	// Connection connection = null;
+	PreparedStatement statement = null;
+
+	try
+	{
+	    // connection = DatabaseUtils.getConnection();
+	    statement = connection.prepareStatement(UPDATE_QUERY);
+	    statement.setString(1, item.getName());
+	    statement.setLong(2, item.getFoodId());
+	    statement.execute();
+	    return true;
+	} catch (SQLException e)
+	{
+	    throw new DataAccessObjectException(e);
+	} finally
+	{
+	    DatabaseUtils.close(statement);
+	}
+
+    }
+
+    public boolean delete(FoodEntry entry) throws DataAccessObjectException
+    {
+	// Connection connection = null;
+	PreparedStatement statement = null;
+
+	try
+	{
+	    // connection = DatabaseUtils.getConnection();
+	    statement = connection.prepareStatement(DELETE_QUERY);
+	    statement.setLong(1, entry.getFoodId());
+	    statement.execute();
+	    return true;
+	} catch (SQLException e)
+	{
+	   throw new DataAccessObjectException(e);
+	} finally
+	{
+	    DatabaseUtils.close(statement);
+	}
+
+    }
+
+    
 
     public void close() 
     {

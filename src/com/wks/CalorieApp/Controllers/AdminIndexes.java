@@ -125,8 +125,8 @@ public class AdminIndexes extends HttpServlet
     private boolean reindex() throws FileNotFoundException, IOException
     {
 	DocumentBuilder builder = DocumentBuilderFactory.getAutoColorCorrelogramDocumentBuilder();
-	Indexer indexer = new Indexer(builder);
+	Indexer indexer = Indexer.getInstance(builder);
 
-	return indexer.indexImage(Environment.getImagesDirectory(getServletContext()), Environment.getIndexesDirectory(getServletContext()));
+	return indexer.indexImages(Environment.getImagesDirectory(getServletContext()), Environment.getIndexesDirectory(getServletContext()));
     }
 }

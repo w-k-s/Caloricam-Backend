@@ -104,7 +104,7 @@ public class Identifier
 	    ImageEntry imageDTO = imageDao.find(imageName);
 	    if (imageDTO != null)
 	    {
-		FoodEntry foodDTO = foodDao.find(imageDTO.getFoodId());
+		FoodEntry foodDTO = foodDao.read(imageDTO.getFoodId());
 
 		if (foodDTO != null) foodName = foodDTO.getName();
 	    }

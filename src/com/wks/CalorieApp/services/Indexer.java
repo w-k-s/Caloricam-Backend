@@ -18,21 +18,34 @@ import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.Version;
 
 import net.semanticmetadata.lire.DocumentBuilder;
+import net.semanticmetadata.lire.DocumentBuilderFactory;
 import net.semanticmetadata.lire.utils.FileUtils;
 
 public class Indexer
 {
+    private static Indexer instance = null;
+    private DocumentBuilder documentBuilder;
 
-    DocumentBuilder documentBuilder;
-
-    public Indexer(DocumentBuilder documentBuilder)
+    private Indexer(DocumentBuilder builder)
     {
 
-	if (documentBuilder == null) throw new IllegalStateException("DocumentBuilder should not be null");
+	if (documentBuilder == null)
+	    throw new IllegalStateException("DocumentBuilder should not be null");
 
-	this.documentBuilder = documentBuilder;
+	this.documentBuilder = builder;
+	
     }
 
+    public static Indexer getInstance(DocumentBuilder builder)
+    {
+	if(Indexer.instance == null)
+	{
+	    instance = new Indexer(builder);
+	}
+	
+	return instance;
+    }
+    
     public void setDocumentBuilder(DocumentBuilder documentBuilder)
     {
 	this.documentBuilder = documentBuilder;
@@ -43,39 +56,53 @@ public class Indexer
 	return documentBuilder;
     }
 
-    public synchronized boolean indexImage(String imageURI, String indexesDir) throws IOException,
-	    FileNotFoundException
-    {
-
-	
-
-	return true;
-    }
-
-    // TODO there is code repetition here. I could repeatedly call indexImage
-    // but
-    // I think repeatedly opening and closing writer streams would be a really
-    // bad idea.
-    // optimise this to remove repeated code later.
     public synchronized boolean indexImages(String imagesDir, String indexesDir) throws IOException
     {
-	// get images
+	//get filepaths for all images
 	ArrayList<String> images = FileUtils.getAllImages(new File(imagesDir), true);
-	// Configure lucene index writer
+	
+	//Configure Lucene IndexWriter.
 	IndexWriterConfig config = new IndexWriterConfig(Version.LUCENE_40, new WhitespaceAnalyzer(Version.LUCENE_40));
-	// prepare index writer.
-	IndexWriter indexer = new IndexWriter(FSDirectory.open(new File(indexesDir)), config);
-	// create document for each image and ad to index.
-	for (Iterator<String> iterator = images.iterator(); iterator.hasNext();)
+	
+	IndexWriter indexer = null;
+	try
 	{
-	    String imageURI = iterator.next();
-	    BufferedImage image = ImageIO.read(new FileInputStream(imageURI));
-	    Document document = getDocumentBuilder().createDocument(image, imageURI);
-	    indexer.addDocument(document);
+	    //Initialise indexer with output location.
+	    indexer = new IndexWriter(FSDirectory.open(new File(indexesDir)), config);
+	    
+	    // Read each image file into a buffered image.
+	    // Create Lucene Document from image
+	    // Index Lucene Document.
+	    for (Iterator<String> iterator = images.iterator(); iterator.hasNext();)
+	    {
+	        String imageURI = iterator.next();
+	        BufferedImage image = ImageIO.read(new FileInputStream(imageURI));
+	        DocumentBuilder builder = this.getDocumentBuilder();
+	        Document document = builder.createDocument(image, imageURI);
+	        indexer.addDocument(document);
+	    }
+	    return true;
+	} catch (FileNotFoundException e)
+	{
+	    throw e;
+	} catch (IOException e)
+	{
+	    throw e;
+	}finally{
+	    if(indexer != null)
+	    {
+		 try
+		{
+		    indexer.close();
+		} catch (IOException e)
+		{
+		   throw e;
+		}
+	    }
+	   
 	}
-	// closing the IndexWriter
-	indexer.close();
-	return true;
+	
     }
 
+    
 }
