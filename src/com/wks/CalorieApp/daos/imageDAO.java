@@ -142,7 +142,7 @@ public class imageDAO
 	try
 	{
 	    statement = connection.prepareStatement(DELETE_QUERY);
-	    statement.setString(1, id);
+	    statement.setString(1,id);
 	    statement.execute();
 	    return true;
 	} catch (SQLException e)

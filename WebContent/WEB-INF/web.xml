@@ -12,7 +12,7 @@
 
 	<servlet>
 		<servlet-name>upload</servlet-name>
-		<servlet-class>com.wks.calorieapp.controllers.Upload</servlet-class>
+		<servlet-class>com.wks.calorieapp.resources.Upload</servlet-class>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>upload</servlet-name>
@@ -21,25 +21,25 @@
 
 	<servlet>
 		<servlet-name>index</servlet-name>
-		<servlet-class>com.wks.calorieapp.controllers.Index</servlet-class>
+		<servlet-class>com.wks.calorieapp.resources.Index</servlet-class>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>index</servlet-name>
-		<url-pattern>/index/*</url-pattern>
+		<url-pattern>/index</url-pattern>
 	</servlet-mapping>
 
 	<servlet>
 		<servlet-name>identify</servlet-name>
-		<servlet-class>com.wks.calorieapp.controllers.Identify</servlet-class>
+		<servlet-class>com.wks.calorieapp.resources.Identify</servlet-class>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>identify</servlet-name>
-		<url-pattern>/identify/*</url-pattern>
+		<url-pattern>/identify</url-pattern>
 	</servlet-mapping>
 
 	<servlet>
 		<servlet-name>test</servlet-name>
-		<servlet-class>com.wks.calorieapp.controllers.Test</servlet-class>
+		<servlet-class>com.wks.calorieapp.resources.Test</servlet-class>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>test</servlet-name>
@@ -48,7 +48,7 @@
 
 	<servlet>
 		<servlet-name>login</servlet-name>
-		<servlet-class>com.wks.calorieapp.controllers.AdminLogin</servlet-class>
+		<servlet-class>com.wks.calorieapp.resources.AdminLogin</servlet-class>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>login</servlet-name>
@@ -57,7 +57,7 @@
 
 	<servlet>
 		<servlet-name>admin</servlet-name>
-		<servlet-class>com.wks.calorieapp.controllers.Admin</servlet-class>
+		<servlet-class>com.wks.calorieapp.resources.Admin</servlet-class>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>admin</servlet-name>
@@ -66,7 +66,7 @@
 
 	<servlet>
 		<servlet-name>logout</servlet-name>
-		<servlet-class>com.wks.calorieapp.controllers.AdminLogout</servlet-class>
+		<servlet-class>com.wks.calorieapp.resources.AdminLogout</servlet-class>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>logout</servlet-name>
@@ -75,7 +75,7 @@
 
 	<servlet>
 		<servlet-name>images</servlet-name>
-		<servlet-class>com.wks.calorieapp.controllers.AdminImages</servlet-class>
+		<servlet-class>com.wks.calorieapp.resources.AdminImages</servlet-class>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>images</servlet-name>
@@ -84,7 +84,7 @@
 
 	<servlet>
 		<servlet-name>indexes</servlet-name>
-		<servlet-class>com.wks.calorieapp.controllers.AdminIndexes</servlet-class>
+		<servlet-class>com.wks.calorieapp.resources.AdminIndexes</servlet-class>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>indexes</servlet-name>
@@ -93,34 +93,34 @@
 
 	<servlet>
 		<servlet-name>nutrition_info</servlet-name>
-		<servlet-class>com.wks.calorieapp.controllers.GetNutritionInfo</servlet-class>
+		<servlet-class>com.wks.calorieapp.resources.GetNutritionInfo</servlet-class>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>nutrition_info</servlet-name>
-		<url-pattern>/nutrition_info/*</url-pattern>
+		<url-pattern>/nutrition_info</url-pattern>
 	</servlet-mapping>
 	
 	<servlet>
 		<servlet-name>recognize</servlet-name>
-		<servlet-class>com.wks.calorieapp.controllers.Recognize</servlet-class>
+		<servlet-class>com.wks.calorieapp.resources.Recognize</servlet-class>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>recognize</servlet-name>
-		<url-pattern>/recognize/*</url-pattern>
+		<url-pattern>/recognize</url-pattern>
 	</servlet-mapping>
 	
 	<servlet>
-		<servlet-name>update</servlet-name>
-		<servlet-class>com.wks.calorieapp.controllers.Update</servlet-class>
+		<servlet-name>link</servlet-name>
+		<servlet-class>com.wks.calorieapp.resources.Link</servlet-class>
 	</servlet>
 	<servlet-mapping>
-		<servlet-name>update</servlet-name>
-		<url-pattern>/update/*</url-pattern>
+		<servlet-name>link</servlet-name>
+		<url-pattern>/link</url-pattern>
 	</servlet-mapping>
 
 	<servlet>
 		<servlet-name>error</servlet-name>
-		<servlet-class>com.wks.calorieapp.controllers.Error</servlet-class>
+		<servlet-class>com.wks.calorieapp.resources.Error</servlet-class>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>error</servlet-name>
@@ -129,7 +129,7 @@
 	
 	<servlet>
 		<servlet-name>log</servlet-name>
-		<servlet-class>com.wks.calorieapp.controllers.AdminLog</servlet-class>
+		<servlet-class>com.wks.calorieapp.resources.AdminLog</servlet-class>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>log</servlet-name>
@@ -142,7 +142,7 @@
 
 	<servlet>
 		<servlet-name>log_init</servlet-name>
-		<servlet-class>com.wks.calorieapp.controllers.LogInit</servlet-class>
+		<servlet-class>com.wks.calorieapp.resources.LogInit</servlet-class>
 		<init-param>
 			<param-name>local_log4j_properties_uri</param-name>
 			<param-value>WEB-INF/local_log4j.properties</param-value>
@@ -181,13 +181,14 @@
 		<param-name>default_max_hits</param-name>
 		<param-value>10</param-value>
 	</context-param>
+
 	<context-param>
 		<param-name>default_min_similarity</param-name>
 		<param-value>0</param-value>
 	</context-param>
 	<context-param>
 		<param-name>is_deployed</param-name>
-		<param-value>true</param-value>
+		<param-value>false</param-value>
 	</context-param>
 	
 	<context-param>

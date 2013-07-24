@@ -21,7 +21,7 @@ public class NutritionInfo extends FSResponse implements JSONWriteable
     // private static final String REGEX_DESCRIPTION =
     // "Per([0-9.]+?)g-Calories:([0-9.]+?)kcal|Fat:([0-9.]+?)g|Carbs:([0-9.]+?)g|Protein:([0-9.]+?)g";
     private static final int NUM_MATCH_GROUPS = 5;
-    private static final int MATCH_GROUP_SERVING_SIZE = 0;
+    //private static final int MATCH_GROUP_SERVING_SIZE = 0;
     private static final int MATCH_GROUP_CALORIES = 1;
     private static final int MATCH_GROUP_FAT = 2;
     private static final int MATCH_GROUP_CARBS = 3;

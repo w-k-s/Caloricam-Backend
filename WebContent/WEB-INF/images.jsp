@@ -1,11 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
-    pageEncoding="ISO-8859-1" import="java.util.*,java.io.File,com.wks.calorieapp.controllers.Attribute, com.wks.calorieapp.utils.Environment"%>
-<%!
-
-	private static final String HREF_VIEW = "images?action=view&img=";
-	private static final String HREF_DELETE = "images?action=delete&img=";
-
-%>
+    pageEncoding="ISO-8859-1" import="java.util.*,java.io.File,com.wks.calorieapp.resources.Attributes,com.wks.calorieapp.utils.Environment"%>
+<%!private static final String HREF_VIEW = "images?action=view&img=";
+	private static final String HREF_DELETE = "images?action=delete&img=";%>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
@@ -19,8 +15,8 @@
 <p>Click on delete to delete an image; corresponding database record will also be deleted.</p>
 
 <%
-	String imageDir = Environment.getImagesDirectory(application);
-	List<String> files = (ArrayList<String>) request.getAttribute(Attribute.IMAGE_LIST.toString());
+    String imageDir = Environment.getImagesDirectory(application);
+	List<String> files = (ArrayList<String>) request.getAttribute(Attributes.IMAGE_LIST.toString());
 %>
 <table>
 	<tr>

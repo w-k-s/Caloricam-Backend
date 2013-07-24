@@ -18,7 +18,6 @@ import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.Version;
 
 import net.semanticmetadata.lire.DocumentBuilder;
-import net.semanticmetadata.lire.DocumentBuilderFactory;
 import net.semanticmetadata.lire.utils.FileUtils;
 
 public class Indexer
@@ -29,7 +28,7 @@ public class Indexer
     private Indexer(DocumentBuilder builder)
     {
 
-	if (documentBuilder == null)
+	if (builder == null)
 	    throw new IllegalStateException("DocumentBuilder should not be null");
 
 	this.documentBuilder = builder;
@@ -56,6 +55,13 @@ public class Indexer
 	return documentBuilder;
     }
 
+    /** Indexes Images using the set document builder.
+     * 
+     * @param imagesDir directory where images to indexed are kept.
+     * @param indexesDir directory where generated indexes are to be stored
+     * @return true, if all images were indexed successfully
+     * @throws IOException
+     */
     public synchronized boolean indexImages(String imagesDir, String indexesDir) throws IOException
     {
 	//get filepaths for all images
@@ -73,15 +79,18 @@ public class Indexer
 	    // Read each image file into a buffered image.
 	    // Create Lucene Document from image
 	    // Index Lucene Document.
-	    for (Iterator<String> iterator = images.iterator(); iterator.hasNext();)
+	    Iterator<String> iterator = images.iterator();
+	    while(iterator.hasNext())
 	    {
-	        String imageURI = iterator.next();
-	        BufferedImage image = ImageIO.read(new FileInputStream(imageURI));
-	        DocumentBuilder builder = this.getDocumentBuilder();
-	        Document document = builder.createDocument(image, imageURI);
-	        indexer.addDocument(document);
+		String imageUri = iterator.next();
+		BufferedImage image = ImageIO.read(new FileInputStream(imageUri));
+		DocumentBuilder builder = this.getDocumentBuilder();
+		Document document = builder.createDocument(image, imageUri);
+		indexer.addDocument(document);
 	    }
+	    
 	    return true;
+	    
 	} catch (FileNotFoundException e)
 	{
 	    throw e;
