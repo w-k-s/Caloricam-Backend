@@ -69,21 +69,23 @@ public class Link extends HttpServlet
 	if (!imageFile.exists())
 	{
 	    out.println(new Response(StatusCode.FILE_NOT_FOUND).toJSON());
-	    logger.info("Update request failed. " + imageFile.getAbsolutePath() + " does not exist.");
+	    logger.info("Link request failed. " + imageFile.getAbsolutePath() + " does not exist.");
 	    return;
 	}
 	
 	try
 	{
+	    logger.info("Link Request. Linking "+foodName+" with "+imageFile);
 	    Linker linker = new Linker(connection);
 	    boolean linked = linker.linkImageWithFood(foodName, imageFile);
 	    StatusCode statusCode = linked? StatusCode.OK : StatusCode.LINK_FAILED;
 	    Response response = new Response(statusCode);
 	    out.println(response.toJSON());
+	    logger.info("Link Request. Success: "+linked);
 	} catch (DataAccessObjectException e)
 	{
 	    out.println(new Response(StatusCode.DB_INSERT_FAILED).toJSON());
-	    logger.error("Update request Failed. Food Item " + foodName + " could not be inserted into db.", e);
+	    logger.error("Link request Failed. Food Item " + foodName + " could not be inserted into db.", e);
 	}
 
     }

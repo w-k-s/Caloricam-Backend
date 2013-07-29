@@ -5,7 +5,7 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 
-public class FSResponseFactory
+public class FSResponseFactoryProducer
 {
     private static final String JSON_FOODS_KEY = "foods";
     private static final String JSON_ERROR_KEY = "error";

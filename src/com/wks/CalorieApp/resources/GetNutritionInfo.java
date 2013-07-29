@@ -2,6 +2,7 @@ package com.wks.calorieapp.resources;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.URLDecoder;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -47,7 +48,7 @@ public class GetNutritionInfo extends HttpServlet
 	resp.setContentType(CONTENT_TYPE);
 	PrintWriter out = resp.getWriter();
 
-	String foodName = req.getParameter(PARAM_FOOD_NAME);
+	String foodName = URLDecoder.decode(req.getParameter(PARAM_FOOD_NAME),"UTF-8");
 
 	if (foodName == null || foodName.isEmpty())
 	{

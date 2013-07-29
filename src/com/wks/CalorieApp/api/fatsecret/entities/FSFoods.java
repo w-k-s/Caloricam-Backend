@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class FSFoods extends FSResponse
+public class FSFoods extends FSAbstractResponse
 {
     private List<NutritionInfo> nutritionInfoList;
     

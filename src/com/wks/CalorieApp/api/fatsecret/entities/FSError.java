@@ -1,7 +1,7 @@
 package com.wks.calorieapp.api.fatsecret.entities;
 
 
-public class FSError extends FSResponse{
+public class FSError extends FSAbstractResponse{
 
     private long code;
     private String message;

@@ -1,9 +1,11 @@
 package com.wks.calorieapp.api.fatsecret.factories;
 
 import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 import com.wks.calorieapp.api.fatsecret.entities.FSError;
-import com.wks.calorieapp.api.fatsecret.entities.FSResponse;
+import com.wks.calorieapp.api.fatsecret.entities.FSAbstractResponse;
 
 public class FSErrorResponseFactory extends FSAbstractResponseFactory
 {
@@ -17,8 +19,11 @@ public class FSErrorResponseFactory extends FSAbstractResponseFactory
     }
 
    
-    public FSResponse createResponseFromJSON(JSONObject responseJson)
+    public FSError createResponseFromJSON(String json) throws ParseException
     {
+	JSONParser parser = new JSONParser();
+	JSONObject responseJson = (JSONObject) parser.parse(json);
+	
 	JSONObject errorJson = (JSONObject) responseJson.get(JSON_ERROR_KEY);
 	long code = (Long) errorJson.get(JSON_ERROR_CODE_KEY) | 0L;
 	String message = (String) errorJson.get(JSON_ERROR_MESSAGE_KEY);

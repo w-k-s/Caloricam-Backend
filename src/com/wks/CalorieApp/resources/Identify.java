@@ -51,7 +51,8 @@ public class Identify extends HttpServlet
     {
 	imagesDir = Environment.getImagesDirectory(getServletContext());
 	indexesDir = Environment.getIndexesDirectory(getServletContext());
-	defaultMaxHits = Integer.parseInt(getServletContext().getInitParameter(ContextParameters.DEFAULT_MAX_HITS.toString()));
+	defaultMaxHits = Integer.parseInt(getServletContext().getInitParameter(
+		ContextParameters.DEFAULT_MAX_HITS.toString()));
 	defaultMinSimilarity = Float.parseFloat(getServletContext().getInitParameter(
 		ContextParameters.DEFAULT_MIN_SIMILARITY.toString()));
 	connection = DatabaseUtils.getConnection();
@@ -72,13 +73,14 @@ public class Identify extends HttpServlet
 	PrintWriter out = resp.getWriter();
 
 	String imageName = req.getParameter(PARAM_IMAGE_NAME);
-	float minSimilarity = req.getParameter(PARAM_MIN_SIMILARITY)==null?defaultMinSimilarity:Float.valueOf(req.getParameter(PARAM_MIN_SIMILARITY));
-	int maximumHits = req.getParameter(PARAM_MAX_HITS)==null?defaultMaxHits : Integer.valueOf(req.getParameter(PARAM_MAX_HITS));
+	float minSimilarity = req.getParameter(PARAM_MIN_SIMILARITY) == null ? defaultMinSimilarity : Float.valueOf(req
+		.getParameter(PARAM_MIN_SIMILARITY));
+	int maximumHits = req.getParameter(PARAM_MAX_HITS) == null ? defaultMaxHits : Integer.valueOf(req
+		.getParameter(PARAM_MAX_HITS));
 
 	if (imageName == null)
 	{
-	    out.println(new Response(StatusCode.TOO_FEW_ARGS)
-		    .toJSON());
+	    out.println(new Response(StatusCode.TOO_FEW_ARGS).toJSON());
 	    return;
 	}
 
@@ -90,12 +92,11 @@ public class Identify extends HttpServlet
 	    return;
 	}
 
-
 	try
 	{
 	    Identifier identifier = Identifier.getInstance(connection);
-	    Map<String, Float> foodNameSimilarity = identifier.getPossibleFoodsForImage(imageFile.getAbsolutePath(), indexesDir,
-		    minSimilarity, maximumHits);
+	    Map<String, Float> foodNameSimilarity = identifier.getPossibleFoodsForImage(imageFile.getAbsolutePath(),
+		    indexesDir, minSimilarity, maximumHits);
 
 	    String jsonMap = JSONValue.toJSONString(foodNameSimilarity);
 

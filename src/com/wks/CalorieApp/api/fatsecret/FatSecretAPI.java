@@ -18,7 +18,6 @@ public class FatSecretAPI
 
     private static String consumerKey;
     private static String consumerSecret;;
-    private Format responseFormat = Format.JSON;
 
     public FatSecretAPI(String consumerKey, String sharedKey)
     {
@@ -29,20 +28,14 @@ public class FatSecretAPI
 	FatSecretAPI.consumerSecret = sharedKey;
     }
 
-    public Format getResponseFormat() {
-	return responseFormat;
-    }
-
-    public void setResponseFormat(Format responseFormat) {
-	this.responseFormat = responseFormat;
-    }
-
-    private String doRestCall(Method method, HashMap<Parameter, String> methodParameters) throws IOException {
+    private String doRestCall(Method method, HashMap<Parameter, String> methodParameters, Format responseFormat)
+	    throws IOException
+    {
 	HashMap<String, String> requestParameters = new HashMap<String, String>();
 	// add method name to parameters
 	requestParameters.put(Parameter.METHOD.getName(), method.getName());
 	// add response type to parameters
-	requestParameters.put(Parameter.FORMAT.getName(), getResponseFormat().value);
+	requestParameters.put(Parameter.FORMAT.getName(), responseFormat.value);
 
 	// add method parameters to request parameters
 	for (Entry<Parameter, String> e : methodParameters.entrySet())
@@ -61,21 +54,22 @@ public class FatSecretAPI
 
 	// make rest call
 	String signedUrl = result.getURL();
-	String jsonResults = HttpClient.get(signedUrl);
-	return jsonResults;
+	return HttpClient.get(signedUrl);
     }
 
     // Convenience method for doing a REST call to the FatSecret Search method.
-    public String foodsSearch(String searchExpression) throws IOException {
+    public String foodsSearch(String searchExpression) throws IOException
+    {
 
 	HashMap<Parameter, String> parameters = new HashMap<Parameter, String>();
 	parameters.put(Parameter.SEARCH_EXPRESSION, searchExpression);
 
-	String result = doRestCall(Method.FOODS_SEARCH, parameters);
+	String result = doRestCall(Method.FOODS_SEARCH, parameters, Format.JSON);
 	return result;
     }
 
-    private String addParametersToUrl(String url, HashMap<String, String> parameters) {
+    private String addParametersToUrl(String url, HashMap<String, String> parameters)
+    {
 	String params = "";
 	for (Entry<String, String> entry : parameters.entrySet())
 	{
@@ -84,7 +78,6 @@ public class FatSecretAPI
 
 	return url + params.substring(1);
     }
-
 
     public enum Format
     {
@@ -97,7 +90,8 @@ public class FatSecretAPI
 	    this.value = value;
 	}
 
-	public String value() {
+	public String value()
+	{
 	    return this.value;
 	}
     }

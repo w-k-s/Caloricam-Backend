@@ -14,7 +14,7 @@ import com.wks.calorieapp.entities.JSONWriteable;
  * @author Waqqas
  * 
  */
-public class NutritionInfo extends FSResponse implements JSONWriteable
+public class NutritionInfo extends FSAbstractResponse implements JSONWriteable
 {
 
     private static final String REGEX_SPACE = "\\s";

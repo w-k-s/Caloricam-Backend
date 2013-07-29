@@ -45,11 +45,24 @@ public class Identifier
 	return instance;
     }
 
-    
+    /**
+     * 
+     * @param imageUri path of image
+     * @param indexesDir path of indexes directory
+     * @param minimumSimilarity minimum similarity index
+     * @param maximumHits max results
+     * @return Map of food name (key) and similarity index (value)
+     * @throws IOException
+     * @throws DataAccessObjectException
+     */
     public  synchronized Map<String,Float> getPossibleFoodsForImage(String imageUri,String indexesDir, float minimumSimilarity, int maximumHits) throws IOException, DataAccessObjectException
     {
 	Map<String,Float> foodNameSimilarityMap = new HashMap<String,Float>();
+	
+	//find similar images
 	Map<String,Float> imageSimilarityMap = this.findSimilarImages(imageUri, indexesDir, maximumHits);
+	
+	//get name of food in each similar image.
 	for(java.util.Map.Entry<String, Float> imageSimilarityEntry : imageSimilarityMap.entrySet())
 	{
 	    String imageName = imageSimilarityEntry.getKey();
@@ -66,15 +79,30 @@ public class Identifier
 	
     }
 
+    /**
+     * 
+     * @param imageUri path to image file
+     * @param indexesDir path to indexes file
+     * @param maximumHits maximum number of hits to be determined
+     * @return Map of image name (key) and similarity index (value).
+     * @throws IOException
+     */
     private  Map<String,Float> findSimilarImages(String imageUri, String indexesDir, int maximumHits)
 	    throws IOException {
 
 	
 	Map<String,Float> imageSimilarityMap = new HashMap<String,Float>();
 
+	//load file into image.
 	BufferedImage image = ImageIO.read(new File(imageUri));
+	
+	//load indexes
 	IndexReader reader = DirectoryReader.open(FSDirectory.open(new File(indexesDir)));
+	
+	//create searcher to compare auto color correlogram descriptors
 	ImageSearcher searcher = ImageSearcherFactory.createAutoColorCorrelogramImageSearcher(maximumHits);
+	
+	//search for images similar to given image
 	ImageSearchHits hits = searcher.search(image, reader);
 
 	int limit = hits.length() > maximumHits? maximumHits : hits.length();

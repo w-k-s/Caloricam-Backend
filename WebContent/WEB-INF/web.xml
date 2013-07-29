@@ -57,7 +57,7 @@
 
 	<servlet>
 		<servlet-name>admin</servlet-name>
-		<servlet-class>com.wks.calorieapp.resources.Admin</servlet-class>
+		<servlet-class>com.wks.calorieapp.resources.AdminPanel</servlet-class>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>admin</servlet-name>
@@ -188,12 +188,12 @@
 	</context-param>
 	<context-param>
 		<param-name>is_deployed</param-name>
-		<param-value>false</param-value>
+		<param-value>true</param-value>
 	</context-param>
 	
 	<context-param>
 		<param-name>app_version</param-name>
-		<param-value>1.31</param-value>
+		<param-value>1.32</param-value>
 	</context-param>
 
 	<!-- API KEYS -->

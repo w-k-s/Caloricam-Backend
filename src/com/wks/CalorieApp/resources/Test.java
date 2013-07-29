@@ -159,7 +159,7 @@ public class Test extends HttpServlet{
 	GeneralDataAccessObject shit = new GeneralDataAccessObject(connection);
 	boolean b = shit.doQuery("INSERT INTO Users VALUES ('wks','2212')");
 	
-	
+	*/
 	FSWebService ws = new FSWebService("ea0d6a946b3e4b3a8d5cbdb0a55900dd","49704a68e7114143925f6390aeca8b42");
 	try
 	{
@@ -169,7 +169,7 @@ public class Test extends HttpServlet{
 	{
 	    // TODO Auto-generated catch block
 	    e.printStackTrace();
-	}*/
+	}
     }
     
     @Override

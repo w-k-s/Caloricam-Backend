@@ -3,6 +3,8 @@ package com.wks.calorieapp.services;
 import java.io.File;
 import java.sql.Connection;
 
+import org.apache.log4j.Logger;
+
 import com.wks.calorieapp.daos.DataAccessObjectException;
 import com.wks.calorieapp.daos.FoodDAO;
 import com.wks.calorieapp.daos.imageDAO;
@@ -12,22 +14,35 @@ import com.wks.calorieapp.entities.ImageEntry;
 public class Linker
 {
     private static Connection connection;
+    private static Logger logger = Logger.getLogger(Linker.class);
 
     public Linker(Connection connection)
     {
 	Linker.connection = connection;
     }
 
+    /**Links food in image with given food name.
+     * 
+     * @param foodName
+     * @param imageFile
+     * @return true if linking was succesful.
+     * @throws DataAccessObjectException
+     */
     public boolean linkImageWithFood(String foodName, File imageFile) throws DataAccessObjectException
     {
 	boolean success = false;
 	String imageName = imageFile.getName();
 	
+	//get id of food in food database
+	//getFoodId will create record if it doesnt already exist.
+	//likewise for imageId.
 	long foodId = getFoodId(foodName);
 	String imageId = getImageId(imageFile);
 	if (foodId != -1 && imageId != null)
 	{
+	    //set image.foodId = food.id
 	    success = (linkImageWithFood(imageName, foodId));
+	    logger.info("Linker. ImageName: "+imageName+", FoodId: "+foodId+", Success: "+success);
 	} 
 	
 	return success;

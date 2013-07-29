@@ -92,7 +92,7 @@ public class Upload extends HttpServlet
 			// forward the request to indexer so that uploaded image
 			// can be added to index of images.
 			logger.info("Uploaded Request. File uploaded successfully; forwarding request to indexer: " + fileName);
-			RequestDispatcher indexer = req.getRequestDispatcher("/index/" + fileName);
+			RequestDispatcher indexer = req.getRequestDispatcher("/index?image_name="+fileName);
 			indexer.forward(req, resp);
 		    } else
 		    {

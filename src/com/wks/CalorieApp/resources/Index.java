@@ -29,7 +29,7 @@ public class Index extends HttpServlet
     private static final long serialVersionUID = 1L;
     private static final String CONTENT_TYPE = "application/json";
     
-    private static final String PARAM_IMAGE_NAME = "param_image_name";
+    private static final String PARAM_IMAGE_NAME = "image_name";
     
     private static Connection connection = null;
     private static String imagesDir = "";
@@ -81,7 +81,9 @@ public class Index extends HttpServlet
 
 	if (this.insertImage(imageFile))
 	{
+	    long start = System.currentTimeMillis();
 	    boolean success = this.indexImage(imageFile);
+	    logger.info("Index Request. Indexing complete in "+(System.currentTimeMillis() - start)+" ms.");
 
 	    StatusCode statusCode = success ? StatusCode.OK : StatusCode.INDEX_ERROR;
 	    Response response = new Response(statusCode);
@@ -99,19 +101,34 @@ public class Index extends HttpServlet
 	return this.indexImage(imageFile.getAbsolutePath());
     }
 
+    /**Indexes the image
+     * 
+     * @param imageUri path to the image file.
+     * @return true if image was indexed successfully.
+     */
     private boolean indexImage(String imageUri)
     {
 	boolean success = false;
+	
 	try
 	{
+	    
+	    //Use auto color correlogram method to build the documents
 	    DocumentBuilder builder = DocumentBuilderFactory.getAutoColorCorrelogramDocumentBuilder();
+	    
+	    //TODO changed
+	    //get instace of indexer
 	    Indexer indexer = Indexer.getInstance(builder);
+	    //Indexer indexer = new Indexer(builder);
+	    
+	    //index all images in imagesDir. Output to indexes dir.
+	    long startIndex = System.currentTimeMillis();
 	    success = indexer.indexImages(Index.imagesDir, Index.indexesDir);
-	    logger.info("Index Request. Successfully Indexed " + imageUri + ".");
+	    logger.info("Index Request. Total Indexing Time: "+(System.currentTimeMillis() - startIndex)+" ms.");
+	    
 	} catch (IOException e)
 	{
-	    // TODO Auto-generated catch block
-	    e.printStackTrace();
+	    logger.error("Index Request. Image: "+imageUri,e);
 	}
 
 	return success;
