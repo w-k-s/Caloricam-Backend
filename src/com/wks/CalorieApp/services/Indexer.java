@@ -67,6 +67,22 @@ public class Indexer
 	return documentBuilder;
     }
 
+    public boolean indexImage(File imageFile, File indexesDir) throws IOException
+    {
+	synchronized(lock)
+	{
+	    if(imageFile != null && !imageFile.isFile())
+		throw new IllegalArgumentException("The Image File provided is not a file.");
+	    if(indexesDir != null && !indexesDir.isDirectory())
+		throw new IllegalArgumentException("The indexes File provided is not a directory.");
+	    
+	    
+	    ArrayList<String> images = new ArrayList<String>();
+	    images.add(imageFile.getAbsolutePath());
+	    return this.indexImages(images, indexesDir);
+	}
+    }
+
     /**
      * http://www.semanticmetadata.net/wiki/doku.php?id=lire:createindex Indexes
      * Images using the set document builder.
@@ -78,90 +94,79 @@ public class Indexer
      * @return true, if all images were indexed successfully
      * @throws IOException
      */
-    public boolean indexImages(String imagesDir, String indexesDir) throws IOException
+    public boolean indexImages(File imagesDir, File indexesDir) throws IOException
     {
 	synchronized (lock)
 	{
-	    // get filepaths for all images
-	    boolean success = false;
-	    long beginTime = System.currentTimeMillis();
-	    Directory indexesDirectory = FSDirectory.open(new File(indexesDir));
-	    long fileOpenTime = System.currentTimeMillis();
-	    ArrayList<String> images = FileUtils.getAllImages(new File(imagesDir), true);
-
-	    // Configure Lucene IndexWriter.
-	    IndexWriterConfig config = new IndexWriterConfig(Version.LUCENE_40, new WhitespaceAnalyzer(
-		    Version.LUCENE_40));
-
-	    IndexWriter indexer = null;
-	    long startIndexTime = 0;
-	    long stopIndexTime = 0;
-	    long endTime = 0;
-	    String inny = "-";
-	    try
-	    {
-		// Initialise indexer with output location.
-		indexer = new IndexWriter(indexesDirectory, config);
-
-		// Read each image file into a buffered image.
-		// Create Lucene Document from image
-		// Index Lucene Document.
-		// startIndexTime = System.currentTimeMillis();
-		for (Iterator<String> it = images.iterator(); it.hasNext();)
-		{
-		    String imageFilePath = it.next();
-
-		    long readBeginTime = System.currentTimeMillis();
-		    BufferedImage img = ImageIO.read(new FileInputStream(imageFilePath));
-		    long documentBuildTime = System.currentTimeMillis();
-		    Document document = this.getDocumentBuilder().createDocument(img, imageFilePath);
-		    long addDocumentTime = System.currentTimeMillis();
-		    indexer.addDocument(document);
-		    long done = System.currentTimeMillis();
-
-		    inny = "\treading image: " + (documentBuildTime - readBeginTime) + "\n";
-		    inny += "\tcreating document " + (addDocumentTime - documentBuildTime) + "\n";
-		    inny += "\tadding to document " + (done - addDocumentTime) + "\n";
-		    inny += "------";
-		}
-		stopIndexTime = System.currentTimeMillis();
-		endTime = System.currentTimeMillis();
-		success = true;
-
-	    } catch (FileNotFoundException e)
-	    {
-		throw e;
-	    } catch (LockObtainFailedException e)
-	    {
-		logger.error("Indexer. Lock ObtainFailedException. Will Unlock", e);
-		IndexWriter.unlock(indexesDirectory);
-	    } catch (IOException e)
-	    {
-		throw e;
-	    } finally
-	    {
-		if (indexer != null)
-		{
-		    try
-		    {
-			indexer.close();
-		    } catch (IOException e)
-		    {
-			IndexWriter.unlock(indexesDirectory);
-		    }
-		}
-
-	    }
-	    long returnTime = System.currentTimeMillis() - endTime;
-	    long fileOpen = fileOpenTime - beginTime;
-	    long indexTime = stopIndexTime - startIndexTime;
-
-	    String profile = String.format("open file: %d\nindex: %d\n%s\nreturn: %d\n", fileOpen, indexTime, inny,
-		    returnTime);
-	    logger.info(profile);
-	    return success;
+	    if(imagesDir != null && !imagesDir.isDirectory())
+		throw new IllegalArgumentException("The Image File provided is not a directory.");
+	    if(indexesDir != null && !indexesDir.isDirectory())
+		throw new IllegalArgumentException("The indexes File provided is not a directory.");
+	    
+	    ArrayList<String> images = FileUtils.getAllImages(imagesDir, true);
+	    return this.indexImages(images, indexesDir);
 	}
     }
+
+    private boolean indexImages(ArrayList<String> images, File indexesDir) throws IOException
+    {
+	boolean success = false;
+
+	IndexWriterConfig config = new IndexWriterConfig(Version.LUCENE_40, new WhitespaceAnalyzer(Version.LUCENE_40));
+	IndexWriter indexer = null;
+	Directory indexesDirectory = null;
+	try
+	{
+	    // Initialise indexer with output location.
+	    indexesDirectory = FSDirectory.open(indexesDir);
+	    indexer = new IndexWriter(indexesDirectory, config);
+
+	    for (Iterator<String> it = images.iterator(); it.hasNext();)
+	    {
+		String imageFilePath = it.next();
+
+		BufferedImage img = ImageIO.read(new FileInputStream(imageFilePath));
+
+		Document document = this.getDocumentBuilder().createDocument(img, imageFilePath);
+
+		indexer.addDocument(document);
+
+	    }
+
+	    success = true;
+
+	} catch (FileNotFoundException e)
+	{
+	    throw e;
+	} catch (LockObtainFailedException e)
+	{
+	    logger.error("Indexer. Lock ObtainFailedException. Will Unlock", e);
+	    if (indexesDirectory != null)
+	    {
+		IndexWriter.unlock(indexesDirectory);
+	    }
+	} catch (IOException e)
+	{
+	    throw e;
+	} finally
+	{
+	    if (indexer != null)
+	    {
+		try
+		{
+		    indexer.close();
+		} catch (IOException e)
+		{
+		    IndexWriter.unlock(indexesDirectory);
+		}
+	    }
+
+	}
+
+	return success;
+
+    }
+
     /*
      * DocumentBuilder documentBuilder;
      * 

@@ -33,7 +33,6 @@ public class DatabaseUtils
 	    String url = "";
 	    if (appIsDeployed)
 	    {
-
 		url = "jdbc:mysql://127.12.26.130:3306/uploadte?autoReconnect=true";
 	    } else
 	    {

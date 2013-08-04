@@ -1,5 +1,6 @@
 package com.wks.calorieapp.resources;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -129,6 +130,6 @@ public class AdminIndexes extends HttpServlet
 	Indexer indexer = Indexer.getInstance(builder);
 	//Indexer indexer = new Indexer(builder);
 		
-	return indexer.indexImages(Environment.getImagesDirectory(getServletContext()), Environment.getIndexesDirectory(getServletContext()));
+	return indexer.indexImages(new File(Environment.getImagesDirectory(getServletContext())), new File(Environment.getIndexesDirectory(getServletContext())));
     }
 }

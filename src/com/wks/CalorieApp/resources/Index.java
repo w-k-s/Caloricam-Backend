@@ -82,7 +82,7 @@ public class Index extends HttpServlet
 	if (this.insertImage(imageFile))
 	{
 	    long start = System.currentTimeMillis();
-	    boolean success = this.indexImage(imageFile);
+	    boolean success = this.indexImage(imageFile,new File(indexesDir));
 	    logger.info("Index Request. Indexing complete in "+(System.currentTimeMillis() - start)+" ms.");
 
 	    StatusCode statusCode = success ? StatusCode.OK : StatusCode.INDEX_ERROR;
@@ -96,17 +96,13 @@ public class Index extends HttpServlet
 
     }
 
-    private boolean indexImage(File imageFile)
-    {
-	return this.indexImage(imageFile.getAbsolutePath());
-    }
 
     /**Indexes the image
      * 
      * @param imageUri path to the image file.
      * @return true if image was indexed successfully.
      */
-    private boolean indexImage(String imageUri)
+    private boolean indexImage(File imageFile,File indexesDir)
     {
 	boolean success = false;
 	
@@ -123,12 +119,12 @@ public class Index extends HttpServlet
 	    
 	    //index all images in imagesDir. Output to indexes dir.
 	    long startIndex = System.currentTimeMillis();
-	    success = indexer.indexImages(Index.imagesDir, Index.indexesDir);
+	    success = indexer.indexImage(imageFile, indexesDir);
 	    logger.info("Index Request. Total Indexing Time: "+(System.currentTimeMillis() - startIndex)+" ms.");
 	    
 	} catch (IOException e)
 	{
-	    logger.error("Index Request. Image: "+imageUri,e);
+	    logger.error("Index Request. Image: "+imageFile.getAbsolutePath(),e);
 	}
 
 	return success;

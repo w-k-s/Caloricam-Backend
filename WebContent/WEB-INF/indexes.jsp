@@ -5,13 +5,21 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 <title>Admin | Indexes</title>
+<script type="text/javascript">
+
+function confirmDeleteAll(){
+	return confirm("Are you sure want to DELETE ALL images?! ");
+}
+
+</script>
 </head>
 <body>
 <h1>Indexes Admin Page</h1>
 <hr/>
 <h2>Tools</h2>
 <ul>
-	 <li><a href="indexes?action=delete">Delete all</a></li>
+	 <li><a href="indexes?action=reindex">Reindex</a></li>
+	 <li><a href="indexes?action=delete" onClick="return confirmDeleteAll()">Delete all</a></li>
 </ul>
 <strong><em>Note: Must reindex images after deleting them.</em></strong>
 <hr/>

@@ -193,7 +193,7 @@
 	
 	<context-param>
 		<param-name>app_version</param-name>
-		<param-value>1.32</param-value>
+		<param-value>1.35</param-value>
 	</context-param>
 
 	<!-- API KEYS -->
