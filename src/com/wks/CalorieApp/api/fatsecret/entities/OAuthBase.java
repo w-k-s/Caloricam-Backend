@@ -6,9 +6,12 @@ import java.util.*;
 import javax.crypto.*;
 import javax.crypto.spec.*;
 
-/**
+
+
+/** CITATION
  * 
- * @author FatSecret API provided by the website.
+ * @author FatSecret 
+ * FatSecret, FatSecret Platform API Java, http://platform.fatsecret.com/api/static/libraries/java.tar.gz
  *
  */
 public class OAuthBase {

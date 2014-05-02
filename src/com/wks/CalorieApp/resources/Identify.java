@@ -19,11 +19,6 @@ import com.wks.calorieapp.services.Identifier;
 import com.wks.calorieapp.utils.DatabaseUtils;
 import com.wks.calorieapp.utils.Environment;
 
-/*
- * - think of a better JSON writer impmentation.
- * - create an abstract class for index writing
- * - handle duplication??
- */
 
 public class Identify extends HttpServlet
 {

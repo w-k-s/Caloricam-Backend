@@ -18,7 +18,6 @@ import com.wks.calorieapp.utils.DatabaseUtils;
 
 public class AdminPanel extends HttpServlet
 {
-    // private static final boolean appIsDeployed = false;
     private static final long serialVersionUID = 1L;
     private static final String SRVLT_LOGIN = "/login";
     private static final String JSP_ADMIN = "/WEB-INF/admin.jsp";

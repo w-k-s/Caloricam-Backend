@@ -40,14 +40,9 @@ public class LogInit extends HttpServlet
 	    if (!logFile.exists())
 	    {
 		if (!logFile.createNewFile()) getServletContext().setAttribute("log", "Logfile coult not be created");
-	    } else
-	    {
-		getServletContext().setAttribute("logfile", "log file exists: "+logUri);
-
-	    }
+	    } 
 	} catch (IOException e)
 	{
-	    // TODO Auto-generated catch block
 	    e.printStackTrace();
 	}
 

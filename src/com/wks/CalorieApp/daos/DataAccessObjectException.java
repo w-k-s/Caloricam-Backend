@@ -1,8 +1,11 @@
 package com.wks.calorieapp.daos;
 
 /**
- * based on tutorial: http://balusc.blogspot.ae/2008/07/dao-tutorial-data-layer.html
- * @author Waqqas
+ * CITATION
+ * 
+ * Bauke Scholtz (July 7, 2008), DAO Tutorial - The Data Layer,
+ * http://balusc.blogspot.ae/2008/07/dao-tutorial-data-layer.html
+ * (retrieved on 11-July-2013)
  *
  */
 public class DataAccessObjectException extends Exception

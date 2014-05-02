@@ -7,13 +7,7 @@ import org.json.simple.JSONObject;
 
 import com.wks.calorieapp.entities.JSONWriteable;
 
-/**
- * TODO: I think the calculation of nutrients per 100g is incorrent. Double
- * check results.
- * 
- * @author Waqqas
- * 
- */
+
 public class NutritionInfo extends FSAbstractResponse implements JSONWriteable
 {
 

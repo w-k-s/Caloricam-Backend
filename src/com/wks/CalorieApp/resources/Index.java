@@ -22,6 +22,11 @@ import com.wks.calorieapp.services.Indexer;
 import com.wks.calorieapp.utils.DatabaseUtils;
 import com.wks.calorieapp.utils.Environment;
 
+/**
+ * 
+ * @author Waqqas
+ *
+ */
 public class Index extends HttpServlet
 {
     
@@ -97,9 +102,10 @@ public class Index extends HttpServlet
     }
 
 
-    /**Indexes the image
+    /**Index the image
      * 
-     * @param imageUri path to the image file.
+     * @param imageFile path of image to index.
+     * @param indexesDir directory where index will be saved.
      * @return true if image was indexed successfully.
      */
     private boolean indexImage(File imageFile,File indexesDir)
@@ -112,10 +118,8 @@ public class Index extends HttpServlet
 	    //Use auto color correlogram method to build the documents
 	    DocumentBuilder builder = DocumentBuilderFactory.getAutoColorCorrelogramDocumentBuilder();
 	    
-	    //TODO changed
 	    //get instace of indexer
 	    Indexer indexer = Indexer.getInstance(builder);
-	    //Indexer indexer = new Indexer(builder);
 	    
 	    //index all images in imagesDir. Output to indexes dir.
 	    long startIndex = System.currentTimeMillis();

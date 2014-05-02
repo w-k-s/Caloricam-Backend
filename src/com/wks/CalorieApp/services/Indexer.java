@@ -23,6 +23,14 @@ import org.apache.lucene.util.Version;
 import net.semanticmetadata.lire.DocumentBuilder;
 import net.semanticmetadata.lire.utils.FileUtils;
 
+/**
+ * CITATION
+ * 
+ * Mathias Lux (April 20, 2013), Creating an Index with LIRe
+ * http://www.semanticmetadata.net/wiki/doku.php?id=lire:createindex
+ * (retrieved on 5-Aug-2013)
+ *
+ */
 public class Indexer
 {
     private static Object lock = new Object();
@@ -67,6 +75,13 @@ public class Indexer
 	return documentBuilder;
     }
 
+    /**
+     * 
+     * @param imageFile image to index
+     * @param indexesDir directory where index will be stored.
+     * @return true if image was indexed successfully.
+     * @throws IOException
+     */
     public boolean indexImage(File imageFile, File indexesDir) throws IOException
     {
 	synchronized(lock)
@@ -88,7 +103,7 @@ public class Indexer
      * Images using the set document builder.
      * 
      * @param imagesDir
-     *            directory where images to indexed are kept.
+     *            directory where images to index are kept.
      * @param indexesDir
      *            directory where generated indexes are to be stored
      * @return true, if all images were indexed successfully
@@ -108,6 +123,16 @@ public class Indexer
 	}
     }
 
+    /**
+     * Indexes all images using selected document builder.
+     * 
+     * @param images
+     *            paths of images to index.
+     * @param indexesDir
+     *            directory where generated indexes are to be stored
+     * @return true, if all images were indexed successfully
+     * @throws IOException
+     */
     private boolean indexImages(ArrayList<String> images, File indexesDir) throws IOException
     {
 	boolean success = false;
@@ -124,11 +149,11 @@ public class Indexer
 	    for (Iterator<String> it = images.iterator(); it.hasNext();)
 	    {
 		String imageFilePath = it.next();
-
+		//load image
 		BufferedImage img = ImageIO.read(new FileInputStream(imageFilePath));
-
+		//create lucene document containing descriptor
 		Document document = this.getDocumentBuilder().createDocument(img, imageFilePath);
-
+		//index document
 		indexer.addDocument(document);
 
 	    }
@@ -167,44 +192,4 @@ public class Indexer
 
     }
 
-    /*
-     * DocumentBuilder documentBuilder;
-     * 
-     * public Indexer(DocumentBuilder documentBuilder) {
-     * 
-     * if (documentBuilder == null) throw new
-     * IllegalStateException("DocumentBuilder should not be null");
-     * 
-     * this.documentBuilder = documentBuilder; }
-     * 
-     * public void setDocumentBuilder(DocumentBuilder documentBuilder) {
-     * this.documentBuilder = documentBuilder; }
-     * 
-     * public DocumentBuilder getDocumentBuilder() { return documentBuilder; }
-     * 
-     * public synchronized boolean indexImage(String imageURI, String
-     * indexesDir) throws IOException, FileNotFoundException {
-     * 
-     * 
-     * 
-     * return true; }
-     * 
-     * // TODO there is code repetition here. I could repeatedly call indexImage
-     * // but // I think repeatedly opening and closing writer streams would be
-     * a really // bad idea. // optimise this to remove repeated code later.
-     * public synchronized boolean indexImages(String imagesDir, String
-     * indexesDir) throws IOException { // get images ArrayList<String> images =
-     * FileUtils.getAllImages(new File(imagesDir), true); // Configure lucene
-     * index writer IndexWriterConfig config = new
-     * IndexWriterConfig(Version.LUCENE_40, new
-     * WhitespaceAnalyzer(Version.LUCENE_40)); // prepare index writer.
-     * IndexWriter indexer = new IndexWriter(FSDirectory.open(new
-     * File(indexesDir)), config); // create document for each image and ad to
-     * index. for (Iterator<String> iterator = images.iterator();
-     * iterator.hasNext();) { String imageURI = iterator.next(); BufferedImage
-     * image = ImageIO.read(new FileInputStream(imageURI)); Document document =
-     * getDocumentBuilder().createDocument(image, imageURI);
-     * indexer.addDocument(document); } // closing the IndexWriter
-     * indexer.close(); return true; }
-     */
 }

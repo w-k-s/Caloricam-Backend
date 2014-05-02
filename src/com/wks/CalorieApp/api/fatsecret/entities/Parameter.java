@@ -1,5 +1,10 @@
 package com.wks.calorieapp.api.fatsecret.entities;
 
+/**
+ * 
+ * @author Waqqas
+ *
+ */
 public enum Parameter {
     SEARCH_EXPRESSION("search_expression"),
     OAUTH_CONSUMER_KEY("oauth_consumer_key"),

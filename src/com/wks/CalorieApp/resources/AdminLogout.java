@@ -12,7 +12,6 @@ import org.apache.log4j.Logger;
 
 public class AdminLogout extends HttpServlet
 {
-    //private static final boolean appIsDeployed = false;
     private static final long serialVersionUID = 1L;
     private static final String SRVLT_LOGIN = "/login";
     private static final String REDIRECT = "/calorieapp";

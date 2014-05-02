@@ -24,6 +24,14 @@ import net.semanticmetadata.lire.ImageSearchHits;
 import net.semanticmetadata.lire.ImageSearcher;
 import net.semanticmetadata.lire.ImageSearcherFactory;
 
+/**
+ * CITATION
+ * 
+ * Mathias Lux (April 20, 2013), AutoColorCorrelogram Image Feature
+ * http://www.semanticmetadata.net/wiki/doku.php?id=lire:autocolorcorrelation
+ * (retrieved on 5-Aug-2013)
+ *
+ */
 public class Identifier
 {
 

@@ -1,8 +1,16 @@
 package com.wks.calorieapp.api.fatsecret.entities;
 
+/** CITATION
+ * 
+ * @author FatSecret 
+ * FatSecret, FatSecret Platform API Java, http://platform.fatsecret.com/api/static/libraries/java.tar.gz
+ *
+ *Modified to add getters and setters for Nonce, Timestamp and URL.
+ *
+ */
 public class Result
 {
-	private String _signature, _signatureBase, _normalizedUrl, _normalizedRequestParameters, nonce, timestamp;
+	private String _signature, _signatureBase, _normalizedUrl, _normalizedRequestParameters, _nonce, _timestamp;
 
 	public Result()
 	{
@@ -41,19 +49,19 @@ public class Result
 	}
 
 	public String getNonce() {
-	    return nonce;
+	    return _nonce;
 	}
 
 	public String getTimestamp() {
-	    return timestamp;
+	    return _timestamp;
 	}
 
-	public void setNonce(String nonce) {
-	    this.nonce = nonce;
+	public void setNonce(String _nonce) {
+	    this._nonce = _nonce;
 	}
 
-	public void setTimestamp(String timestamp) {
-	    this.timestamp = timestamp;
+	public void setTimestamp(String _timestamp) {
+	    this._timestamp = _timestamp;
 	}
 
 	public String getURL() {

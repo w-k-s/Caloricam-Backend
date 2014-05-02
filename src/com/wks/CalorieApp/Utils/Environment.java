@@ -39,6 +39,8 @@ public class Environment
 
 	} else
 	{
+	    //I couldnt get the Openshift variables to work.
+	    //This is temporary (I hope).
 	    outsideRoot = "/var/lib/openshift/519f8e8c4382ec1eb0000156/app-root/data";
 	}
 	return outsideRoot + File.separator + resourcesDir;

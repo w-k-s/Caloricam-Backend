@@ -126,7 +126,7 @@ public class Test extends HttpServlet{
 	
 	/*
 	try {
-	    FatSecretAPI fatsecret = new FatSecretAPI("ea0d6a946b3e4b3a8d5cbdb0a55900dd","49704a68e7114143925f6390aeca8b42");
+	    FatSecretAPI fatsecret = new FatSecretAPI("**********************","**********************");
 	    String json = fatsecret.foodsSearch("chicken");
 	    
 	    
@@ -146,7 +146,6 @@ public class Test extends HttpServlet{
 	    e.printStackTrace();
 	}*/
 	/*
-	logger.info("Let the games begin!");
 	
 	try{
 	    int s = Integer.parseInt("s");
@@ -156,11 +155,11 @@ public class Test extends HttpServlet{
 	}*/
 	/*
 	Connection connection = DatabaseUtil.getConnection();
-	GeneralDataAccessObject shit = new GeneralDataAccessObject(connection);
-	boolean b = shit.doQuery("INSERT INTO Users VALUES ('wks','2212')");
+	GeneralDataAccessObject gdao = new GeneralDataAccessObject(connection);
+	boolean b = gdao.doQuery("INSERT INTO Users VALUES ('wks','2212')");
 	
-	*/
-	FSWebService ws = new FSWebService("ea0d6a946b3e4b3a8d5cbdb0a55900dd","49704a68e7114143925f6390aeca8b42");
+	
+	FSWebService ws = new FSWebService("**********************","*****************");
 	try
 	{
 	    List<NutritionInfo> l = ws.searchFood("chicken");
@@ -169,7 +168,7 @@ public class Test extends HttpServlet{
 	{
 	    // TODO Auto-generated catch block
 	    e.printStackTrace();
-	}
+	}*/
     }
     
     @Override

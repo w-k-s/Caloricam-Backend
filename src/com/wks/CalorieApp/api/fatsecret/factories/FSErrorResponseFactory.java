@@ -5,7 +5,6 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import com.wks.calorieapp.api.fatsecret.entities.FSError;
-import com.wks.calorieapp.api.fatsecret.entities.FSAbstractResponse;
 
 public class FSErrorResponseFactory extends FSAbstractResponseFactory
 {

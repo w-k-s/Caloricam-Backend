@@ -15,9 +15,6 @@ import com.wks.calorieapp.entities.Response;
 public class Error extends HttpServlet
 {
 
-    /**
-     * 
-     */
     private static final long serialVersionUID = 2893179894559140866L;
     private static final String CONTENT_TYPE = "application/json";
     private static Logger logger = Logger.getLogger(Error.class);

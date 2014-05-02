@@ -11,6 +11,11 @@ import com.wks.calorieapp.daos.imageDAO;
 import com.wks.calorieapp.entities.FoodEntry;
 import com.wks.calorieapp.entities.ImageEntry;
 
+/**
+ * 
+ * @author Waqqas
+ *
+ */
 public class Linker
 {
     private static Connection connection;
