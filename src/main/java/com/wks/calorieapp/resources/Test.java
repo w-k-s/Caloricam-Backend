@@ -28,7 +28,7 @@ import com.wks.calorieapp.daos.UserDAO;
 import com.wks.calorieapp.entities.ImageEntry;
 import com.wks.calorieapp.entities.User;
 import com.wks.calorieapp.utils.DatabaseUtils;
-import com.wks.calorieapp.utils.HttpClient;
+import com.wks.calorieapp.utils.HTTPClient;
 
 
 @SuppressWarnings("unused")

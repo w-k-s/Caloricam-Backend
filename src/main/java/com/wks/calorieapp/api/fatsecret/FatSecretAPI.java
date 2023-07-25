@@ -9,7 +9,8 @@ import com.wks.calorieapp.api.fatsecret.entities.Method;
 import com.wks.calorieapp.api.fatsecret.entities.OAuthBase;
 import com.wks.calorieapp.api.fatsecret.entities.Parameter;
 import com.wks.calorieapp.api.fatsecret.entities.Result;
-import com.wks.calorieapp.utils.HttpClient;
+import com.wks.calorieapp.utils.HTTPClient;
+import sun.net.www.http.HttpClient;
 
 public class FatSecretAPI
 {
@@ -54,7 +55,7 @@ public class FatSecretAPI
 
 	// make rest call
 	String signedUrl = result.getURL();
-	return HttpClient.get(signedUrl);
+	return HTTPClient.get(signedUrl);
     }
 
     // Convenience method for doing a REST call to the FatSecret Search method.

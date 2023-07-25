@@ -6,7 +6,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-public class HttpClient {
+public class HTTPClient {
     
     public static String get(String url) throws IOException
     {
