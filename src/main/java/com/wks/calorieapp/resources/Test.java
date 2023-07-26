@@ -1,34 +1,13 @@
 package com.wks.calorieapp.resources;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.sql.Connection;
-import java.util.List;
-import java.util.Map;
+import org.apache.log4j.Logger;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import org.apache.log4j.BasicConfigurator;
-import org.apache.log4j.Logger;
-import org.json.simple.parser.ParseException;
-
-
-import com.mysql.jdbc.exceptions.MySQLIntegrityConstraintViolationException;
-import com.wks.calorieapp.api.fatsecret.FSWebService;
-import com.wks.calorieapp.api.fatsecret.FatSecretAPI;
-import com.wks.calorieapp.api.fatsecret.entities.FSError;
-import com.wks.calorieapp.api.fatsecret.entities.FSFoods;
-import com.wks.calorieapp.api.fatsecret.entities.NutritionInfo;
-import com.wks.calorieapp.api.fatsecret.entities.Result;
-import com.wks.calorieapp.daos.GeneralDAO;
-import com.wks.calorieapp.daos.UserDAO;
-import com.wks.calorieapp.entities.ImageEntry;
-import com.wks.calorieapp.entities.User;
-import com.wks.calorieapp.utils.DatabaseUtils;
-import com.wks.calorieapp.utils.HTTPClient;
+import java.io.IOException;
+import java.io.PrintWriter;
 
 
 @SuppressWarnings("unused")

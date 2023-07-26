@@ -14,7 +14,6 @@ public class AdminLogout extends HttpServlet
 {
     private static final long serialVersionUID = 1L;
     private static final String SRVLT_LOGIN = "/login";
-    private static final String REDIRECT = "/calorieapp";
     private static Logger logger = Logger.getLogger(AdminLogout.class);
 
     @Override
@@ -28,7 +27,7 @@ public class AdminLogout extends HttpServlet
 	    logger.info( (String) session.getAttribute(Attributes.USERNAME.toString()) + " has logged out.");
 	    session.invalidate();
 	}
-	resp.sendRedirect(REDIRECT + SRVLT_LOGIN);
+	resp.sendRedirect(req.getContextPath() + SRVLT_LOGIN);
 	return;
     }
 

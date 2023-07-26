@@ -1,0 +1,28 @@
+version: "3.9"
+services:
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: app
+    restart: always
+    depends_on:
+      - db
+    links:
+      - db
+    ports:
+      - 8080:8080
+
+  db:
+    image: mysql:latest
+    environment:
+      MYSQL_DATABASE: "calorie_app"
+      MYSQL_ROOT_PASSWORD: "123456"
+      MYSQL_USER: "waqqas"
+      MYSQL_USER_PASSWORD: "123456"
+    ports:
+      - 3306:3306
+    command: --init-file /data/application/init.sql
+    volumes:
+      - .docker/db/init.sql:/data/application/init.sql

@@ -23,10 +23,10 @@ td {
 	<hr />
 	<h2>Navigation</h2>
 	<ul>
-		<li><a href="/calorieapp/images">Images</a></li>
-		<li><a href="/calorieapp/indexes">Indexes</a></li>
-		<li><a href="/calorieapp/log">Logs</a></li>
-		<li><a href="/calorieapp/logout">Logout (${username})</a></li>
+		<li><a href="${pageContext.request.contextPath}/images">Images</a></li>
+		<li><a href="${pageContext.request.contextPath}/indexes">Indexes</a></li>
+		<li><a href="${pageContext.request.contextPath}/log">Logs</a></li>
+		<li><a href="${pageContext.request.contextPath}/logout">Logout (${username})</a></li>
 	</ul>
 	<hr />
 	<h2>Upload</h2>

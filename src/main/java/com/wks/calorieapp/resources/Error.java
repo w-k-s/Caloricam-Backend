@@ -33,7 +33,7 @@ public class Error extends HttpServlet
        logger.fatal(sw.toString());
        
        //display response.
-       Response response = new Response(StatusCode.SERVICE_FAILED);
+       Response response = new Response(StatusCode.SERVICE_FAILED, sw.toString());
        out.println( response.toJSON() );
     }
     

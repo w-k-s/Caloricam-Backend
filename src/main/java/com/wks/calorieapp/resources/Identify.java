@@ -20,8 +20,7 @@ import com.wks.calorieapp.utils.DatabaseUtils;
 import com.wks.calorieapp.utils.Environment;
 
 
-public class Identify extends HttpServlet
-{
+public class Identify extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
     private static final String CONTENT_TYPE = "application/json";
@@ -42,72 +41,64 @@ public class Identify extends HttpServlet
     private static Logger logger = Logger.getLogger(Identify.class);
 
     @Override
-    public void init() throws ServletException
-    {
-	imagesDir = Environment.getImagesDirectory(getServletContext());
-	indexesDir = Environment.getIndexesDirectory(getServletContext());
-	defaultMaxHits = Integer.parseInt(getServletContext().getInitParameter(
-		ContextParameters.DEFAULT_MAX_HITS.toString()));
-	defaultMinSimilarity = Float.parseFloat(getServletContext().getInitParameter(
-		ContextParameters.DEFAULT_MIN_SIMILARITY.toString()));
-	connection = DatabaseUtils.getConnection();
+    public void init() throws ServletException {
+        imagesDir = Environment.getImagesDirectory(getServletContext());
+        indexesDir = Environment.getIndexesDirectory(getServletContext());
+        defaultMaxHits = Integer.parseInt(getServletContext().getInitParameter(
+                ContextParameters.DEFAULT_MAX_HITS.toString()));
+        defaultMinSimilarity = Float.parseFloat(getServletContext().getInitParameter(
+                ContextParameters.DEFAULT_MIN_SIMILARITY.toString()));
+        connection = DatabaseUtils.getConnection();
     }
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException
-    {
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
-	doPost(req, resp);
+        doPost(req, resp);
     }
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException
-    {
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
-	resp.setContentType(CONTENT_TYPE);
-	PrintWriter out = resp.getWriter();
+        resp.setContentType(CONTENT_TYPE);
+        PrintWriter out = resp.getWriter();
 
-	String imageName = req.getParameter(PARAM_IMAGE_NAME);
-	float minSimilarity = req.getParameter(PARAM_MIN_SIMILARITY) == null ? defaultMinSimilarity : Float.valueOf(req
-		.getParameter(PARAM_MIN_SIMILARITY));
-	int maximumHits = req.getParameter(PARAM_MAX_HITS) == null ? defaultMaxHits : Integer.valueOf(req
-		.getParameter(PARAM_MAX_HITS));
+        String imageName = req.getParameter(PARAM_IMAGE_NAME);
+        float minSimilarity = req.getParameter(PARAM_MIN_SIMILARITY) == null ? defaultMinSimilarity : Float.valueOf(req
+                .getParameter(PARAM_MIN_SIMILARITY));
+        int maximumHits = req.getParameter(PARAM_MAX_HITS) == null ? defaultMaxHits : Integer.valueOf(req
+                .getParameter(PARAM_MAX_HITS));
 
-	if (imageName == null)
-	{
-	    out.println(new Response(StatusCode.TOO_FEW_ARGS).toJSON());
-	    return;
-	}
+        if (imageName == null) {
+            out.println(new Response(StatusCode.TOO_FEW_ARGS).toJSON());
+            return;
+        }
 
-	File imageFile = new File(imagesDir + imageName);
-	if (!imageFile.exists())
-	{
-	    out.println(new Response(StatusCode.FILE_NOT_FOUND).toJSON());
-	    logger.error("Index Request Failed. " + imageName + " does not exist.");
-	    return;
-	}
+        File imageFile = new File(imagesDir + imageName);
+        if (!imageFile.exists()) {
+            out.println(new Response(StatusCode.FILE_NOT_FOUND).toJSON());
+            logger.error("Index Request Failed. " + imageName + " does not exist.");
+            return;
+        }
 
-	try
-	{
-	    Identifier identifier = Identifier.getInstance(connection);
-	    Map<String, Float> foodNameSimilarity = identifier.getPossibleFoodsForImage(imageFile.getAbsolutePath(),
-		    indexesDir, minSimilarity, maximumHits);
+        try {
+            Identifier identifier = Identifier.getInstance(connection);
+            Map<String, Float> foodNameSimilarity = identifier.getPossibleFoodsForImage(imageFile.getAbsolutePath(),
+                    indexesDir, minSimilarity, maximumHits);
 
-	    String jsonMap = JSONValue.toJSONString(foodNameSimilarity);
+            String jsonMap = JSONValue.toJSONString(foodNameSimilarity);
 
-	    out.println(new Response(StatusCode.OK, jsonMap).toJSON());
+            out.println(new Response(StatusCode.OK, jsonMap).toJSON());
 
-	} catch (DataAccessObjectException e)
-	{
+        } catch (DataAccessObjectException e) {
 
-	    logger.error("Failure to load food name from database", e);
-	    out.println(new Response(StatusCode.DB_SQL_EXCEPTION).toJSON());
+            logger.error("Failure to load food name from database", e);
+            out.println(new Response(StatusCode.DB_SQL_EXCEPTION).toJSON());
 
-	} catch (IOException e)
-	{
-	    logger.error("IO Exception encountered while finding similar image.", e);
-	    out.println(new Response(StatusCode.FILE_IO_ERROR).toJSON());
-	}
+        } catch (IOException e) {
+            logger.error("IO Exception encountered while finding similar image.", e);
+            out.println(new Response(StatusCode.FILE_IO_ERROR).toJSON());
+        }
 
     }
 

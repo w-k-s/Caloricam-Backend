@@ -30,7 +30,6 @@ public class AdminIndexes extends HttpServlet
     private final static String ACTION_REINDEX = "reindex";
 
     private final static String JSP_INDEXES = "/WEB-INF/indexes.jsp";
-    private final static String REDIRECT = "/calorieapp";
     private final static String SRVLT_LOGIN = "/login";
 
     private static Logger logger = Logger.getLogger(AdminIndexes.class);
@@ -53,7 +52,7 @@ public class AdminIndexes extends HttpServlet
 	if (!authenticated)
 	{
 	    logger.info("Admin Index. Page requested. User not authenticated");
-	    resp.sendRedirect(REDIRECT + SRVLT_LOGIN);
+	    resp.sendRedirect(req.getContextPath() + SRVLT_LOGIN);
 	    return;
 	} else
 	{

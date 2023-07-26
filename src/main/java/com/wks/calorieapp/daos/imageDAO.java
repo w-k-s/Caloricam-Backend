@@ -4,10 +4,11 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.mysql.jdbc.exceptions.MySQLIntegrityConstraintViolationException;
+import com.mysql.jdbc.*;
 import com.wks.calorieapp.entities.ImageEntry;
 import com.wks.calorieapp.utils.DatabaseUtils;
 
@@ -56,7 +57,7 @@ public class imageDAO
 	    statement.setBoolean(4, image.isFinalized());
 	    statement.executeUpdate();
 	    success = true;
-	} catch (MySQLIntegrityConstraintViolationException e)
+	} catch (SQLIntegrityConstraintViolationException e)
 	{
 	    throw new DataAccessObjectException("This image may already exist in the database.",e);
 	} catch (SQLException e)
@@ -123,7 +124,7 @@ public class imageDAO
 	    statement.setString(4, image.getImageId());
 	    statement.execute();
 	    return true;
-	} catch (MySQLIntegrityConstraintViolationException e)
+	} catch (SQLIntegrityConstraintViolationException e)
 	{
 	    throw new DataAccessObjectException("This image may already exist in the database.",e);
 	} catch (SQLException e)
