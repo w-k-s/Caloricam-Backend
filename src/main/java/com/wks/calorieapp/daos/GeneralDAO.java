@@ -1,32 +1,28 @@
 package com.wks.calorieapp.daos;
 
-import java.sql.Connection;
+
+import javax.annotation.Resource;
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Named;
+import javax.sql.DataSource;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-public class GeneralDAO
-{
-    private Connection connection;
+@Named
+@ApplicationScoped
+public class GeneralDAO {
+    @Resource(name = "jdbc/main")
+    DataSource dataSource;
 
-    public GeneralDAO(Connection connection)
-    {
-	if (connection == null) throw new IllegalStateException("Null Connection");
+    public boolean doQuery(String query) throws DataAccessObjectException {
+        Statement statement = null;
 
-	this.connection = connection;
-    }
-
-    public boolean doQuery(String query) throws DataAccessObjectException
-    {
-	Statement statement = null;
-
-	try
-	{
-	    statement = connection.createStatement();
-	    return statement.execute(query);
-	} catch (SQLException e)
-	{
-	    throw new DataAccessObjectException(e);
-	}
+        try {
+            statement = dataSource.getConnection().createStatement();
+            return statement.execute(query);
+        } catch (SQLException e) {
+            throw new DataAccessObjectException(e);
+        }
 
     }
 }

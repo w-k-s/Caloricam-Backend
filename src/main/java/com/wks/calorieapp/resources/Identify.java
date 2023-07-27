@@ -1,25 +1,28 @@
 package com.wks.calorieapp.resources;
 
+import com.wks.calorieapp.daos.DataAccessObjectException;
+import com.wks.calorieapp.entities.Response;
+import com.wks.calorieapp.services.IdentificationService;
+import com.wks.calorieapp.utils.DatabaseUtils;
+import com.wks.calorieapp.utils.Environment;
+import org.apache.log4j.Logger;
+import org.json.simple.JSONValue;
+
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Connection;
 import java.util.Map;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.Logger;
-import org.json.simple.JSONValue;
-
-import com.wks.calorieapp.daos.DataAccessObjectException;
-import com.wks.calorieapp.entities.Response;
-import com.wks.calorieapp.services.Identifier;
-import com.wks.calorieapp.utils.DatabaseUtils;
-import com.wks.calorieapp.utils.Environment;
-
-
+@Named
+@ApplicationScoped
 public class Identify extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
@@ -39,6 +42,9 @@ public class Identify extends HttpServlet {
     private static int defaultMaxHits = DEFAULT_MAX_HITS;
     private static float defaultMinSimilarity = DEFAULT_MIN_SIMILARITY;
     private static Logger logger = Logger.getLogger(Identify.class);
+
+    @Inject
+    private IdentificationService identifier;
 
     @Override
     public void init() throws ServletException {
@@ -82,7 +88,6 @@ public class Identify extends HttpServlet {
         }
 
         try {
-            Identifier identifier = Identifier.getInstance(connection);
             Map<String, Float> foodNameSimilarity = identifier.getPossibleFoodsForImage(imageFile.getAbsolutePath(),
                     indexesDir, minSimilarity, maximumHits);
 

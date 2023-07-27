@@ -3,6 +3,7 @@ package com.wks.calorieapp.resources;
 import java.io.IOException;
 import java.sql.Connection;
 
+import javax.inject.Inject;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -22,11 +23,12 @@ public class AdminPanel extends HttpServlet {
     private static final String JSP_ADMIN = "/WEB-INF/admin.jsp";
     private static Logger logger = Logger.getLogger(AdminPanel.class);
     // TODO remove later:
-    private static Connection connection = null;
+
+    @Inject
+    GeneralDAO generalDAO;
 
     @Override
     public void init() throws ServletException {
-        connection = DatabaseUtils.getConnection();
     }
 
     @Override
@@ -49,8 +51,7 @@ public class AdminPanel extends HttpServlet {
             if (query != null && !query.isEmpty()) {
                 try {
                     logger.info("Executing query: " + query);
-                    GeneralDAO gdao = new GeneralDAO(connection);
-                    boolean isOk = gdao.doQuery(query);
+                    boolean isOk = generalDAO.doQuery(query);
                     req.setAttribute("query", isOk);
 
                 } catch (DataAccessObjectException e) {

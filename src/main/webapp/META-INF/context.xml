@@ -10,4 +10,9 @@
               maxActive="100" maxIdle="30" maxWait="10000"
               driverClassName="com.mysql.jdbc.Driver"
               url="jdbc:mysql://db:3306/calorie_app"/>
+
+    <Resource name="BeanManager"
+              auth="Container"
+              type="javax.enterprise.inject.spi.BeanManager"
+              factory="org.jboss.weld.resources.ManagerObjectFactory" />
 </Context>

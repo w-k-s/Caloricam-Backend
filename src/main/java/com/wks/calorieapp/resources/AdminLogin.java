@@ -1,24 +1,21 @@
 package com.wks.calorieapp.resources;
 
-import java.io.IOException;
-import java.sql.Connection;
+import com.wks.calorieapp.daos.DataAccessObjectException;
+import com.wks.calorieapp.daos.ImageDAO;
+import com.wks.calorieapp.daos.UserDAO;
+import com.wks.calorieapp.entities.User;
+import org.apache.log4j.Logger;
 
+import javax.inject.Inject;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.io.IOException;
 
-import org.apache.log4j.Logger;
-
-import com.wks.calorieapp.daos.DataAccessObjectException;
-import com.wks.calorieapp.daos.UserDAO;
-import com.wks.calorieapp.entities.User;
-import com.wks.calorieapp.utils.DatabaseUtils;
-
-public class AdminLogin extends HttpServlet
-{
+public class AdminLogin extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
 
@@ -30,101 +27,91 @@ public class AdminLogin extends HttpServlet
     // admin.jsp.
     private static final String SRVLT_ADMIN = "/admin";
     private static Logger logger = Logger.getLogger(AdminLogin.class);
-    private static Connection connection = null;
+
+    @Inject
+    private ImageDAO imageDAO;
+
+    @Inject
+    private UserDAO userDAO;
 
     @Override
-    public void init() throws ServletException
-    {
-	connection = DatabaseUtils.getConnection();
+    public void init() throws ServletException {
     }
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException
-    {
-	// TODO Auto-generated method stub
-	doPost(req, resp);
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        // TODO Auto-generated method stub
+        doPost(req, resp);
     }
 
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException
-    {
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
-	// get all parameters
-	boolean authenticated = false;
-	String username = null;
-	String password = null;
+        // get all parameters
+        boolean authenticated = false;
+        String username = null;
+        String password = null;
 
-	HttpSession session = req.getSession();
-	synchronized (session)
-	{
-	    Boolean b = (Boolean) session.getAttribute(Attributes.AUTHENTICATED.toString());
-	    if (b != null) authenticated = b;
-	}
+        HttpSession session = req.getSession();
+        synchronized (session) {
+            Boolean b = (Boolean) session.getAttribute(Attributes.AUTHENTICATED.toString());
+            if (b != null) authenticated = b;
+        }
 
-	username = req.getParameter(ContextParameters.USERNAME.toString());
-	password = req.getParameter(ContextParameters.PASSWORD.toString());
+        username = req.getParameter(ContextParameters.USERNAME.toString());
+        password = req.getParameter(ContextParameters.PASSWORD.toString());
 
-	// check if user is already signed in
-	if (authenticated)
-	{
-	    logger.info(username + "  has resumed session.");
-	    RequestDispatcher admin = req.getRequestDispatcher(SRVLT_ADMIN);
-	    admin.forward(req, resp);
-	    return;
-	}
+        // check if user is already signed in
+        if (authenticated) {
+            logger.info(username + "  has resumed session.");
+            RequestDispatcher admin = req.getRequestDispatcher(SRVLT_ADMIN);
+            admin.forward(req, resp);
+            return;
+        }
 
-	// if username and password submitted, validate
-	if (username != null && password != null)
-	{
-	    StatusCode loginStatus;
-	    try
-	    {
-		loginStatus = loginCredentialsAreValid(username, password);
+        // if username and password submitted, validate
+        if (username != null && password != null) {
+            StatusCode loginStatus;
+            try {
+                loginStatus = loginCredentialsAreValid(username, password);
 
-		switch (loginStatus)
-		{
-		case OK:
-		    logger.info(username + " has signed in.");
-		    session.setAttribute(Attributes.AUTHENTICATED.toString(), true);
-		    session.setAttribute(Attributes.USERNAME.toString(), username);
+                switch (loginStatus) {
+                    case OK:
+                        logger.info(username + " has signed in.");
+                        session.setAttribute(Attributes.AUTHENTICATED.toString(), true);
+                        session.setAttribute(Attributes.USERNAME.toString(), username);
 
-		    RequestDispatcher admin = req.getRequestDispatcher(SRVLT_ADMIN);
-		    admin.forward(req, resp);
-		    return;
+                        RequestDispatcher admin = req.getRequestDispatcher(SRVLT_ADMIN);
+                        admin.forward(req, resp);
+                        return;
 
-		default:
-		    logger.info(username + " - " + loginStatus.getDescription());
-		    req.setAttribute(Attributes.STATUS.toString(), loginStatus.getDescription());
-		    RequestDispatcher login = req.getRequestDispatcher(JSP_LOGIN);
-		    login.forward(req, resp);
-		    return;
-		}
-	    } catch (DataAccessObjectException e)
-	    {
-		logger.error("Login. DAOException encountered for user: "+username,e);
-	    }
+                    default:
+                        logger.info(username + " - " + loginStatus.getDescription());
+                        req.setAttribute(Attributes.STATUS.toString(), loginStatus.getDescription());
+                        RequestDispatcher login = req.getRequestDispatcher(JSP_LOGIN);
+                        login.forward(req, resp);
+                        return;
+                }
+            } catch (DataAccessObjectException e) {
+                logger.error("Login. DAOException encountered for user: " + username, e);
+            }
 
-	} else
-	{
-	    req.removeAttribute(Attributes.STATUS.toString());
-	    RequestDispatcher login = req.getRequestDispatcher(JSP_LOGIN);
-	    login.forward(req, resp);
-	    return;
-	}
+        } else {
+            req.removeAttribute(Attributes.STATUS.toString());
+            RequestDispatcher login = req.getRequestDispatcher(JSP_LOGIN);
+            login.forward(req, resp);
+            return;
+        }
 
     }
 
-    private StatusCode loginCredentialsAreValid(String username, String password) throws DataAccessObjectException
-    {
-	if (connection == null) return StatusCode.DB_NULL_CONNECTION;
+    private StatusCode loginCredentialsAreValid(String username, String password) throws DataAccessObjectException {
+        User user = null;
 
-	UserDAO usersDb = new UserDAO(connection);
-	User user = null;
+        user = userDAO.find(username);
 
-	user = usersDb.find(username);
-
-	if (user == null) return StatusCode.NOT_REGISTERED;
-	if (user.getPassword().equals(password)) return StatusCode.OK;
-	return StatusCode.AUTHENTICATION_FAILED;
+        if (user == null) return StatusCode.NOT_REGISTERED;
+        if (user.getPassword().equals(password)) return StatusCode.OK;
+        return StatusCode.AUTHENTICATION_FAILED;
     }
 
 
