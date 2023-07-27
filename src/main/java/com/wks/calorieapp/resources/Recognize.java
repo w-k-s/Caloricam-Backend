@@ -4,7 +4,6 @@ import com.wks.calorieapp.api.fatsecret.FSWebService;
 import com.wks.calorieapp.api.fatsecret.entities.NutritionInfo;
 import com.wks.calorieapp.daos.DataAccessObjectException;
 import com.wks.calorieapp.services.IdentificationService;
-import com.wks.calorieapp.utils.DatabaseUtils;
 import com.wks.calorieapp.utils.Environment;
 import org.apache.log4j.Logger;
 import org.json.simple.JSONValue;
@@ -18,7 +17,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.sql.Connection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,7 +30,6 @@ public class Recognize extends HttpServlet {
     private static final String PARAM_MIN_SIMILARITY = "min_similarity";
     private static final String PARAM_MAX_HITS = "max_hits";
 
-    private static Connection connection = null;
     private static String imagesDir = "";
     private static String indexesDir = "";
     private static String consumerKey;
@@ -55,8 +52,6 @@ public class Recognize extends HttpServlet {
 
         consumerKey = getServletContext().getInitParameter(ContextParameters.CONSUMER_KEY.toString());
         consumerSecret = getServletContext().getInitParameter(ContextParameters.CONSUMER_SECRET.toString());
-
-        connection = DatabaseUtils.getConnection();
     }
 
     @Override

@@ -3,7 +3,6 @@ package com.wks.calorieapp.resources;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.sql.Connection;
 
 import javax.annotation.ManagedBean;
 import javax.enterprise.context.ApplicationScoped;
@@ -19,7 +18,6 @@ import org.apache.log4j.Logger;
 import com.wks.calorieapp.daos.DataAccessObjectException;
 import com.wks.calorieapp.daos.ImageDao;
 import com.wks.calorieapp.entities.ImageEntry;
-import com.wks.calorieapp.utils.DatabaseUtils;
 import com.wks.calorieapp.utils.Environment;
 
 /**
@@ -35,7 +33,6 @@ public class Index extends HttpServlet {
 
     private static final String PARAM_IMAGE_NAME = "image_name";
 
-    private static Connection connection = null;
     private static String imagesDir = "";
     private static String indexesDir = "";
     private static Logger logger = Logger.getLogger(Index.class);
@@ -47,7 +44,6 @@ public class Index extends HttpServlet {
 
     @Override
     public void init() throws ServletException {
-        connection = DatabaseUtils.getConnection();
         imagesDir = Environment.getImagesDirectory(getServletContext());
         indexesDir = Environment.getIndexesDirectory(getServletContext());
     }
@@ -123,8 +119,6 @@ public class Index extends HttpServlet {
     }
 
     private boolean insertImage(File imageFile) {
-        if (connection == null) return false;
-
         boolean success = true;
 
         try {

@@ -34,8 +34,6 @@ public class Identify extends HttpServlet {
     private static final int DEFAULT_MAX_HITS = 10;
     private static final float DEFAULT_MIN_SIMILARITY = 0F;
 
-    private static Connection connection = null;
-
     private static String imagesDir = "";
     private static String indexesDir = "";
     private static int defaultMaxHits = DEFAULT_MAX_HITS;
@@ -53,7 +51,6 @@ public class Identify extends HttpServlet {
                 ContextParameters.DEFAULT_MAX_HITS.toString()));
         defaultMinSimilarity = Float.parseFloat(getServletContext().getInitParameter(
                 ContextParameters.DEFAULT_MIN_SIMILARITY.toString()));
-        connection = DatabaseUtils.getConnection();
     }
 
     @Override
