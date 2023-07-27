@@ -1,6 +1,5 @@
 package com.wks.calorieapp.resources;
 
-import com.wks.calorieapp.entities.Response;
 import com.wks.calorieapp.utils.Environment;
 import com.wks.calorieapp.utils.FileUtils;
 import org.apache.commons.fileupload.FileItemIterator;

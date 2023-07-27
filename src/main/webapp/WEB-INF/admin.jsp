@@ -34,20 +34,5 @@ td {
 		<input type="file" name="image" /><br /> <input type="submit"
 			value="Upload" />
 	</form>
-	<hr />
-	<h2>Query</h2>
-	<!-- 
-	The PHPAdmin panel doesnt always work. I've emailed them but they cant reproduce the prob.
-	I've made this little query field to get the work done for the time being.
-	 -->
-	<form name="admin" method="post">
-		<input type="text" name="query" value=""/> 
-		<input type="submit" value="go" />
-		<div>${query}</div>
-	</form>
-	<hr />
-	<script type="text/javascript">
-		
-	</script>
 </body>
 </html>

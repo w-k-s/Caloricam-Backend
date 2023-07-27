@@ -1,7 +1,6 @@
 package com.wks.calorieapp.resources;
 
 import com.wks.calorieapp.daos.DataAccessObjectException;
-import com.wks.calorieapp.entities.Response;
 import com.wks.calorieapp.services.LinkingService;
 import com.wks.calorieapp.utils.Environment;
 import org.apache.log4j.Logger;

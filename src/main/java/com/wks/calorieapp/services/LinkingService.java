@@ -1,8 +1,8 @@
 package com.wks.calorieapp.services;
 
 import com.wks.calorieapp.daos.DataAccessObjectException;
-import com.wks.calorieapp.daos.FoodDAO;
-import com.wks.calorieapp.daos.ImageDAO;
+import com.wks.calorieapp.daos.FoodDao;
+import com.wks.calorieapp.daos.ImageDao;
 import com.wks.calorieapp.entities.FoodEntry;
 import com.wks.calorieapp.entities.ImageEntry;
 import org.apache.log4j.Logger;
@@ -20,8 +20,8 @@ import java.io.File;
 public class LinkingService {
     private static Logger logger = Logger.getLogger(LinkingService.class);
 
-    private FoodDAO foodDAO;
-    private ImageDAO imageDAO;
+    private FoodDao foodDAO;
+    private ImageDao imageDAO;
 
     public LinkingService() {
         // Required by CDI to create a proxy class. The proxy class is created because of the Applicationscope
@@ -29,7 +29,7 @@ public class LinkingService {
     }
 
     @Inject
-    public LinkingService(FoodDAO foodDAO, ImageDAO imageDAO) {
+    public LinkingService(FoodDao foodDAO, ImageDao imageDAO) {
         this.foodDAO = foodDAO;
         this.imageDAO = imageDAO;
     }

@@ -1,21 +1,14 @@
 package com.wks.calorieapp.resources;
 
-import java.io.IOException;
-import java.sql.Connection;
+import org.apache.log4j.Logger;
 
-import javax.inject.Inject;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-
-import org.apache.log4j.Logger;
-
-import com.wks.calorieapp.daos.DataAccessObjectException;
-import com.wks.calorieapp.daos.GeneralDAO;
-import com.wks.calorieapp.utils.DatabaseUtils;
+import java.io.IOException;
 
 public class AdminPanel extends HttpServlet {
     private static final long serialVersionUID = 1L;
@@ -24,8 +17,6 @@ public class AdminPanel extends HttpServlet {
     private static Logger logger = Logger.getLogger(AdminPanel.class);
     // TODO remove later:
 
-    @Inject
-    GeneralDAO generalDAO;
 
     @Override
     public void init() throws ServletException {
@@ -36,7 +27,6 @@ public class AdminPanel extends HttpServlet {
 
         // get params and attributes
         boolean authenticated = false;
-        String query = req.getParameter("query");
 
         // load authentication variable.
         HttpSession session = req.getSession();
@@ -47,17 +37,6 @@ public class AdminPanel extends HttpServlet {
 
         // check that the user is signed in.
         if (authenticated) {
-            //if the user has performed a query, do the query
-            if (query != null && !query.isEmpty()) {
-                try {
-                    logger.info("Executing query: " + query);
-                    boolean isOk = generalDAO.doQuery(query);
-                    req.setAttribute("query", isOk);
-
-                } catch (DataAccessObjectException e) {
-                    logger.error("Error while performing query: " + query, e);
-                }
-            }
 
             //load admin page.
             RequestDispatcher admin = req.getRequestDispatcher(JSP_ADMIN);

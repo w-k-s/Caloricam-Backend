@@ -1,8 +1,6 @@
-package com.wks.calorieapp.entities;
+package com.wks.calorieapp.resources;
 
 import org.json.simple.JSONObject;
-
-import com.wks.calorieapp.resources.StatusCode;
 
 
 public class Response implements JSONWriteable

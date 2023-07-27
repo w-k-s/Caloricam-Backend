@@ -1,7 +1,6 @@
 package com.wks.calorieapp.resources;
 
 import com.wks.calorieapp.daos.DataAccessObjectException;
-import com.wks.calorieapp.entities.Response;
 import com.wks.calorieapp.services.IdentificationService;
 import com.wks.calorieapp.utils.DatabaseUtils;
 import com.wks.calorieapp.utils.Environment;

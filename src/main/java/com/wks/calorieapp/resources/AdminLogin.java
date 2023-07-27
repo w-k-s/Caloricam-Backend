@@ -1,8 +1,8 @@
 package com.wks.calorieapp.resources;
 
 import com.wks.calorieapp.daos.DataAccessObjectException;
-import com.wks.calorieapp.daos.ImageDAO;
-import com.wks.calorieapp.daos.UserDAO;
+import com.wks.calorieapp.daos.ImageDao;
+import com.wks.calorieapp.daos.UserDao;
 import com.wks.calorieapp.entities.User;
 import org.apache.log4j.Logger;
 
@@ -29,10 +29,10 @@ public class AdminLogin extends HttpServlet {
     private static Logger logger = Logger.getLogger(AdminLogin.class);
 
     @Inject
-    private ImageDAO imageDAO;
+    private ImageDao imageDAO;
 
     @Inject
-    private UserDAO userDAO;
+    private UserDao userDAO;
 
     @Override
     public void init() throws ServletException {

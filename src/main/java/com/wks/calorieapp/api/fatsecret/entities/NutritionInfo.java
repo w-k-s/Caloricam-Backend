@@ -5,7 +5,7 @@ import java.util.regex.Pattern;
 
 import org.json.simple.JSONObject;
 
-import com.wks.calorieapp.entities.JSONWriteable;
+import com.wks.calorieapp.resources.JSONWriteable;
 
 
 public class NutritionInfo extends FSAbstractResponse implements JSONWriteable

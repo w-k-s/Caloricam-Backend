@@ -17,9 +17,8 @@ import com.wks.calorieapp.services.IndexingService;
 import org.apache.log4j.Logger;
 
 import com.wks.calorieapp.daos.DataAccessObjectException;
-import com.wks.calorieapp.daos.ImageDAO;
+import com.wks.calorieapp.daos.ImageDao;
 import com.wks.calorieapp.entities.ImageEntry;
-import com.wks.calorieapp.entities.Response;
 import com.wks.calorieapp.utils.DatabaseUtils;
 import com.wks.calorieapp.utils.Environment;
 
@@ -42,7 +41,7 @@ public class Index extends HttpServlet {
     private static Logger logger = Logger.getLogger(Index.class);
 
     @Inject
-    private ImageDAO imageDAO;
+    private ImageDao imageDAO;
     @Inject
     private IndexingService indexer;
 

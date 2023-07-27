@@ -10,8 +10,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 
-import com.wks.calorieapp.entities.Response;
-
 public class Error extends HttpServlet
 {
 

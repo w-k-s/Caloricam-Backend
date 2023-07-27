@@ -16,7 +16,6 @@ import org.json.simple.parser.ParseException;
 
 import com.wks.calorieapp.api.fatsecret.FSWebService;
 import com.wks.calorieapp.api.fatsecret.entities.NutritionInfo;
-import com.wks.calorieapp.entities.Response;
 
 public class GetNutritionInfo extends HttpServlet {
 

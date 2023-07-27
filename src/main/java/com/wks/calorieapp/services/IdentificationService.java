@@ -16,8 +16,8 @@ import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.store.FSDirectory;
 
 import com.wks.calorieapp.daos.DataAccessObjectException;
-import com.wks.calorieapp.daos.FoodDAO;
-import com.wks.calorieapp.daos.ImageDAO;
+import com.wks.calorieapp.daos.FoodDao;
+import com.wks.calorieapp.daos.ImageDao;
 import com.wks.calorieapp.entities.FoodEntry;
 import com.wks.calorieapp.entities.ImageEntry;
 
@@ -37,8 +37,8 @@ import net.semanticmetadata.lire.ImageSearcherFactory;
 @ApplicationScoped
 public class IdentificationService {
 
-    private FoodDAO foodDAO;
-    private ImageDAO imageDAO;
+    private FoodDao foodDAO;
+    private ImageDao imageDAO;
 
     public IdentificationService() {
         // Required by CDI to create a proxy class. The proxy class is created because of the Applicationscope
@@ -46,8 +46,8 @@ public class IdentificationService {
     }
 
     @Inject
-    public IdentificationService(FoodDAO foodDAO,
-                                        ImageDAO imageDAO) {
+    public IdentificationService(FoodDao foodDAO,
+                                 ImageDao imageDAO) {
         this.foodDAO = foodDAO;
         this.imageDAO = imageDAO;
     }

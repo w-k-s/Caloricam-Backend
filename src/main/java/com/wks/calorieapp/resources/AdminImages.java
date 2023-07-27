@@ -5,7 +5,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.sql.Connection;
 import java.util.*;
 
 import javax.inject.Inject;
@@ -18,7 +17,7 @@ import javax.servlet.http.HttpSession;
 import org.apache.log4j.Logger;
 
 import com.wks.calorieapp.daos.DataAccessObjectException;
-import com.wks.calorieapp.daos.ImageDAO;
+import com.wks.calorieapp.daos.ImageDao;
 import com.wks.calorieapp.utils.*;
 
 public class AdminImages extends HttpServlet {
@@ -36,7 +35,7 @@ public class AdminImages extends HttpServlet {
     private static Logger logger = Logger.getLogger(AdminImages.class);
 
     @Inject
-    private ImageDAO imageDAO;
+    private ImageDao imageDAO;
 
     @Override
     public void init() throws ServletException {
