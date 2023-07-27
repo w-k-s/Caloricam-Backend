@@ -25,7 +25,6 @@ td {
 	<ul>
 		<li><a href="${pageContext.request.contextPath}/images">Images</a></li>
 		<li><a href="${pageContext.request.contextPath}/indexes">Indexes</a></li>
-		<li><a href="${pageContext.request.contextPath}/log">Logs</a></li>
 		<li><a href="${pageContext.request.contextPath}/logout">Logout (${username})</a></li>
 	</ul>
 	<hr />

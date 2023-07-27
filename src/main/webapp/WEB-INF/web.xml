@@ -38,15 +38,6 @@
 	</servlet-mapping>
 
 	<servlet>
-		<servlet-name>test</servlet-name>
-		<servlet-class>com.wks.calorieapp.resources.Test</servlet-class>
-	</servlet>
-	<servlet-mapping>
-		<servlet-name>test</servlet-name>
-		<url-pattern>/test</url-pattern>
-	</servlet-mapping>
-
-	<servlet>
 		<servlet-name>login</servlet-name>
 		<servlet-class>com.wks.calorieapp.resources.AdminLogin</servlet-class>
 	</servlet>
@@ -126,34 +117,17 @@
 		<servlet-name>error</servlet-name>
 		<url-pattern>/error</url-pattern>
 	</servlet-mapping>
-	
-	<servlet>
-		<servlet-name>log</servlet-name>
-		<servlet-class>com.wks.calorieapp.resources.AdminLog</servlet-class>
-	</servlet>
-	<servlet-mapping>
-		<servlet-name>log</servlet-name>
-		<url-pattern>/log</url-pattern>
-	</servlet-mapping>
-	
-	
-	
+
 	<!-- LOGGING -->
 
-	<servlet>
-		<servlet-name>log_init</servlet-name>
-		<servlet-class>com.wks.calorieapp.resources.LogInit</servlet-class>
-		<init-param>
-			<param-name>local_log4j_properties_uri</param-name>
-			<param-value>WEB-INF/local_log4j.properties</param-value>
-		</init-param>
-		<init-param>
-			<param-name>web_log4j_properties</param-name>
-			<param-value>WEB-INF/web_log4j.properties</param-value>
-		</init-param>
-		<load-on-startup>1</load-on-startup>
-	</servlet>
+	<context-param>
+		<param-name>log4j-config-location</param-name>
+		<param-value>WEB-INF/log4j.properties</param-value>
+	</context-param>
 
+	<listener>
+		<listener-class>com.wks.calorieapp.listener.ContextListener</listener-class>
+	</listener>
 
 	<!-- CONTEXT -->
 
