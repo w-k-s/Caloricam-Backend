@@ -132,26 +132,6 @@
 	<!-- CONTEXT -->
 
 	<context-param>
-		<param-name>resources_dir</param-name>
-		<param-value>calorie_app/</param-value>
-	</context-param>
-	<context-param>
-		<param-name>images_dir</param-name>
-		<param-value>images/</param-value>
-	</context-param>
-	<context-param>
-		<param-name>indexes_dir</param-name>
-		<param-value>indexes/</param-value>
-	</context-param>
-	<context-param>
-		<param-name>log_dir</param-name>
-		<param-value>log/</param-value>
-	</context-param>
-	<context-param>
-		<param-name>log_file</param-name>
-		<param-value>log2.txt</param-value>
-	</context-param>
-	<context-param>
 		<param-name>default_max_hits</param-name>
 		<param-value>10</param-value>
 	</context-param>
@@ -160,11 +140,7 @@
 		<param-name>default_min_similarity</param-name>
 		<param-value>0</param-value>
 	</context-param>
-	<context-param>
-		<param-name>is_deployed</param-name>
-		<param-value>true</param-value>
-	</context-param>
-	
+
 	<context-param>
 		<param-name>app_version</param-name>
 		<param-value>1.35</param-value>

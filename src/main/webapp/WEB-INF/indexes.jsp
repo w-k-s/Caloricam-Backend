@@ -1,5 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
-    pageEncoding="ISO-8859-1" import="java.util.*,com.wks.calorieapp.resources.Attributes,com.wks.calorieapp.utils.Environment,java.io.File"%>
+    pageEncoding="ISO-8859-1" import="java.util.*,com.wks.calorieapp.resources.Attributes,java.io.File"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
@@ -32,12 +32,11 @@ function confirmDeleteAll(){
 		<th>File size</th>
 	</tr>
 	<%
-	
-	String indexesDir = Environment.getIndexesDirectory(application);
+
 	
 	for(String fileName : indexFiles)
 	{
-	    File indexFile = new File(indexesDir + fileName);
+	    File indexFile = new File(fileName);
 	    
 	    out.println("<tr>");
 	    out.println("<td>"+ fileName +"</td>");

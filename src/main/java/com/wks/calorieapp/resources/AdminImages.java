@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import com.wks.calorieapp.factories.ImagesDirectory;
 import org.apache.log4j.Logger;
 
 import com.wks.calorieapp.daos.DataAccessObjectException;
@@ -31,11 +32,14 @@ public class AdminImages extends HttpServlet {
 
     private static final String[] EXTENSIONS = {".jpeg", ".jpg"};
     private static final String DEFAULT_MIME_TYPE = "image/jpeg";
-    private static final String REDIRECT = "/calorieapp";
     private static Logger logger = Logger.getLogger(AdminImages.class);
 
     @Inject
     private ImageDao imageDAO;
+
+    @Inject
+    @ImagesDirectory
+    private File imagesDirectory;
 
     @Override
     public void init() throws ServletException {
@@ -68,7 +72,7 @@ public class AdminImages extends HttpServlet {
 
             // redirect to login page
             logger.info("Admin Image. Page requested. User not authenticated");
-            resp.sendRedirect(REDIRECT + SRVLT_LOGIN);
+            resp.sendRedirect(req.getContextPath() + SRVLT_LOGIN);
             return;
 
         } else {
@@ -88,8 +92,7 @@ public class AdminImages extends HttpServlet {
 
         }
 
-        List<String> imageURIList = FileUtils.getFilesInDir(Environment.getImagesDirectory(getServletContext()),
-                EXTENSIONS);
+        List<String> imageURIList = FileUtils.getFilesInDir(imagesDirectory.getAbsolutePath(), EXTENSIONS);
 
         req.setAttribute(Attributes.IMAGE_LIST.toString(), imageURIList);
         RequestDispatcher request = req.getRequestDispatcher(JSP_IMAGE);
@@ -97,8 +100,8 @@ public class AdminImages extends HttpServlet {
     }
 
     private boolean handleAction(String action, String fileName, HttpServletResponse resp) throws DataAccessObjectException {
+        final String fileURI = new File(imagesDirectory, fileName).getAbsolutePath();
         if (action.equalsIgnoreCase(ACTION_DELETE)) {
-            String fileURI = Environment.getImagesDirectory(getServletContext()) + fileName;
             deleteFile(fileURI);
 
             boolean recordDeleted = imageDAO.delete(fileName);
@@ -106,7 +109,6 @@ public class AdminImages extends HttpServlet {
             return recordDeleted;
 
         } else if (action.equalsIgnoreCase(ACTION_VIEW)) {
-            String fileURI = Environment.getImagesDirectory(getServletContext()) + fileName;
             return respondWithImage(resp, fileURI);
         }
 

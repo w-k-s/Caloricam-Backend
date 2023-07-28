@@ -23,9 +23,6 @@
 	<tr>
 		<td colspan="2">${status}</td>
 	</tr>
-	<tr>
-		<td>Deployed: ${initParam.is_deployed}</td>
-	</tr>
 </table>
 </form>
 <p>Version ${initParam.app_version}</p>

@@ -12,13 +12,13 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.wks.calorieapp.factories.ImagesDirectory;
 import com.wks.calorieapp.services.IndexingService;
 import org.apache.log4j.Logger;
 
 import com.wks.calorieapp.daos.DataAccessObjectException;
 import com.wks.calorieapp.daos.ImageDao;
 import com.wks.calorieapp.entities.ImageEntry;
-import com.wks.calorieapp.utils.Environment;
 
 /**
  * @author Waqqas
@@ -33,8 +33,6 @@ public class Index extends HttpServlet {
 
     private static final String PARAM_IMAGE_NAME = "image_name";
 
-    private static String imagesDir = "";
-    private static String indexesDir = "";
     private static Logger logger = Logger.getLogger(Index.class);
 
     @Inject
@@ -42,10 +40,12 @@ public class Index extends HttpServlet {
     @Inject
     private IndexingService indexer;
 
+    @Inject
+    @ImagesDirectory
+    private File imagesDir;
+
     @Override
     public void init() throws ServletException {
-        imagesDir = Environment.getImagesDirectory(getServletContext());
-        indexesDir = Environment.getIndexesDirectory(getServletContext());
     }
 
     @Override
@@ -66,7 +66,7 @@ public class Index extends HttpServlet {
             return;
         }
 
-        File imageFile = new File(imagesDir + imageName);
+        File imageFile = new File(imagesDir, imageName);
 
         if (!imageFile.exists()) {
             Response response = new Response(StatusCode.FILE_NOT_FOUND);
@@ -80,7 +80,7 @@ public class Index extends HttpServlet {
 
         if (this.insertImage(imageFile)) {
             long start = System.currentTimeMillis();
-            boolean success = this.indexImage(imageFile, new File(indexesDir));
+            boolean success = this.indexImage(imageFile);
             logger.info("Index Request. Indexing complete in " + (System.currentTimeMillis() - start) + " ms.");
 
             StatusCode statusCode = success ? StatusCode.OK : StatusCode.INDEX_ERROR;
@@ -97,18 +97,17 @@ public class Index extends HttpServlet {
     /**
      * Index the image
      *
-     * @param imageFile  path of image to index.
-     * @param indexesDir directory where index will be saved.
+     * @param imageFile path of image to index.
      * @return true if image was indexed successfully.
      */
-    private boolean indexImage(File imageFile, File indexesDir) {
+    private boolean indexImage(File imageFile) {
         boolean success = false;
 
         try {
 
             //index all images in imagesDir. Output to indexes dir.
             long startIndex = System.currentTimeMillis();
-            success = indexer.indexImage(imageFile, indexesDir);
+            success = indexer.indexImage(imageFile);
             logger.info("Index Request. Total Indexing Time: " + (System.currentTimeMillis() - startIndex) + " ms.");
 
         } catch (IOException e) {

@@ -1,5 +1,7 @@
 package com.wks.calorieapp.services;
 
+import com.wks.calorieapp.factories.ImagesDirectory;
+import com.wks.calorieapp.factories.IndexesDirectory;
 import net.semanticmetadata.lire.DocumentBuilder;
 import net.semanticmetadata.lire.utils.FileUtils;
 import org.apache.log4j.Logger;
@@ -24,6 +26,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * CITATION
@@ -35,9 +38,11 @@ import java.util.Iterator;
 @Named
 @ApplicationScoped
 public class IndexingService {
-    private static Object lock = new Object();
-    private DocumentBuilder documentBuilder;
     private static Logger logger = Logger.getLogger(IndexingService.class);
+    private static Object lock = new Object();
+    private File indexesDirectory;
+    private File imagesDirectory;
+    private DocumentBuilder documentBuilder;
 
     public IndexingService() {
         // Required by CDI to create a proxy class. The proxy class is created because of the Applicationscope
@@ -45,12 +50,17 @@ public class IndexingService {
     }
 
     @Inject
-    public IndexingService(DocumentBuilder builder) {
-
+    public IndexingService(
+            DocumentBuilder builder,
+            @IndexesDirectory File indexesDirectory,
+            @ImagesDirectory File imagesDirectory
+    ) {
         if (builder == null) throw new IllegalStateException("DocumentBuilder should not be null");
-
+        if (indexesDirectory != null && !indexesDirectory.isDirectory())
+            throw new IllegalArgumentException("The indexes File provided is not a directory.");
         this.documentBuilder = builder;
-
+        this.indexesDirectory = indexesDirectory;
+        this.imagesDirectory = imagesDirectory;
     }
 
     public DocumentBuilder getDocumentBuilder() {
@@ -59,21 +69,18 @@ public class IndexingService {
 
     /**
      * @param imageFile  image to index
-     * @param indexesDir directory where index will be stored.
      * @return true if image was indexed successfully.
      * @throws IOException
      */
-    public boolean indexImage(File imageFile, File indexesDir) throws IOException {
+    public boolean indexImage(File imageFile) throws IOException {
         synchronized (lock) {
             if (imageFile != null && !imageFile.isFile())
                 throw new IllegalArgumentException("The Image File provided is not a file.");
-            if (indexesDir != null && !indexesDir.isDirectory())
-                throw new IllegalArgumentException("The indexes File provided is not a directory.");
 
 
             ArrayList<String> images = new ArrayList<String>();
             images.add(imageFile.getAbsolutePath());
-            return this.indexImages(images, indexesDir);
+            return this.indexImages(images, indexesDirectory);
         }
     }
 
@@ -154,4 +161,15 @@ public class IndexingService {
 
     }
 
+    public boolean deleteIndexes() {
+        return com.wks.calorieapp.utils.FileUtils.deleteFiles(getIndexFilesList());
+    }
+
+    public List<String> getIndexFilesList() {
+        return com.wks.calorieapp.utils.FileUtils.getFilesInDir(indexesDirectory.getAbsolutePath(), new String[]{""});
+    }
+
+    public boolean reindex() throws IOException {
+        return indexImages(imagesDirectory, indexesDirectory);
+    }
 }

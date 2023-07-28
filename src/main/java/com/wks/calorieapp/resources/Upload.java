@@ -1,6 +1,6 @@
 package com.wks.calorieapp.resources;
 
-import com.wks.calorieapp.utils.Environment;
+import com.wks.calorieapp.factories.ImagesDirectory;
 import com.wks.calorieapp.utils.FileUtils;
 import org.apache.commons.fileupload.FileItemIterator;
 import org.apache.commons.fileupload.FileItemStream;
@@ -8,11 +8,13 @@ import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.log4j.Logger;
 
+import javax.inject.Inject;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 
@@ -22,12 +24,14 @@ public class Upload extends HttpServlet {
     private static final String CONTENT_TYPE = "application/json";
     private static final String EXTENSION_JPEG = ".jpeg";
     private static final String EXTENSION_JPG = ".jpg";
-    private static String imagesDir = "";
     private static Logger logger = Logger.getLogger(Upload.class);
+
+    @Inject
+    @ImagesDirectory
+    private File imagesDir;
 
     @Override
     public void init() throws ServletException {
-        imagesDir = Environment.getImagesDirectory(getServletContext());
     }
 
     @Override
@@ -75,7 +79,7 @@ public class Upload extends HttpServlet {
                         return;
                     }
 
-                    boolean fileDidUpload = FileUtils.upload(imagesDir, item);
+                    boolean fileDidUpload = FileUtils.upload(imagesDir.getAbsolutePath(), item);
 
                     if (fileDidUpload) {
                         // forward the request to indexer so that uploaded image

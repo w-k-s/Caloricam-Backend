@@ -14,5 +14,9 @@
     <Resource name="BeanManager"
               auth="Container"
               type="javax.enterprise.inject.spi.BeanManager"
-              factory="org.jboss.weld.resources.ManagerObjectFactory" />
+              factory="org.jboss.weld.resources.ManagerObjectFactory"/>
+
+    <Environment name="app/rootdir"
+                 value="${user.home}/.calorieapp"
+                 type="java.lang.String"/>
 </Context>

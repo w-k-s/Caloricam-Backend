@@ -11,6 +11,7 @@ import javax.imageio.ImageIO;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import com.wks.calorieapp.factories.IndexesDirectory;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.store.FSDirectory;
@@ -39,6 +40,7 @@ public class IdentificationService {
 
     private FoodDao foodDAO;
     private ImageDao imageDAO;
+    private File indexesDirectory;
 
     public IdentificationService() {
         // Required by CDI to create a proxy class. The proxy class is created because of the Applicationscope
@@ -46,8 +48,10 @@ public class IdentificationService {
     }
 
     @Inject
-    public IdentificationService(FoodDao foodDAO,
+    public IdentificationService(@IndexesDirectory File indexesDirectory,
+                                 FoodDao foodDAO,
                                  ImageDao imageDAO) {
+        this.indexesDirectory = indexesDirectory;
         this.foodDAO = foodDAO;
         this.imageDAO = imageDAO;
     }
@@ -55,18 +59,17 @@ public class IdentificationService {
 
     /**
      * @param imageUri          path of image
-     * @param indexesDir        path of indexes directory
      * @param minimumSimilarity minimum similarity index
      * @param maximumHits       max results
      * @return Map of food name (key) and similarity index (value)
      * @throws IOException
      * @throws DataAccessObjectException
      */
-    public Map<String, Float> getPossibleFoodsForImage(String imageUri, String indexesDir, float minimumSimilarity, int maximumHits) throws IOException, DataAccessObjectException {
+    public Map<String, Float> getPossibleFoodsForImage(String imageUri, float minimumSimilarity, int maximumHits) throws IOException, DataAccessObjectException {
         Map<String, Float> foodNameSimilarityMap = new HashMap<String, Float>();
 
         //find similar images
-        Map<String, Float> imageSimilarityMap = this.findSimilarImages(imageUri, indexesDir, maximumHits);
+        Map<String, Float> imageSimilarityMap = this.findSimilarImages(imageUri, indexesDirectory.getAbsolutePath(), maximumHits);
 
         //get name of food in each similar image.
         for (java.util.Map.Entry<String, Float> imageSimilarityEntry : imageSimilarityMap.entrySet()) {

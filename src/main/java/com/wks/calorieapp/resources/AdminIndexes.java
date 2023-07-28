@@ -1,10 +1,7 @@
 package com.wks.calorieapp.resources;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import com.wks.calorieapp.services.IndexingService;
+import org.apache.log4j.Logger;
 
 import javax.inject.Inject;
 import javax.servlet.RequestDispatcher;
@@ -13,12 +10,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-
-import com.wks.calorieapp.services.IndexingService;
-import org.apache.log4j.Logger;
-
-import com.wks.calorieapp.utils.Environment;
-import com.wks.calorieapp.utils.FileUtils;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 
 public class AdminIndexes extends HttpServlet {
 
@@ -63,7 +56,7 @@ public class AdminIndexes extends HttpServlet {
         }
 
 
-        req.setAttribute(Attributes.INDEX_LIST.toString(), getIndexFilesList());
+        req.setAttribute(Attributes.INDEX_LIST.toString(), indexer.getIndexFilesList());
         RequestDispatcher indexView = req.getRequestDispatcher(JSP_INDEXES);
         indexView.forward(req, resp);
     }
@@ -73,16 +66,12 @@ public class AdminIndexes extends HttpServlet {
         doGet(req, resp);
     }
 
-    private List<String> getIndexFilesList() {
-        return FileUtils.getFilesInDir(Environment.getIndexesDirectory(getServletContext()), new String[]{""});
-    }
-
     private boolean handleAction(String action) {
         if (action.equalsIgnoreCase(ACTION_DELETE)) {
-            return deleteIndexes();
+            return indexer.deleteIndexes();
         } else if (action.equalsIgnoreCase(ACTION_REINDEX)) {
             try {
-                return reindex();
+                return indexer.reindex();
             } catch (FileNotFoundException e) {
                 logger.error("Admin Index. FileNotFoundException encountered while reindexing.", e);
                 e.printStackTrace();
@@ -95,19 +84,5 @@ public class AdminIndexes extends HttpServlet {
             logger.error("Admin index. Unidentified action from " + JSP_INDEXES + ": " + action);
             return false;
         }
-    }
-
-    private boolean deleteIndexes() {
-        String indexesDir = Environment.getIndexesDirectory(getServletContext());
-        List<String> fileNames = FileUtils.getFilesInDir(Environment.getIndexesDirectory(getServletContext()), new String[]{""});
-        List<String> fileUri = new ArrayList<String>();
-        for (String fileName : fileNames)
-            fileUri.add(indexesDir + fileName);
-
-        return FileUtils.deleteFiles(fileUri);
-    }
-
-    private boolean reindex() throws FileNotFoundException, IOException {
-        return indexer.indexImages(new File(Environment.getImagesDirectory(getServletContext())), new File(Environment.getIndexesDirectory(getServletContext())));
     }
 }

@@ -1,9 +1,8 @@
 package com.wks.calorieapp.resources;
 
 import com.wks.calorieapp.daos.DataAccessObjectException;
+import com.wks.calorieapp.factories.ImagesDirectory;
 import com.wks.calorieapp.services.IdentificationService;
-import com.wks.calorieapp.utils.DatabaseUtils;
-import com.wks.calorieapp.utils.Environment;
 import org.apache.log4j.Logger;
 import org.json.simple.JSONValue;
 
@@ -17,7 +16,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.sql.Connection;
 import java.util.Map;
 
 @Named
@@ -34,19 +32,18 @@ public class Identify extends HttpServlet {
     private static final int DEFAULT_MAX_HITS = 10;
     private static final float DEFAULT_MIN_SIMILARITY = 0F;
 
-    private static String imagesDir = "";
-    private static String indexesDir = "";
     private static int defaultMaxHits = DEFAULT_MAX_HITS;
     private static float defaultMinSimilarity = DEFAULT_MIN_SIMILARITY;
     private static Logger logger = Logger.getLogger(Identify.class);
 
     @Inject
     private IdentificationService identifier;
+    @Inject
+    @ImagesDirectory
+    private File imagesDirectory;
 
     @Override
     public void init() throws ServletException {
-        imagesDir = Environment.getImagesDirectory(getServletContext());
-        indexesDir = Environment.getIndexesDirectory(getServletContext());
         defaultMaxHits = Integer.parseInt(getServletContext().getInitParameter(
                 ContextParameters.DEFAULT_MAX_HITS.toString()));
         defaultMinSimilarity = Float.parseFloat(getServletContext().getInitParameter(
@@ -76,7 +73,7 @@ public class Identify extends HttpServlet {
             return;
         }
 
-        File imageFile = new File(imagesDir + imageName);
+        File imageFile = new File(imagesDirectory, imageName);
         if (!imageFile.exists()) {
             out.println(new Response(StatusCode.FILE_NOT_FOUND).toJSON());
             logger.error("Index Request Failed. " + imageName + " does not exist.");
@@ -84,8 +81,7 @@ public class Identify extends HttpServlet {
         }
 
         try {
-            Map<String, Float> foodNameSimilarity = identifier.getPossibleFoodsForImage(imageFile.getAbsolutePath(),
-                    indexesDir, minSimilarity, maximumHits);
+            Map<String, Float> foodNameSimilarity = identifier.getPossibleFoodsForImage(imageFile.getAbsolutePath(), minSimilarity, maximumHits);
 
             String jsonMap = JSONValue.toJSONString(foodNameSimilarity);
 

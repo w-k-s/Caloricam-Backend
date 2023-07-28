@@ -1,8 +1,8 @@
 package com.wks.calorieapp.resources;
 
 import com.wks.calorieapp.daos.DataAccessObjectException;
+import com.wks.calorieapp.factories.ImagesDirectory;
 import com.wks.calorieapp.services.LinkingService;
-import com.wks.calorieapp.utils.Environment;
 import org.apache.log4j.Logger;
 
 import javax.inject.Inject;
@@ -26,14 +26,15 @@ public class Link extends HttpServlet {
     private static final String PARAM_IMAGE_NAME = "image_name";
     private static final String PARAM_FOOD_NAME = "food_name";
 
-    private static String imagesDir = "";
-
     @Inject
     private LinkingService linker;
 
+    @Inject
+    @ImagesDirectory
+    private File imagesDir;
+
     @Override
     public void init() throws ServletException {
-        imagesDir = Environment.getImagesDirectory(getServletContext());
     }
 
     @Override
@@ -49,14 +50,12 @@ public class Link extends HttpServlet {
         String imageName = req.getParameter(PARAM_IMAGE_NAME);
         String foodName = URLDecoder.decode(req.getParameter(PARAM_FOOD_NAME), "UTF-8");
 
-
         if (imageName == null || foodName == null || imageName.isEmpty() || foodName.isEmpty()) {
             out.println(new Response(StatusCode.TOO_FEW_ARGS).toJSON());
             return;
         }
 
-
-        File imageFile = new File(imagesDir + imageName);
+        File imageFile = new File(imagesDir, imageName);
         if (!imageFile.exists()) {
             out.println(new Response(StatusCode.FILE_NOT_FOUND).toJSON());
             logger.info("Link request failed. " + imageFile.getAbsolutePath() + " does not exist.");

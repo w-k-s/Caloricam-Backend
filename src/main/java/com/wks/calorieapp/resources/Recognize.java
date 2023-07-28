@@ -3,8 +3,8 @@ package com.wks.calorieapp.resources;
 import com.wks.calorieapp.api.fatsecret.FSWebService;
 import com.wks.calorieapp.api.fatsecret.entities.NutritionInfo;
 import com.wks.calorieapp.daos.DataAccessObjectException;
+import com.wks.calorieapp.factories.ImagesDirectory;
 import com.wks.calorieapp.services.IdentificationService;
-import com.wks.calorieapp.utils.Environment;
 import org.apache.log4j.Logger;
 import org.json.simple.JSONValue;
 import org.json.simple.parser.ParseException;
@@ -30,8 +30,6 @@ public class Recognize extends HttpServlet {
     private static final String PARAM_MIN_SIMILARITY = "min_similarity";
     private static final String PARAM_MAX_HITS = "max_hits";
 
-    private static String imagesDir = "";
-    private static String indexesDir = "";
     private static String consumerKey;
     private static String consumerSecret;
     private static int defaultMaxHits;
@@ -41,11 +39,12 @@ public class Recognize extends HttpServlet {
 
     @Inject
     private IdentificationService identifier;
+    @Inject
+    @ImagesDirectory
+    private File imagesDir;
 
     @Override
     public void init() throws ServletException {
-        imagesDir = Environment.getImagesDirectory(getServletContext());
-        indexesDir = Environment.getIndexesDirectory(getServletContext());
         defaultMaxHits = Integer.parseInt(getServletContext().getInitParameter(ContextParameters.DEFAULT_MAX_HITS.toString()));
         defaultMinSimilarity = Float.parseFloat(getServletContext().getInitParameter(
                 ContextParameters.DEFAULT_MIN_SIMILARITY.toString()));
@@ -75,7 +74,7 @@ public class Recognize extends HttpServlet {
             return;
         }
 
-        File imageFile = new File(imagesDir + imageName);
+        File imageFile = new File(imagesDir, imageName);
         if (!imageFile.exists()) {
             out.println(new Response(StatusCode.FILE_NOT_FOUND).toJSON());
             logger.error("Index Request Failed. " + imageName + " does not exist.");
@@ -84,19 +83,17 @@ public class Recognize extends HttpServlet {
 
         logger.info("Recognise Request. Image: " + imageFile.getAbsolutePath() + " maximumHits: " + maximumHits);
 
-        Map<String, Float> foodNameSimilarity = getSimilarFoods(imageFile.getAbsolutePath(), indexesDir, minSimilarity, maximumHits);
+        Map<String, Float> foodNameSimilarity = getSimilarFoods(imageFile.getAbsolutePath(), minSimilarity, maximumHits);
 
         Map<String, List<NutritionInfo>> nutritionInfo = getNutritionInfoForFoods(foodNameSimilarity.keySet());
         out.println(new Response(StatusCode.OK, JSONValue.toJSONString(nutritionInfo)).toJSON());
 
     }
 
-    private Map<String, Float> getSimilarFoods(String fileURI, String indexesDir, float minimumSimilarity,
-                                               int maximumHits) {
+    private Map<String, Float> getSimilarFoods(String fileURI, float minimumSimilarity, int maximumHits) {
         Map<String, Float> foodNameSimilarity = null;
         try {
-            foodNameSimilarity = identifier.getPossibleFoodsForImage(fileURI, indexesDir, minimumSimilarity,
-                    maximumHits);
+            foodNameSimilarity = identifier.getPossibleFoodsForImage(fileURI, minimumSimilarity, maximumHits);
 
         } catch (DataAccessObjectException e) {
 
