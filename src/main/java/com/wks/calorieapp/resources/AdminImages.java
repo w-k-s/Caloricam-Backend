@@ -28,7 +28,6 @@ public class AdminImages extends HttpServlet {
     private static final String ACTION_VIEW = "view";
 
     private static final String JSP_IMAGE = "/WEB-INF/images.jsp";
-    private static final String SRVLT_LOGIN = "/login";
 
     private static final String[] EXTENSIONS = {".jpeg", ".jpg"};
     private static final String DEFAULT_MIME_TYPE = "image/jpeg";
@@ -41,43 +40,12 @@ public class AdminImages extends HttpServlet {
     @ImagesDirectory
     private File imagesDirectory;
 
-    @Override
-    public void init() throws ServletException {
-    }
 
     protected void doGet(javax.servlet.http.HttpServletRequest req, javax.servlet.http.HttpServletResponse resp)
             throws javax.servlet.ServletException, java.io.IOException {
 
-        // laods all images, stores them into a list and passes it as an
-        // attribute to images.jsp
-
-        boolean authenticated = false;
-        String username = "";
-        String action = null;
-        String image = null;
-
-
-        // session is not a thread-safe variable.
-        HttpSession session = req.getSession();
-        synchronized (session) {
-            Boolean b = (Boolean) session.getAttribute(Attributes.AUTHENTICATED.toString());
-            username = (String) session.getAttribute(Attributes.USERNAME.toString());
-            if (b != null) authenticated = b;
-        }
-
-        action = req.getParameter(ContextParameters.ACTION.toString());
-        image = req.getParameter(ContextParameters.IMAGE.toString());
-
-        if (!authenticated) {
-
-            // redirect to login page
-            logger.info("Admin Image. Page requested. User not authenticated");
-            resp.sendRedirect(req.getContextPath() + SRVLT_LOGIN);
-            return;
-
-        } else {
-            logger.info("Admin Image. Page requested by " + username);
-        }
+        final String action = req.getParameter(ContextParameters.ACTION.toString());
+        final String image = req.getParameter(ContextParameters.IMAGE.toString());
 
         logger.info("Admin. Request contained action='" + action + "', image='" + image + "'.");
         if (action != null && image != null) {

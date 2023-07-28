@@ -1,7 +1,6 @@
 package com.wks.calorieapp.resources;
 
 import com.wks.calorieapp.daos.DataAccessObjectException;
-import com.wks.calorieapp.daos.ImageDao;
 import com.wks.calorieapp.daos.UserDao;
 import com.wks.calorieapp.entities.User;
 import org.apache.log4j.Logger;
@@ -29,9 +28,6 @@ public class AdminLogin extends HttpServlet {
     private static Logger logger = Logger.getLogger(AdminLogin.class);
 
     @Inject
-    private ImageDao imageDAO;
-
-    @Inject
     private UserDao userDAO;
 
     @Override
@@ -40,7 +36,6 @@ public class AdminLogin extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        // TODO Auto-generated method stub
         doPost(req, resp);
     }
 
@@ -99,7 +94,6 @@ public class AdminLogin extends HttpServlet {
             req.removeAttribute(Attributes.STATUS.toString());
             RequestDispatcher login = req.getRequestDispatcher(JSP_LOGIN);
             login.forward(req, resp);
-            return;
         }
 
     }

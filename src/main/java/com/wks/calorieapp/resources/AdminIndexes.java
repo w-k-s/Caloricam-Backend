@@ -20,7 +20,6 @@ public class AdminIndexes extends HttpServlet {
     private final static String ACTION_REINDEX = "reindex";
 
     private final static String JSP_INDEXES = "/WEB-INF/indexes.jsp";
-    private final static String SRVLT_LOGIN = "/login";
 
     private static Logger logger = Logger.getLogger(AdminIndexes.class);
 
@@ -29,41 +28,16 @@ public class AdminIndexes extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        boolean authenticated = false;
-        String username = "";
-        String action = null;
-
-        HttpSession session = req.getSession();
-        synchronized (session) {
-            Boolean b = (Boolean) session.getAttribute(Attributes.AUTHENTICATED.toString());
-            username = (String) session.getAttribute(Attributes.USERNAME.toString());
-            if (b != null) authenticated = b;
-        }
-
-        if (!authenticated) {
-            logger.info("Admin Index. Page requested. User not authenticated");
-            resp.sendRedirect(req.getContextPath() + SRVLT_LOGIN);
-            return;
-        } else {
-            logger.info("Admin Index. Page requested by " + username);
-        }
-
-        action = req.getParameter(ContextParameters.ACTION.toString());
+        final String action = req.getParameter(ContextParameters.ACTION.toString());
         logger.info("Admin Index. action = '" + action + "'.");
         if (action != null) {
             boolean success = handleAction(action);
             logger.info("Admin Index. action='" + action + "', success='" + success + "'");
         }
 
-
         req.setAttribute(Attributes.INDEX_LIST.toString(), indexer.getIndexFilesList());
         RequestDispatcher indexView = req.getRequestDispatcher(JSP_INDEXES);
         indexView.forward(req, resp);
-    }
-
-    @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        doGet(req, resp);
     }
 
     private boolean handleAction(String action) {
