@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import com.wks.calorieapp.api.fatsecret.entities.FSFoods;
@@ -14,7 +12,7 @@ import com.wks.calorieapp.api.fatsecret.entities.NutritionInfo;
 import com.wks.calorieapp.api.fatsecret.factories.FSAbstractResponseFactory;
 import com.wks.calorieapp.api.fatsecret.factories.FSResponseFactoryProducer;
 
-public class FSWebService
+public class FatSecretWebService
 {
     private FatSecretAPI apiLayer;
     private static final int NUM_TRIES = 3;
@@ -25,7 +23,7 @@ public class FSWebService
      * @param consumerKey private key for FatSecret REST API
      * @param sharedKey public key for FatSecret REST API
      */
-    public FSWebService(String consumerKey, String sharedKey)
+    public FatSecretWebService(String consumerKey, String sharedKey)
     {
 	this.apiLayer = new FatSecretAPI(consumerKey, sharedKey);
     }

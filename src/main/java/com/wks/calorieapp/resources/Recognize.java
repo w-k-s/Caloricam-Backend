@@ -1,14 +1,16 @@
 package com.wks.calorieapp.resources;
 
-import com.wks.calorieapp.api.fatsecret.FSWebService;
+import com.wks.calorieapp.api.fatsecret.FatSecretWebService;
 import com.wks.calorieapp.api.fatsecret.entities.NutritionInfo;
 import com.wks.calorieapp.daos.DataAccessObjectException;
+import com.wks.calorieapp.factories.FatSecretWebServiceFactory;
 import com.wks.calorieapp.factories.ImagesDirectory;
 import com.wks.calorieapp.services.IdentificationService;
 import org.apache.log4j.Logger;
 import org.json.simple.JSONValue;
 import org.json.simple.parser.ParseException;
 
+import javax.annotation.Resource;
 import javax.inject.Inject;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -24,34 +26,27 @@ import java.util.Set;
 
 public class Recognize extends HttpServlet {
     private static final long serialVersionUID = 1L;
+    private static Logger logger = Logger.getLogger(Identify.class);
     private static final String CONTENT_TYPE = "application/json";
 
     private static final String PARAM_IMAGE_NAME = "image_name";
     private static final String PARAM_MIN_SIMILARITY = "min_similarity";
     private static final String PARAM_MAX_HITS = "max_hits";
 
-    private static String consumerKey;
-    private static String consumerSecret;
-    private static int defaultMaxHits;
-    private static float defaultMinSimilarity;
-
-    private static Logger logger = Logger.getLogger(Identify.class);
+    @Resource(name = "app/defaults/max-hits")
+    private int defaultMaxHits;
+    @Resource(name = "app/defaults/min-similarity")
+    private float defaultMinSimilarity;
 
     @Inject
     private IdentificationService identifier;
+
+    @Inject
+    private FatSecretWebService fatSecretWebService;
+
     @Inject
     @ImagesDirectory
     private File imagesDir;
-
-    @Override
-    public void init() throws ServletException {
-        defaultMaxHits = Integer.parseInt(getServletContext().getInitParameter(ContextParameters.DEFAULT_MAX_HITS.toString()));
-        defaultMinSimilarity = Float.parseFloat(getServletContext().getInitParameter(
-                ContextParameters.DEFAULT_MIN_SIMILARITY.toString()));
-
-        consumerKey = getServletContext().getInitParameter(ContextParameters.CONSUMER_KEY.toString());
-        consumerSecret = getServletContext().getInitParameter(ContextParameters.CONSUMER_SECRET.toString());
-    }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -65,8 +60,8 @@ public class Recognize extends HttpServlet {
         PrintWriter out = resp.getWriter();
 
         String imageName = req.getParameter(PARAM_IMAGE_NAME);
-        float minSimilarity = req.getParameter(PARAM_MIN_SIMILARITY) == null ? defaultMinSimilarity : Float.valueOf(req.getParameter(PARAM_MIN_SIMILARITY));
-        int maximumHits = req.getParameter(PARAM_MAX_HITS) == null ? defaultMaxHits : Integer.valueOf(req.getParameter(PARAM_MAX_HITS));
+        float minSimilarity = req.getParameter(PARAM_MIN_SIMILARITY) == null ? 0f : Float.parseFloat(req.getParameter(PARAM_MIN_SIMILARITY));
+        int maximumHits = req.getParameter(PARAM_MAX_HITS) == null ? 0 : Integer.parseInt(req.getParameter(PARAM_MAX_HITS));
 
         if (imageName == null) {
             out.println(new Response(StatusCode.TOO_FEW_ARGS)
@@ -90,10 +85,17 @@ public class Recognize extends HttpServlet {
 
     }
 
-    private Map<String, Float> getSimilarFoods(String fileURI, float minimumSimilarity, int maximumHits) {
+    private Map<String, Float> getSimilarFoods(
+            final String fileURI,
+            final float preferredMinimumSimilarity,
+            final int preferredMaxHits
+    ) {
+        final float actualMinSimilarity  = Math.max(defaultMinSimilarity, preferredMinimumSimilarity);
+        final int actualMaxHits = Math.min(defaultMaxHits, preferredMaxHits);
         Map<String, Float> foodNameSimilarity = null;
+
         try {
-            foodNameSimilarity = identifier.getPossibleFoodsForImage(fileURI, minimumSimilarity, maximumHits);
+            foodNameSimilarity = identifier.getPossibleFoodsForImage(fileURI, actualMinSimilarity, actualMaxHits);
 
         } catch (DataAccessObjectException e) {
 
@@ -110,8 +112,7 @@ public class Recognize extends HttpServlet {
         Map<String, List<NutritionInfo>> nutritionInfo = new HashMap<String, List<NutritionInfo>>();
         for (String foodName : foodNames) {
             try {
-                FSWebService fsWebService = new FSWebService(consumerKey, consumerSecret);
-                List<NutritionInfo> info = fsWebService.searchFood(foodName);
+                List<NutritionInfo> info = fatSecretWebService.searchFood(foodName);
                 if (info != null) {
                     nutritionInfo.put(foodName, info);
                 }

@@ -1,10 +1,14 @@
 package com.wks.calorieapp.entities;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
@@ -17,14 +21,11 @@ import javax.persistence.Table;
 @Table(name = "images")
 public class ImageEntry {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "image_id", nullable = false, unique = true)
     private String imageId;
-//    @OneToOne(
-//            targetEntity = FoodEntry.class,
-//            mappedBy = "foodId"
-//    )
-    private long foodId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "food_id", referencedColumnName = "food_id", nullable = true)
+    private FoodEntry food;
     @Column(name = "size")
     private long size;
 
@@ -39,12 +40,12 @@ public class ImageEntry {
         this.imageId = imageId;
     }
 
-    public long getFoodId() {
-        return foodId;
+    public FoodEntry getFood() {
+        return food;
     }
 
-    public void setFoodId(long foodId) {
-        this.foodId = foodId;
+    public void setFood(FoodEntry food) {
+        this.food = food;
     }
 
     public long getSize() {
@@ -65,7 +66,7 @@ public class ImageEntry {
 
     @Override
     public String toString() {
-        return String.format("[imageId: %s,foodId: %d,size: %d,finalized: %s]", getImageId(), getFoodId(), getSize(), isFinalized());
+        return String.format("[imageId: %s,foodId: %d,size: %d,finalized: %s]", getImageId(), getFood(), getSize(), isFinalized());
     }
 
 

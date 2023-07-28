@@ -1,31 +1,29 @@
 package com.wks.calorieapp.services;
 
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.enterprise.context.ApplicationScoped;
-import javax.imageio.ImageIO;
-import javax.inject.Inject;
-import javax.inject.Named;
-
-import com.wks.calorieapp.factories.IndexesDirectory;
-import org.apache.lucene.index.DirectoryReader;
-import org.apache.lucene.index.IndexReader;
-import org.apache.lucene.store.FSDirectory;
-
 import com.wks.calorieapp.daos.DataAccessObjectException;
 import com.wks.calorieapp.daos.FoodDao;
 import com.wks.calorieapp.daos.ImageDao;
 import com.wks.calorieapp.entities.FoodEntry;
 import com.wks.calorieapp.entities.ImageEntry;
-
+import com.wks.calorieapp.factories.IndexesDirectory;
 import net.semanticmetadata.lire.DocumentBuilder;
 import net.semanticmetadata.lire.ImageSearchHits;
 import net.semanticmetadata.lire.ImageSearcher;
 import net.semanticmetadata.lire.ImageSearcherFactory;
+import org.apache.lucene.index.DirectoryReader;
+import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.store.FSDirectory;
+
+import javax.annotation.Resource;
+import javax.enterprise.context.ApplicationScoped;
+import javax.imageio.ImageIO;
+import javax.inject.Inject;
+import javax.inject.Named;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * CITATION
@@ -38,9 +36,14 @@ import net.semanticmetadata.lire.ImageSearcherFactory;
 @ApplicationScoped
 public class IdentificationService {
 
-    private FoodDao foodDAO;
     private ImageDao imageDAO;
     private File indexesDirectory;
+
+    @Resource(name = "defaults/min-similarity")
+    private Float minSimilarity;
+
+    @Resource(name = "defaults/max-hits")
+    private Integer maxHits;
 
     public IdentificationService() {
         // Required by CDI to create a proxy class. The proxy class is created because of the Applicationscope
@@ -48,28 +51,35 @@ public class IdentificationService {
     }
 
     @Inject
-    public IdentificationService(@IndexesDirectory File indexesDirectory,
-                                 FoodDao foodDAO,
-                                 ImageDao imageDAO) {
+    public IdentificationService(ImageDao imageDAO,
+                                 @IndexesDirectory File indexesDirectory
+    ) {
         this.indexesDirectory = indexesDirectory;
-        this.foodDAO = foodDAO;
         this.imageDAO = imageDAO;
     }
 
 
     /**
-     * @param imageUri          path of image
-     * @param minimumSimilarity minimum similarity index
-     * @param maximumHits       max results
+     * @param imageUri                   path of image
+     * @param preferredMinimumSimilarity minimum similarity index
+     * @param preferredMaxHits           max results
      * @return Map of food name (key) and similarity index (value)
      * @throws IOException
      * @throws DataAccessObjectException
      */
-    public Map<String, Float> getPossibleFoodsForImage(String imageUri, float minimumSimilarity, int maximumHits) throws IOException, DataAccessObjectException {
+    public Map<String, Float> getPossibleFoodsForImage(
+            final String imageUri,
+            final float preferredMinimumSimilarity,
+            final int preferredMaxHits
+    ) throws IOException, DataAccessObjectException {
+
+        final float actualMinSimilarity = Math.max(preferredMinimumSimilarity, minSimilarity);
+        final int actualMaxHits = Math.min(preferredMaxHits, maxHits);
+
         Map<String, Float> foodNameSimilarityMap = new HashMap<String, Float>();
 
         //find similar images
-        Map<String, Float> imageSimilarityMap = this.findSimilarImages(imageUri, indexesDirectory.getAbsolutePath(), maximumHits);
+        Map<String, Float> imageSimilarityMap = this.findSimilarImages(imageUri, indexesDirectory.getAbsolutePath(), actualMaxHits);
 
         //get name of food in each similar image.
         for (java.util.Map.Entry<String, Float> imageSimilarityEntry : imageSimilarityMap.entrySet()) {
@@ -77,7 +87,7 @@ public class IdentificationService {
             String foodName = this.getFoodNameForImage(imageName);
             float similarity = imageSimilarityEntry.getValue();
 
-            if (foodName != null && !foodName.isEmpty() && (similarity >= minimumSimilarity)) {
+            if (foodName != null && !foodName.isEmpty() && (similarity >= actualMinSimilarity)) {
                 foodNameSimilarityMap.put(foodName, similarity);
             }
         }
@@ -111,7 +121,7 @@ public class IdentificationService {
         //search for images similar to given image
         ImageSearchHits hits = searcher.search(image, reader);
 
-        int limit = hits.length() > maximumHits ? maximumHits : hits.length();
+        int limit = Math.min(hits.length(), maximumHits);
 
         for (int i = 0; i < limit; i++) {
             String fileName = hits.doc(i).getValues(DocumentBuilder.FIELD_NAME_IDENTIFIER)[0];
@@ -125,15 +135,10 @@ public class IdentificationService {
     }
 
     private String getFoodNameForImage(String imageName) throws DataAccessObjectException {
-        String foodName = null;
-
-
         ImageEntry imageDTO = imageDAO.find(imageName);
-        if (imageDTO != null) {
-            FoodEntry foodDTO = foodDAO.read(imageDTO.getFoodId());
-            if (foodDTO != null) foodName = foodDTO.getName();
+        if (imageDTO == null) {
+            return null;
         }
-
-        return foodName;
+        return imageDTO.getFood().getName();
     }
 }

@@ -49,28 +49,19 @@ public class LinkingService {
         //get id of food in food database
         //getFoodId will create record if it doesnt already exist.
         //likewise for imageId.
-        long foodId = getFoodId(foodName);
+        final FoodEntry food = getFoodByName(foodName);
         String imageId = getImageId(imageFile);
-        if (foodId != -1 && imageId != null) {
+        if (food != null && imageId != null) {
             //set image.foodId = food.id
-            success = (linkImageWithFood(imageName, foodId));
-            logger.info("Linker. ImageName: " + imageName + ", FoodId: " + foodId + ", Success: " + success);
+            success = (linkImageWithFood(imageName, food));
+            logger.info("Linker. ImageName: " + imageName + ", FoodId: " + food.getFoodId() + ", Success: " + success);
         }
 
         return success;
     }
 
-    private long getFoodId(String foodName) throws DataAccessObjectException {
-        long foodId = -1;
-        FoodEntry foodDto = foodDAO.read(foodName);
-        if (foodDto != null) {
-            foodId = foodDto.getFoodId();
-        } else {
-            foodDto = new FoodEntry();
-            foodDto.setName(foodName);
-            foodId = foodDAO.create(foodDto);
-        }
-        return foodId;
+    private FoodEntry getFoodByName(String foodName) throws DataAccessObjectException {
+        return foodDAO.read(foodName);
     }
 
     // This code will insert the image into the db if it hasnt already been
@@ -90,11 +81,11 @@ public class LinkingService {
         return imageId;
     }
 
-    private boolean linkImageWithFood(String imageId, long foodId) throws DataAccessObjectException {
+    private boolean linkImageWithFood(String imageId, FoodEntry food) throws DataAccessObjectException {
         boolean success = false;
         ImageEntry imageDto = imageDAO.find(imageId);
         if (imageDto != null) {
-            imageDto.setFoodId(foodId);
+            imageDto.setFood(food);
             success = imageDAO.update(imageDto);
         }
 

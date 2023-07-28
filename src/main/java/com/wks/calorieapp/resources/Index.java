@@ -118,7 +118,7 @@ public class Index extends HttpServlet {
     }
 
     private boolean insertImage(File imageFile) {
-        boolean success = true;
+        boolean success = false;
 
         try {
             if (imageDAO.find(imageFile.getName()) == null) {
@@ -129,8 +129,6 @@ public class Index extends HttpServlet {
                 imageItem.setFinalized(false);
 
                 success = imageDAO.create(imageItem);
-            } else {
-                success = true;
             }
         } catch (DataAccessObjectException e) {
             logger.error("Index Required. Failed to insert image record.", e);

@@ -29,11 +29,6 @@ public class Identify extends HttpServlet {
     private static final String PARAM_MIN_SIMILARITY = "min_similarity";
     private static final String PARAM_MAX_HITS = "max_hits";
 
-    private static final int DEFAULT_MAX_HITS = 10;
-    private static final float DEFAULT_MIN_SIMILARITY = 0F;
-
-    private static int defaultMaxHits = DEFAULT_MAX_HITS;
-    private static float defaultMinSimilarity = DEFAULT_MIN_SIMILARITY;
     private static Logger logger = Logger.getLogger(Identify.class);
 
     @Inject
@@ -41,14 +36,6 @@ public class Identify extends HttpServlet {
     @Inject
     @ImagesDirectory
     private File imagesDirectory;
-
-    @Override
-    public void init() throws ServletException {
-        defaultMaxHits = Integer.parseInt(getServletContext().getInitParameter(
-                ContextParameters.DEFAULT_MAX_HITS.toString()));
-        defaultMinSimilarity = Float.parseFloat(getServletContext().getInitParameter(
-                ContextParameters.DEFAULT_MIN_SIMILARITY.toString()));
-    }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -63,10 +50,8 @@ public class Identify extends HttpServlet {
         PrintWriter out = resp.getWriter();
 
         String imageName = req.getParameter(PARAM_IMAGE_NAME);
-        float minSimilarity = req.getParameter(PARAM_MIN_SIMILARITY) == null ? defaultMinSimilarity : Float.valueOf(req
-                .getParameter(PARAM_MIN_SIMILARITY));
-        int maximumHits = req.getParameter(PARAM_MAX_HITS) == null ? defaultMaxHits : Integer.valueOf(req
-                .getParameter(PARAM_MAX_HITS));
+        float minSimilarity = req.getParameter(PARAM_MIN_SIMILARITY) == null ? 0f : Float.parseFloat(req.getParameter(PARAM_MIN_SIMILARITY));
+        int maximumHits = req.getParameter(PARAM_MAX_HITS) == null ? 0 : Integer.parseInt(req.getParameter(PARAM_MAX_HITS));
 
         if (imageName == null) {
             out.println(new Response(StatusCode.TOO_FEW_ARGS).toJSON());

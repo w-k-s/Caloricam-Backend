@@ -5,16 +5,18 @@ import java.io.PrintWriter;
 import java.net.URLDecoder;
 import java.util.List;
 
+import javax.inject.Inject;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.wks.calorieapp.factories.FatSecretWebServiceFactory;
 import org.apache.log4j.Logger;
 import org.json.simple.JSONValue;
 import org.json.simple.parser.ParseException;
 
-import com.wks.calorieapp.api.fatsecret.FSWebService;
+import com.wks.calorieapp.api.fatsecret.FatSecretWebService;
 import com.wks.calorieapp.api.fatsecret.entities.NutritionInfo;
 
 public class GetNutritionInfo extends HttpServlet {
@@ -25,12 +27,10 @@ public class GetNutritionInfo extends HttpServlet {
 
     private static final String PARAM_FOOD_NAME = "food_name";
 
-    private static String consumerKey;
-    private static String consumerSecret;
+    @Inject
+    private FatSecretWebService fatSecretWebService;
 
     public void init() throws ServletException {
-        consumerKey = getServletContext().getInitParameter(ContextParameters.CONSUMER_KEY.toString());
-        consumerSecret = getServletContext().getInitParameter(ContextParameters.CONSUMER_SECRET.toString());
     }
 
     @Override
@@ -53,8 +53,7 @@ public class GetNutritionInfo extends HttpServlet {
         logger.info("Nutrition Info Request. Finding Nutrition information for " + foodName);
 
         try {
-            FSWebService fsWebService = new FSWebService(consumerKey, consumerSecret);
-            List<NutritionInfo> nutritionInfo = fsWebService.searchFood(foodName);
+            List<NutritionInfo> nutritionInfo = fatSecretWebService.searchFood(foodName);
             out.println(new Response(StatusCode.OK, JSONValue.toJSONString(nutritionInfo)).toJSON());
         } catch (ParseException e) {
             Response response = new Response(StatusCode.PARSE_ERROR);

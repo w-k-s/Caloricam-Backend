@@ -68,20 +68,18 @@ public class IndexingService {
     }
 
     /**
-     * @param imageFile  image to index
+     * @param imageFile image to index
      * @return true if image was indexed successfully.
      * @throws IOException
      */
     public boolean indexImage(File imageFile) throws IOException {
-        synchronized (lock) {
-            if (imageFile != null && !imageFile.isFile())
-                throw new IllegalArgumentException("The Image File provided is not a file.");
+        if (imageFile != null && !imageFile.isFile())
+            throw new IllegalArgumentException("The Image File provided is not a file.");
 
 
-            ArrayList<String> images = new ArrayList<String>();
-            images.add(imageFile.getAbsolutePath());
-            return this.indexImages(images, indexesDirectory);
-        }
+        ArrayList<String> images = new ArrayList<String>();
+        images.add(imageFile.getAbsolutePath());
+        return this.indexImages(images, indexesDirectory);
     }
 
     /**
