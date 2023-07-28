@@ -1,25 +1,24 @@
-package com.wks.calorieapp.resources;
+package com.wks.calorieapp.resources.admin.indexea;
 
+import com.wks.calorieapp.resources.admin.ResponseDecorator;
 import com.wks.calorieapp.services.IndexingService;
 import org.apache.log4j.Logger;
 
 import javax.inject.Inject;
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+
+import static com.wks.calorieapp.resources.admin.ResponseDecorator.View.INDEXES;
 
 public class AdminIndexes extends HttpServlet {
 
     private static final long serialVersionUID = 4863024199042688296L;
     private final static String ACTION_DELETE = "delete";
     private final static String ACTION_REINDEX = "reindex";
-
-    private final static String JSP_INDEXES = "/WEB-INF/indexes.jsp";
 
     private static Logger logger = Logger.getLogger(AdminIndexes.class);
 
@@ -28,19 +27,20 @@ public class AdminIndexes extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        final String action = req.getParameter(ContextParameters.ACTION.toString());
-        logger.info("Admin Index. action = '" + action + "'.");
+        AdminIndexesRequestDecorator adminIndexesRequest = AdminIndexesRequestDecorator.of(req);
+        final String action = adminIndexesRequest.getAction();
+
         if (action != null) {
             boolean success = handleAction(action);
             logger.info("Admin Index. action='" + action + "', success='" + success + "'");
         }
 
-        req.setAttribute(Attributes.INDEX_LIST.toString(), indexer.getIndexFilesList());
-        RequestDispatcher indexView = req.getRequestDispatcher(JSP_INDEXES);
-        indexView.forward(req, resp);
+        adminIndexesRequest.setIndexFilesList(indexer.getIndexFilesList());
+        ResponseDecorator.of(req, resp).forwardTo(INDEXES);
     }
 
     private boolean handleAction(String action) {
+        logger.info("Admin Index. action = '" + action + "'.");
         if (action.equalsIgnoreCase(ACTION_DELETE)) {
             return indexer.deleteIndexes();
         } else if (action.equalsIgnoreCase(ACTION_REINDEX)) {
@@ -55,7 +55,7 @@ public class AdminIndexes extends HttpServlet {
             }
             return false;
         } else {
-            logger.error("Admin index. Unidentified action from " + JSP_INDEXES + ": " + action);
+            logger.error("Admin index. Unidentified action: " + action);
             return false;
         }
     }

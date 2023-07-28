@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
-    pageEncoding="ISO-8859-1" import="java.util.*,java.io.File,com.wks.calorieapp.resources.Attributes"%>
+    pageEncoding="ISO-8859-1" import="java.util.*,java.io.File"%>
+<%@ page import="com.wks.calorieapp.resources.admin.images.AdminImagesRequestDecorator" %>
 <%!private static final String HREF_VIEW = "images?action=view&img=";
 	private static final String HREF_DELETE = "images?action=delete&img=";%>
 
@@ -15,7 +16,7 @@
 <p>Click on delete to delete an image; corresponding database record will also be deleted.</p>
 
 <%
-	List<String> files = (ArrayList<String>) request.getAttribute(Attributes.IMAGE_LIST.toString());
+	List<String> files = AdminImagesRequestDecorator.of(request).getImagesFilesList();
 %>
 <table>
 	<tr>

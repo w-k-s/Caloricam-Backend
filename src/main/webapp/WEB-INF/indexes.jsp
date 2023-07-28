@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
-    pageEncoding="ISO-8859-1" import="java.util.*,com.wks.calorieapp.resources.Attributes,java.io.File"%>
+    pageEncoding="ISO-8859-1" import="java.util.*,java.io.File"%>
+<%@ page import="com.wks.calorieapp.resources.admin.indexea.AdminIndexesRequestDecorator" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
@@ -24,7 +25,7 @@ function confirmDeleteAll(){
 <strong><em>Note: Must reindex images after deleting them.</em></strong>
 <hr/>
 <%
-    List<String> indexFiles = (ArrayList<String>) request.getAttribute(Attributes.INDEX_LIST.toString());
+    List<String> indexFiles = AdminIndexesRequestDecorator.of(request).getIndexFilesList();
 %>
 <table>
 	<tr>

@@ -1,13 +1,13 @@
-package com.wks.calorieapp.resources;
+package com.wks.calorieapp.resources.admin.images;
 
 import com.wks.calorieapp.daos.DataAccessObjectException;
 import com.wks.calorieapp.daos.ImageDao;
 import com.wks.calorieapp.factories.ImagesDirectory;
+import com.wks.calorieapp.resources.admin.ResponseDecorator;
 import com.wks.calorieapp.utils.FileUtils;
 import org.apache.log4j.Logger;
 
 import javax.inject.Inject;
-import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
@@ -15,15 +15,14 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.List;
+
+import static com.wks.calorieapp.resources.admin.ResponseDecorator.View.IMAGES;
 
 public class AdminImages extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
     private static final String ACTION_DELETE = "delete";
     private static final String ACTION_VIEW = "view";
-
-    private static final String JSP_IMAGE = "/WEB-INF/images.jsp";
 
     private static final String[] EXTENSIONS = {".jpeg", ".jpg"};
     private static final String DEFAULT_MIME_TYPE = "image/jpeg";
@@ -40,12 +39,12 @@ public class AdminImages extends HttpServlet {
     protected void doGet(javax.servlet.http.HttpServletRequest req, javax.servlet.http.HttpServletResponse resp)
             throws javax.servlet.ServletException, java.io.IOException {
 
-        final String action = req.getParameter(ContextParameters.ACTION.toString());
-        final String image = req.getParameter(ContextParameters.IMAGE.toString());
+        final AdminImagesRequestDecorator adminImagesRequest = AdminImagesRequestDecorator.of(req);
+        final String action = adminImagesRequest.getAction();
+        final String image = adminImagesRequest.getImage();
 
         logger.info("Admin. Request contained action='" + action + "', image='" + image + "'.");
         if (action != null && image != null) {
-
             try {
                 handleAction(action, image, resp);
                 if (action.equalsIgnoreCase(ACTION_VIEW)) return;
@@ -56,11 +55,8 @@ public class AdminImages extends HttpServlet {
 
         }
 
-        List<String> imageURIList = FileUtils.getFilesInDir(imagesDirectory.getAbsolutePath(), EXTENSIONS);
-
-        req.setAttribute(Attributes.IMAGE_LIST.toString(), imageURIList);
-        RequestDispatcher request = req.getRequestDispatcher(JSP_IMAGE);
-        request.forward(req, resp);
+        adminImagesRequest.setImagesList(FileUtils.getFilesInDir(imagesDirectory.getAbsolutePath(), EXTENSIONS));
+        ResponseDecorator.of(req, resp).forwardTo(IMAGES);
     }
 
     private boolean handleAction(String action, String fileName, HttpServletResponse resp) throws DataAccessObjectException {
@@ -76,7 +72,7 @@ public class AdminImages extends HttpServlet {
             return respondWithImage(resp, fileURI);
         }
 
-        logger.error("Admin Images. Unidentified action from " + JSP_IMAGE + ": " + action);
+        logger.error("Admin Images. Unidentified action: " + action);
         return false;
     }
 
