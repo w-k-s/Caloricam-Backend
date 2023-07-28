@@ -12,12 +12,10 @@ import org.apache.log4j.Logger;
 
 public class Error extends HttpServlet
 {
-
     private static final long serialVersionUID = 2893179894559140866L;
     private static final String CONTENT_TYPE = "application/json";
     private static Logger logger = Logger.getLogger(Error.class);
-    
-    
+
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException
     {
        resp.setContentType(CONTENT_TYPE);

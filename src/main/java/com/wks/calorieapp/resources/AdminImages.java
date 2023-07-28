@@ -1,25 +1,21 @@
 package com.wks.calorieapp.resources;
 
+import com.wks.calorieapp.daos.DataAccessObjectException;
+import com.wks.calorieapp.daos.ImageDao;
+import com.wks.calorieapp.factories.ImagesDirectory;
+import com.wks.calorieapp.utils.FileUtils;
+import org.apache.log4j.Logger;
+
+import javax.inject.Inject;
+import javax.servlet.RequestDispatcher;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.*;
-
-import javax.inject.Inject;
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
-import com.wks.calorieapp.factories.ImagesDirectory;
-import org.apache.log4j.Logger;
-
-import com.wks.calorieapp.daos.DataAccessObjectException;
-import com.wks.calorieapp.daos.ImageDao;
-import com.wks.calorieapp.utils.*;
+import java.util.List;
 
 public class AdminImages extends HttpServlet {
     private static final long serialVersionUID = 1L;
