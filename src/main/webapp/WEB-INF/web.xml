@@ -99,6 +99,31 @@
 		<listener-class>com.wks.calorieapp.listener.ContextListener</listener-class>
 	</listener>
 
+	<!-- RESTEASY -->
+
+	<!-- Map RESTEasy servlet -->
+	<servlet>
+		<servlet-name>Resteasy</servlet-name>
+		<servlet-class>
+			org.jboss.resteasy.plugins.server.servlet.HttpServletDispatcher
+		</servlet-class>
+		<init-param>
+			<param-name>javax.ws.rs.Application</param-name>
+			<param-value>com.wks.calorieapp.app.CalorieApp</param-value> <!-- Replace with your Application class -->
+		</init-param>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>Resteasy</servlet-name>
+		<url-pattern>/api/*</url-pattern> <!-- Set the URL pattern for your REST endpoints -->
+	</servlet-mapping>
+
+	<context-param>
+		<param-name>resteasy.servlet.mapping.prefix</param-name>
+		<param-value>/api</param-value> <!-- Set the base URL path for your REST endpoints -->
+	</context-param>
+
 	<!-- CONTEXT -->
 
 	<context-param>

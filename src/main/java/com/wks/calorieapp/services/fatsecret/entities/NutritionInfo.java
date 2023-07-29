@@ -1,14 +1,13 @@
 package com.wks.calorieapp.services.fatsecret.entities;
 
+import org.json.simple.JSONObject;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.json.simple.JSONObject;
-
-import com.wks.calorieapp.servlets.JSONWriteable;
 
 
-public class NutritionInfo extends FSAbstractResponse implements JSONWriteable
+public class NutritionInfo extends FSAbstractResponse
 {
 
     private static final String REGEX_SPACE = "\\s";
@@ -220,7 +219,6 @@ public class NutritionInfo extends FSAbstractResponse implements JSONWriteable
     }
 
     @SuppressWarnings("unchecked")
-    @Override
     public String toJSON()
     {
 	JSONObject json = new JSONObject();

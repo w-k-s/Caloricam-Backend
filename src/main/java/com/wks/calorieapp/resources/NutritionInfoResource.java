@@ -1,5 +1,6 @@
 package com.wks.calorieapp.resources;
 
+import com.wks.calorieapp.services.ErrorCodes;
 import com.wks.calorieapp.services.NutritionInfoService;
 import com.wks.calorieapp.services.fatsecret.entities.NutritionInfo;
 import org.apache.log4j.Logger;
@@ -28,7 +29,7 @@ public class NutritionInfoResource {
     public List<NutritionInfo> get(@QueryParam("food_name") String foodName) throws IOException {
         if (foodName == null || foodName.isEmpty()) {
             throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST)
-                            .entity("foodName parameter is mandatory")
+                            .entity(new ErrorDto(ErrorCodes.TOO_FEW_ARGS.getCode(), "foodName parameter is mandatory"))
                             .build()
             );
         }

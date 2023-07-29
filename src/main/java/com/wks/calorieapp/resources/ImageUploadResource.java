@@ -33,7 +33,6 @@ public class ImageUploadResource {
     private ImageUploadService imageUploadService;
 
     @POST
-    @Path("/image-upload")
     @Consumes("multipart/form-data")
     public Response upload(MultipartFormDataInput input) throws IOException {
         final FileUpload fileUpload = extractFileFromRequest(input);

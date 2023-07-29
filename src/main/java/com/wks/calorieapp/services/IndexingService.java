@@ -17,16 +17,13 @@ import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.store.LockObtainFailedException;
 import org.apache.lucene.util.Version;
 
-import javax.annotation.Priority;
 import javax.enterprise.context.ApplicationScoped;
 import javax.imageio.ImageIO;
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.ws.rs.core.Response;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -80,16 +77,6 @@ public class IndexingService {
         // Create image file
         final File imageFile = new File(imagesDirectory, imageName);
 
-        // Check if file exists, if not throw error
-        if (!imageFile.exists()) {
-            logger.error("Index Request Failed. " + imageName + " does not exist.");
-            throw new ServiceException(ErrorCodes.FILE_NOT_FOUND);
-        }
-
-        // Check image file exists in database, if not save
-        logger.info("Index Request. Image: " + imageFile.getAbsolutePath());
-        this.insertImage(imageFile);
-
         // index image.
         final long startIndex = System.currentTimeMillis();
         final boolean success = indexImage(imageFile);
@@ -102,10 +89,18 @@ public class IndexingService {
      * @return true if image was indexed successfully.
      * @throws IOException
      */
-    public boolean indexImage(File imageFile) throws IOException, DataAccessObjectException {
+    public boolean indexImage(File imageFile) throws IOException, DataAccessObjectException, ServiceException {
         if (imageFile == null) {
             throw new NullPointerException("image file is required");
         }
+        // Check if file exists, if not throw error
+        if (!imageFile.exists()) {
+            logger.error("Index Request Failed. " + imageFile.getAbsolutePath() + " does not exist.");
+            throw new ServiceException(ErrorCodes.FILE_NOT_FOUND);
+        }
+        // Check image file exists in database, if not save
+        logger.info("Index Request. Image: " + imageFile.getAbsolutePath());
+        this.insertImage(imageFile);
         if (!imageFile.isFile()) {
             throw new IllegalArgumentException("The Image File provided is not a file.");
         }
