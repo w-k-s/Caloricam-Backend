@@ -1,5 +1,8 @@
 package com.wks.calorieapp.services;
 
+import com.wks.calorieapp.daos.DataAccessObjectException;
+import com.wks.calorieapp.daos.ImageDao;
+import com.wks.calorieapp.entities.ImageEntry;
 import com.wks.calorieapp.factories.ImagesDirectory;
 import com.wks.calorieapp.factories.IndexesDirectory;
 import net.semanticmetadata.lire.DocumentBuilder;
@@ -19,12 +22,14 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.imageio.ImageIO;
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.ws.rs.core.Response;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -44,6 +49,8 @@ public class IndexingService {
     private File imagesDirectory;
     private DocumentBuilder documentBuilder;
 
+    private ImageDao imageDao;
+
     public IndexingService() {
         // Required by CDI to create a proxy class. The proxy class is created because of the Applicationscope
         // Possible Fix: https://stackoverflow.com/a/47540516
@@ -53,7 +60,8 @@ public class IndexingService {
     public IndexingService(
             DocumentBuilder builder,
             @IndexesDirectory File indexesDirectory,
-            @ImagesDirectory File imagesDirectory
+            @ImagesDirectory File imagesDirectory,
+            ImageDao imageDao
     ) {
         if (builder == null) throw new IllegalStateException("DocumentBuilder should not be null");
         if (indexesDirectory != null && !indexesDirectory.isDirectory())
@@ -61,10 +69,32 @@ public class IndexingService {
         this.documentBuilder = builder;
         this.indexesDirectory = indexesDirectory;
         this.imagesDirectory = imagesDirectory;
+        this.imageDao = imageDao;
     }
 
     public DocumentBuilder getDocumentBuilder() {
         return documentBuilder;
+    }
+
+    public boolean indexImage(String imageName) throws IOException, ServiceException, DataAccessObjectException {
+        // Create image file
+        final File imageFile = new File(imagesDirectory, imageName);
+
+        // Check if file exists, if not throw error
+        if (!imageFile.exists()) {
+            logger.error("Index Request Failed. " + imageName + " does not exist.");
+            throw new ServiceException(ErrorCodes.FILE_NOT_FOUND);
+        }
+
+        // Check image file exists in database, if not save
+        logger.info("Index Request. Image: " + imageFile.getAbsolutePath());
+        this.insertImage(imageFile);
+
+        // index image.
+        final long startIndex = System.currentTimeMillis();
+        final boolean success = indexImage(imageFile);
+        logger.info("Index Request. Total Indexing Time: " + (System.currentTimeMillis() - startIndex) + " ms.");
+        return success;
     }
 
     /**
@@ -72,14 +102,17 @@ public class IndexingService {
      * @return true if image was indexed successfully.
      * @throws IOException
      */
-    public boolean indexImage(File imageFile) throws IOException {
-        if (imageFile != null && !imageFile.isFile())
+    public boolean indexImage(File imageFile) throws IOException, DataAccessObjectException {
+        if (imageFile == null) {
+            throw new NullPointerException("image file is required");
+        }
+        if (!imageFile.isFile()) {
             throw new IllegalArgumentException("The Image File provided is not a file.");
+        }
+        logger.info("Index Request. Image: " + imageFile.getAbsolutePath());
+        this.insertImage(imageFile);
 
-
-        ArrayList<String> images = new ArrayList<String>();
-        images.add(imageFile.getAbsolutePath());
-        return this.indexImages(images, indexesDirectory);
+        return this.indexImages(Collections.singletonList(imageFile.getAbsolutePath()), indexesDirectory);
     }
 
     /**
@@ -111,7 +144,7 @@ public class IndexingService {
      * @return true, if all images were indexed successfully
      * @throws IOException
      */
-    private boolean indexImages(ArrayList<String> images, File indexesDir) throws IOException {
+    private boolean indexImages(List<String> images, File indexesDir) throws IOException {
         boolean success = false;
 
         IndexWriterConfig config = new IndexWriterConfig(Version.LUCENE_40, new WhitespaceAnalyzer(Version.LUCENE_40));
@@ -135,8 +168,6 @@ public class IndexingService {
 
             success = true;
 
-        } catch (FileNotFoundException e) {
-            throw e;
         } catch (LockObtainFailedException e) {
             logger.error("Indexer. Lock ObtainFailedException. Will Unlock", e);
             if (indexesDirectory != null) {
@@ -157,6 +188,18 @@ public class IndexingService {
 
         return success;
 
+    }
+
+    private boolean insertImage(File imageFile) throws DataAccessObjectException {
+        if (imageDao.find(imageFile.getName()) != null) {
+            return true;
+        }
+
+        ImageEntry imageItem = new ImageEntry();
+        imageItem.setImageId(imageFile.getName());
+        imageItem.setSize(imageFile.length());
+        imageItem.setFinalized(false);
+        return imageDao.create(imageItem);
     }
 
     public boolean deleteIndexes() {

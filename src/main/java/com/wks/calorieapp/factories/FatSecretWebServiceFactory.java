@@ -1,6 +1,6 @@
 package com.wks.calorieapp.factories;
 
-import com.wks.calorieapp.api.fatsecret.FatSecretWebService;
+import com.wks.calorieapp.services.fatsecret.FatSecretWebService;
 
 import javax.annotation.Resource;
 import javax.enterprise.inject.Produces;

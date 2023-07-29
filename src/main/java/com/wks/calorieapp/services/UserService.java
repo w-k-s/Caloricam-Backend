@@ -1,7 +1,6 @@
 package com.wks.calorieapp.services;
 
 import com.wks.calorieapp.daos.DataAccessObjectException;
-import com.wks.calorieapp.daos.FoodDao;
 import com.wks.calorieapp.daos.ImageDao;
 import com.wks.calorieapp.daos.UserDao;
 import com.wks.calorieapp.entities.User;
@@ -26,14 +25,13 @@ public class UserService {
         this.userDao = userDao;
     }
 
-    public void authenticate(String username, String password) {
-        try {
-            final User user = userDao.find(username);
-            if (user == null || !user.getPassword().equals(password)) {
-                throw new InvalidCredentialsException();
-            }
-        } catch (DataAccessObjectException e) {
-            throw new RuntimeException(e);
+    public void authenticate(String username, String password) throws DataAccessObjectException, ServiceException {
+        final User user = userDao.find(username);
+        if (user == null) {
+            throw new ServiceException(ErrorCodes.NOT_REGISTERED);
+        }
+        if (!user.getPassword().equals(password)) {
+            throw new ServiceException(ErrorCodes.AUTHENTICATION_FAILED);
         }
     }
 }

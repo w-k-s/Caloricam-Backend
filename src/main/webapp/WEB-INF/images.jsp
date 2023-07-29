@@ -1,6 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
     pageEncoding="ISO-8859-1" import="java.util.*,java.io.File"%>
-<%@ page import="com.wks.calorieapp.resources.admin.images.AdminImagesRequestDecorator" %>
+<%@ page import="com.wks.calorieapp.servlets.admin.images.AdminImagesRequestDecorator" %>
 <%!private static final String HREF_VIEW = "images?action=view&img=";
 	private static final String HREF_DELETE = "images?action=delete&img=";%>
 
