@@ -63,10 +63,9 @@ public class ImageLinkingService {
         //getFoodId will create record if it doesnt already exist.
         //likewise for imageId.
         final FoodEntry food = getFoodByName(foodName);
-        String imageId = getImageId(imageFile);
 
-        if (imageId != null) {
-            logger.warn("Failed to retrieve id of image named "+imageName);
+        if (getImageId(imageFile) == null) {
+            logger.warn("Image '"+imageName+"' not found in database");
             throw new ServiceException(ErrorCodes.FILE_NOT_FOUND);
         }
 

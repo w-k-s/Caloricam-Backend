@@ -1,7 +1,7 @@
 up:
 	mvn clean package -U; docker compose up -d --build
 
-down:
+kill:
 	docker-compose down --rmi all
 
 logs:
