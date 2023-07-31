@@ -42,10 +42,10 @@ public class FoodIdentificationService {
     private File indexesDirectory;
     private File imagesDirectory;
 
-    @Resource(name = "defaults/min-similarity")
+    @Resource(name = "app/defaults/min-similarity")
     private Float minSimilarity;
 
-    @Resource(name = "defaults/max-hits")
+    @Resource(name = "app/defaults/max-hits")
     private Integer maxHits;
 
     public FoodIdentificationService() {

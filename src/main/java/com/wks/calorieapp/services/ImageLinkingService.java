@@ -11,6 +11,7 @@ import org.apache.log4j.Logger;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.transaction.Transactional;
 import java.io.File;
 
 /**
@@ -50,6 +51,7 @@ public class ImageLinkingService {
      * @return true if linking was succesful.
      * @throws DataAccessObjectException
      */
+    @Transactional(value = Transactional.TxType.REQUIRED)
     public boolean linkImageWithFood(String foodName, String imageName) throws DataAccessObjectException, ServiceException {
         File imageFile = new File(imagesDirectory, imageName);
         if (!imageFile.exists()) {
@@ -63,7 +65,8 @@ public class ImageLinkingService {
         final FoodEntry food = getFoodByName(foodName);
         String imageId = getImageId(imageFile);
 
-        if (food == null || imageId != null) {
+        if (imageId != null) {
+            logger.warn("Failed to retrieve id of image named "+imageName);
             throw new ServiceException(ErrorCodes.FILE_NOT_FOUND);
         }
 
@@ -73,7 +76,14 @@ public class ImageLinkingService {
     }
 
     private FoodEntry getFoodByName(String foodName) throws DataAccessObjectException {
-        return foodDAO.read(foodName);
+        FoodEntry food = foodDAO.read(foodName);
+        if (food == null) {
+            food = new FoodEntry();
+            food.setName(foodName);
+            food.setFoodId(foodDAO.create(food));
+            logger.info(String.format("Saved food '%s' with id '%d'", foodName, food.getFoodId()));
+        }
+        return food;
     }
 
     // This code will insert the image into the db if it hasnt already been

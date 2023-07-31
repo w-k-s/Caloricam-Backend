@@ -20,6 +20,11 @@ public class AdminError extends HttpServlet {
     private static final long serialVersionUID = 2893179894559140866L;
     private static Logger logger = Logger.getLogger(AdminError.class);
 
+    @Override
+    protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        super.service(req, resp);
+    }
+
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         Throwable throwable = (Throwable) req.getAttribute("javax.servlet.error.exception");
 
@@ -32,5 +37,10 @@ public class AdminError extends HttpServlet {
         // --- Print error
         AdminErrorRequestDecorator.of(req).setMessage(sw.toString());
         ResponseDecorator.of(req, resp).forwardTo(ERROR);
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        doGet(req, resp);
     }
 }

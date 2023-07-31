@@ -3,6 +3,7 @@ package com.wks.calorieapp.resources;
 import com.wks.calorieapp.services.ErrorCodes;
 import com.wks.calorieapp.services.ImageUploadService;
 import com.wks.calorieapp.services.ServiceException;
+import org.apache.commons.fileupload.FileUploadException;
 import org.apache.log4j.Logger;
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
@@ -11,7 +12,9 @@ import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
@@ -25,6 +28,12 @@ public class ImageUploadResource {
     private static class FileUpload {
         String fileName;
         InputStream inputStream;
+        FileUpload() {}
+
+        FileUpload(String fileName, InputStream inputStream) {
+            this.fileName = fileName;
+            this.inputStream = inputStream;
+        }
     }
 
     private static Logger logger = Logger.getLogger(ImageUploadResource.class);
@@ -33,11 +42,12 @@ public class ImageUploadResource {
     private ImageUploadService imageUploadService;
 
     @POST
-    @Consumes("multipart/form-data")
-    public Response upload(MultipartFormDataInput input) throws IOException {
-        final FileUpload fileUpload = extractFileFromRequest(input);
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    public Response upload(MultipartFormDataInput req) throws IOException, FileUploadException {
+        final FileUpload fileUpload = extractFileFromRequest(req);
         if (fileUpload == null) {
-            logger.info("Upload Request. " + ErrorCodes.FILE_NOT_FOUND.getDescription().toString());
+            logger.info("Upload Request. " + ErrorCodes.FILE_NOT_FOUND.getDescription());
             throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST)
                     .entity(new ErrorDto(ErrorCodes.FILE_NOT_FOUND.getCode(), ErrorCodes.FILE_NOT_FOUND.getDescription()))
                     .build()
@@ -54,6 +64,7 @@ public class ImageUploadResource {
             }
             return Response.ok().build();
         } catch (ServiceException e) {
+            logger.warn("Upload Request. Failed to upload file: "+fileUpload,e);
             throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST)
                     .entity(new ErrorDto(e.getError().getCode(), e.getError().getDescription()))
                     .build()
@@ -78,9 +89,10 @@ public class ImageUploadResource {
                 if (contentDisposition == null || contentDisposition.isEmpty()) {
                     continue;
                 }
+                logger.info("Image Found, Content Disposition="+contentDisposition);
                 String[] contentDispositionParts = contentDisposition.split(";");
                 for (String name : contentDispositionParts) {
-                    if (name.trim().startsWith("fileName")) {
+                    if (name.trim().toLowerCase().startsWith("filename")) {
                         String[] tmp = name.split("=");
                         fileUpload.fileName = tmp[1].trim().replaceAll("\"", "");
                         break;

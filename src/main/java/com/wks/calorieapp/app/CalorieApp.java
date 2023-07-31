@@ -13,7 +13,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-@ApplicationPath(value = "api")
+@ApplicationPath(value = "/api")
 public class CalorieApp extends Application {
 
     @Override

@@ -29,8 +29,9 @@ td {
 	</ul>
 	<hr />
 	<h2>Upload</h2>
-	<form name="upload" method="post" action="api/upload" enctype="multipart/form-data">
-		<input type="file" name="image" /><br /> <input type="submit" value="Upload" />
+	<form name="upload" method="post" action="${pageContext.request.contextPath}/api/upload" enctype="multipart/form-data">
+		<input type="file" name="image" /><br />
+		<input type="submit" value="Upload" />
 	</form>
 </body>
 </html>

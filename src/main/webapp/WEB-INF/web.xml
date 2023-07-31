@@ -114,6 +114,10 @@
 		<load-on-startup>1</load-on-startup>
 	</servlet>
 
+	<listener>
+		<listener-class>org.jboss.resteasy.plugins.server.servlet.ResteasyBootstrap</listener-class>
+	</listener>
+
 	<servlet-mapping>
 		<servlet-name>Resteasy</servlet-name>
 		<url-pattern>/api/*</url-pattern> <!-- Set the URL pattern for your REST endpoints -->

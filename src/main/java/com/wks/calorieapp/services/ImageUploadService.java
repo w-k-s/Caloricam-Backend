@@ -51,16 +51,12 @@ public class ImageUploadService {
 
         File file = new File(imagesDirectory, fileName);
         if(!writeFile(file, inputStream)){
-            logger.error("Upload Request. File failed to upload: " + fileName);
+            logger.warn("Upload Request. Failed to save image: " + fileName);
             throw new ServiceException(ErrorCodes.FILE_UPLOAD_FAILED, extension);
         }
 
-        try {
-            logger.info("Uploaded Request. File uploaded successfully; forwarding request to indexer: " + fileName);
-            return indexingService.indexImage(file);
-        } catch (DataAccessObjectException e) {
-            throw new ServiceException(ErrorCodes.DB_INSERT_FAILED);
-        }
+        logger.info("Uploaded Request. File uploaded successfully; forwarding request to indexer: " + fileName);
+        return indexingService.indexImage(file);
     }
 
     private boolean writeFile(File file, InputStream inputStream) {
@@ -68,7 +64,8 @@ public class ImageUploadService {
         try {
             byte[] bytes = IOUtils.toByteArray(inputStream);
 
-            if (!file.exists() && !file.createNewFile()) {
+            if (!file.exists() && !file.getParentFile().mkdirs() && !file.createNewFile()) {
+                logger.info(file.getAbsolutePath() + " does not exist and can not be created");
                 return false;
             }
             fop = new FileOutputStream(file);

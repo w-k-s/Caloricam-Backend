@@ -1,15 +1,9 @@
 package com.wks.calorieapp.utils;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-
-import org.apache.commons.fileupload.FileItemStream;
 
 public class FileUtils {
     // This method is synchronised for thread safety.

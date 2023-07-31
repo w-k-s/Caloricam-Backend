@@ -21,6 +21,7 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.imageio.ImageIO;
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.xml.crypto.Data;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
@@ -89,7 +90,7 @@ public class IndexingService {
      * @return true if image was indexed successfully.
      * @throws IOException
      */
-    public boolean indexImage(File imageFile) throws IOException, DataAccessObjectException, ServiceException {
+    public boolean indexImage(File imageFile) throws IOException, ServiceException {
         if (imageFile == null) {
             throw new NullPointerException("image file is required");
         }
@@ -98,14 +99,17 @@ public class IndexingService {
             logger.error("Index Request Failed. " + imageFile.getAbsolutePath() + " does not exist.");
             throw new ServiceException(ErrorCodes.FILE_NOT_FOUND);
         }
-        // Check image file exists in database, if not save
-        logger.info("Index Request. Image: " + imageFile.getAbsolutePath());
-        this.insertImage(imageFile);
         if (!imageFile.isFile()) {
             throw new IllegalArgumentException("The Image File provided is not a file.");
         }
+        // Check image file exists in database, if not save
         logger.info("Index Request. Image: " + imageFile.getAbsolutePath());
-        this.insertImage(imageFile);
+        try {
+            this.insertImage(imageFile);
+        } catch (DataAccessObjectException e) {
+            logger.info("Failed to insert image " + imageFile, e);
+            throw new ServiceException(ErrorCodes.DB_INSERT_FAILED);
+        }
 
         return this.indexImages(Collections.singletonList(imageFile.getAbsolutePath()), indexesDirectory);
     }
