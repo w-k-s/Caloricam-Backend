@@ -97,7 +97,8 @@ jobs:
         with:
           name: CalorieApp-${{ github.event.inputs.version }}
           path: ./
-
+      - name: List Files
+        run: ls -R
       - name: Upload Artifacts to Release
         uses: actions/upload-release-asset@v1
         env:
