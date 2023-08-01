@@ -7,12 +7,12 @@ You could then pick the item you're eating from the menu and get the nutritional
 
 There are 4 endpoints involved:
 
-| Endpoint  | Path                                                       | Description                                                                                                          |
-|-----------|------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------|
-| Upload    | POST /calorieapp/api/upload                                | Uploads and indexes a picture. This should be a picture of food.                                                     |
-| Link      | GET /calorieapp/api/link?image_name=X.jpg&food_name=banana | Links an uploaded picture with a food name.                                                                          |
-| Identify  | GET /calorieapp/api/identify?image_name=Y.jpg              | Does a reverse image search on Y.jpg to find matching uploaded images. Returns the food name of similar images.      |
-| Recognize | GET /calorieapp/api/recognize?image_name=Y.jpg             | Does a reverse image search on Y.jpg to find matching uploaded images. Returns the nutrition info of similar images. |
+| Endpoint  | Path                                                                     | Description                                                                                                          |
+|-----------|--------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------|
+| Upload    | POST /CalorieApp-1.0-SNAPSHOT/api/upload                                 | Uploads and indexes a picture. This should be a picture of food.                                                     |
+| Link      | GET  /CalorieApp-1.0-SNAPSHOT/api/link?image_name=X.jpg&food_name=banana | Links an uploaded picture with a food name.                                                                          |
+| Identify  | GET  /CalorieApp-1.0-SNAPSHOT/api/identify?image_name=Y.jpg              | Does a reverse image search on Y.jpg to find matching uploaded images. Returns the food name of similar images.      |
+| Recognize | GET  /CalorieApp-1.0-SNAPSHOT/api/recognize?image_name=Y.jpg             | Does a reverse image search on Y.jpg to find matching uploaded images. Returns the nutrition info of similar images. |
 
 I have cleaned up the project because I wanted to see it work (and show my kids) but there are a lot of limitations and technical problems:
 - You could upload a picture of a puppy and claim it's a octopus. 

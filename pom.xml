@@ -142,6 +142,11 @@
             <version>${resteasy.version}</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>io.swagger.core.v3</groupId>
+            <artifactId>swagger-jaxrs2</artifactId>
+            <version>2.2.15</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -169,6 +174,44 @@
                         <groupId>mysql</groupId>
                         <artifactId>mysql-connector-java</artifactId>
                         <version>8.0.11</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+            <plugin>
+                <groupId>io.swagger.core.v3</groupId>
+                <artifactId>swagger-maven-plugin</artifactId>
+                <version>2.2.15</version>
+                <configuration>
+                    <outputFileName>openapi</outputFileName>
+                    <outputPath>${project.build.directory}/swagger</outputPath>
+                    <outputFormat>YAML</outputFormat>
+                    <alwaysResolveAppPath>true</alwaysResolveAppPath>
+                    <openapi31>true</openapi31>
+                    <contextId>${project.artifactId}</contextId>
+                    <resourcePackages>
+                        <package>com.wks.calorieapp.app</package>
+                        <package>com.wks.calorieapp.resources</package>
+                    </resourcePackages>
+                    <prettyPrint>true</prettyPrint>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>resolve</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <dependencies>
+                    <dependency>
+                        <groupId>javax.ws.rs</groupId>
+                        <artifactId>javax.ws.rs-api</artifactId>
+                        <version>2.1</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>javax.servlet</groupId>
+                        <artifactId>javax.servlet-api</artifactId>
+                        <version>3.1.0</version>
                     </dependency>
                 </dependencies>
             </plugin>
