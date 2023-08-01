@@ -27,16 +27,13 @@ jobs:
           cache: maven
       - name: Package Maven Project
         run: mvn -B package --file pom.xml
-      - name: Publish WAR
+      - name: Publish WAR and swagger
         uses: actions/upload-artifact@v3
         with:
-          name: CalorieApp.war
-          path: target/*.war
-      - name: Publish Swagger
-        uses: actions/upload-artifact@v3
-        with:
-          name: openapi.yaml
-          path: target/swagger/openapi.yaml
+          name: CalorieApp-${{ github.event.inputs.version }}
+          path: |
+            target/*.war
+            target/swagger/openapi.yaml
 
   docker-build:
     name: Build Docker Image
@@ -95,16 +92,10 @@ jobs:
           draft: false
           prerelease: false
 
-      - name: Download WAR
+      - name: Download Build
         uses: actions/download-artifact@v3
         with:
-          name: CalorieApp.war
-          path: ./
-
-      - name: Download swagger
-        uses: actions/download-artifact@v3
-        with:
-          name: openapi.yaml
+          name: CalorieApp-${{ github.event.inputs.version }}
           path: ./
 
       - name: Upload Artifacts to Release
@@ -113,16 +104,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./CalorieApp.war
-          asset_name: CalorieApp.war
+          asset_path: ./CalorieApp-${{ github.event.inputs.version }}.zip
+          asset_name: CalorieApp-${{ github.event.inputs.version }}.zip
           asset_content_type: application/octet-stream
-
-      - name: Upload Swagger to Release
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./openapi.yaml
-          asset_name: openapi.yaml
-          asset_content_type: application/x-yaml
