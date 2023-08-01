@@ -32,6 +32,14 @@ This usually means there's something wrong with the database e.g. the database f
 - Investigate the logs of the db container. 
 - Delete the `docker/data` directory and restart the docker container `make up`
 
+## How do you add a jar to a local maven repository
+This project uses a local maven repository `.local-maven-repo` to store the `LIRe` library jar.
+To add a new jar to this local maven repo, you can use the following command:
+
+```
+mvn deploy:deploy-file -DgroupId=net.semanticmetadata.lire -DartifactId=lire -Dversion=1.0b4 -Durl=file:./local-maven-repo/ -DrepositoryId=local-maven-repo -DupdateReleaseInfo=true -Dfile=/path/to/jar/example/lire.jar
+```
+
 ## Useful Resources
 
 - [LIRe Docuemntation](http://www.semanticmetadata.net/wiki/searchindex/)
