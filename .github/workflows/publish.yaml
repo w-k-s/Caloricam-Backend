@@ -99,12 +99,21 @@ jobs:
           path: ./
       - name: List Files
         run: ls -R
-      - name: Upload Artifacts to Release
+      - name: Upload WAR to Release
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./CalorieApp-${{ github.event.inputs.version }}.zip
-          asset_name: CalorieApp-${{ github.event.inputs.version }}.zip
+          asset_path: ./*.war
+          asset_name: CalorieApp-${{ github.event.inputs.version }}.war
           asset_content_type: application/octet-stream
+      - name: Upload Swagger to Release
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./swagger/openapi.yaml
+          asset_name: openapi-${{ github.event.inputs.version }}.yaml
+          asset_content_type: application/x-yaml
