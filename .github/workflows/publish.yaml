@@ -56,15 +56,6 @@ jobs:
       - name: Build Docker Image
         run: docker build . --file Dockerfile --tag $IMAGE_NAME --label "runnumber=${GITHUB_RUN_ID}"
 
-      - name: Export Docker Image
-        run: docker export --output="calorieapp.tar" $IMAGE_NAME
-
-      - name: Publish Image
-        uses: actions/upload-artifact@v3
-        with:
-          name: CalorieApp.tar
-          path: calorieapp.tar
-
       - name: Log in to registry
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u $ --password-stdin
       - name: Push image
@@ -89,7 +80,6 @@ jobs:
 
     needs:
       - build
-      - docker-build
 
     steps:
       - name: Checkout repository
@@ -126,13 +116,3 @@ jobs:
           asset_path: ./target/swagger/openapi.yaml
           asset_name: openapi.yaml
           asset_content_type: application/x-yaml
-
-      - name: Upload Docker Image to Release
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: calorieapp.tar
-          asset_name: calorieapp.tar
-          asset_content_type: application/octet-stream
