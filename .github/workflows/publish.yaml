@@ -105,7 +105,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./*.war
+          asset_path: CalorieApp-1.0-SNAPSHOT.war
           asset_name: CalorieApp-${{ github.event.inputs.version }}.war
           asset_content_type: application/octet-stream
       - name: Upload Swagger to Release
