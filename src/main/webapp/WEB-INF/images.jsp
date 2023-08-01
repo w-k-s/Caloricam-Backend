@@ -29,8 +29,8 @@
 	for(String file : files)
 	{
 	    File f = new File(file);
-	    String view=HREF_VIEW+file;
-	    String delete=HREF_DELETE+file;
+	    String view=HREF_VIEW+f.getName();
+	    String delete=HREF_DELETE+f.getName();
 	    
 	    out.println("<tr>");
 	    out.println("<td>"+file+"</td>");

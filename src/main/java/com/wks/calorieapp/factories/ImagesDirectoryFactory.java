@@ -4,6 +4,7 @@ import javax.enterprise.inject.Produces;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import java.io.File;
+import java.nio.file.Path;
 
 public class ImagesDirectoryFactory {
 

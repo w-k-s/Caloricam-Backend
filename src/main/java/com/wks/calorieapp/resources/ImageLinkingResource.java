@@ -52,12 +52,6 @@ public class ImageLinkingResource {
                 );
             }
             return Response.ok().build();
-        } catch (DataAccessObjectException e) {
-            logger.error("Link request Failed. Food Item " + foodName + " could not be inserted into db.", e);
-            throw new WebApplicationException(Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                    .entity(new ErrorDto(ErrorCodes.DB_INSERT_FAILED.getCode(), ErrorCodes.DB_INSERT_FAILED.getDescription()))
-                    .build()
-            );
         } catch (ServiceException e) {
             logger.error("Link request Failed. Food Item " + foodName + " could not be linked.", e);
             throw new WebApplicationException(Response.status(Response.Status.INTERNAL_SERVER_ERROR)

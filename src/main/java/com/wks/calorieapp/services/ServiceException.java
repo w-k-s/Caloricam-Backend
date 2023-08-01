@@ -5,12 +5,15 @@ public class ServiceException extends Exception {
     private ErrorCodes errorCode;
 
     public ServiceException(ErrorCodes errorCode) {
-        super(errorCode.getDescription());
-        this.errorCode = errorCode;
+        this(errorCode, errorCode.getDescription());
     }
 
     public ServiceException(ErrorCodes errorCode, String message) {
-        super(message);
+        this(errorCode, message, null);
+    }
+
+    public ServiceException(ErrorCodes errorCode, String message, Throwable cause) {
+        super(message, cause);
         this.errorCode = errorCode;
     }
 

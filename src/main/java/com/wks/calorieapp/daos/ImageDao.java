@@ -36,10 +36,14 @@ public class ImageDao {
     }
 
     public boolean update(ImageEntry image) throws DataAccessObjectException {
+        EntityTransaction tx = entityManager.getTransaction();
         try {
+            tx.begin();
             entityManager.merge(image);
+            tx.commit();
             return true;
         } catch (Exception e) {
+            tx.rollback();
             throw new DataAccessObjectException(e);
         }
     }

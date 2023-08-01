@@ -14,12 +14,17 @@
         <maven.compiler.target>7</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <resteasy.version>2.3.1.GA</resteasy.version>
+        <lucene.version>6.6.1</lucene.version>
     </properties>
 
     <repositories>
         <repository>
             <id>aksw</id>
             <url>https://maven.aksw.org/repository/internal/</url>
+        </repository>
+        <repository>
+            <id>local-maven-repo</id>
+            <url>file:///${project.basedir}/local-maven-repo</url>
         </repository>
     </repositories>
 
@@ -52,23 +57,27 @@
         <dependency>
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-analyzers-common</artifactId>
-            <version>4.0.0</version>
+            <version>${lucene.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-core</artifactId>
-            <version>4.0.0</version>
+            <version>${lucene.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-codecs</artifactId>
+            <version>${lucene.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-queryparser</artifactId>
-            <version>4.0.0</version>
+            <version>${lucene.version}</version>
         </dependency>
         <dependency>
             <groupId>net.semanticmetadata.lire</groupId>
             <artifactId>lire</artifactId>
-            <version>1.0</version>
-            <scope>provided</scope>
+            <version>1.0b4</version>
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>

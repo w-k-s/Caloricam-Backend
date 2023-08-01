@@ -50,11 +50,11 @@ public class FoodRecognitionResource {
         logger.info("Recognise Request. Image: " + imageName + " maximumHits: " + maxHits);
 
         try {
-            Map<String, Float> foodNameSimilarity = foodIdentificationService
+            Map<String, Double> foodNameSimilarity = foodIdentificationService
                     .getPossibleFoodsForImage(
                             imageName,
                             minSimilarity == null ? 0f : minSimilarity,
-                            maxHits == null ? 0 : maxHits
+                            maxHits == null ? 10 : maxHits
                     );
 
             return getNutritionInfoForFoods(foodNameSimilarity.keySet());

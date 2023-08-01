@@ -5,23 +5,21 @@ import com.wks.calorieapp.daos.ImageDao;
 import com.wks.calorieapp.entities.ImageEntry;
 import com.wks.calorieapp.factories.ImagesDirectory;
 import com.wks.calorieapp.factories.IndexesDirectory;
-import net.semanticmetadata.lire.DocumentBuilder;
+import net.semanticmetadata.lire.builders.GlobalDocumentBuilder;
+import net.semanticmetadata.lire.imageanalysis.features.global.AutoColorCorrelogram;
+import net.semanticmetadata.lire.imageanalysis.features.global.CEDD;
 import net.semanticmetadata.lire.utils.FileUtils;
+import net.semanticmetadata.lire.utils.LuceneUtils;
 import org.apache.log4j.Logger;
-import org.apache.lucene.analysis.core.WhitespaceAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.IndexWriter;
-import org.apache.lucene.index.IndexWriterConfig;
-import org.apache.lucene.store.Directory;
-import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.store.LockObtainFailedException;
-import org.apache.lucene.util.Version;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.imageio.ImageIO;
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.xml.crypto.Data;
+import javax.xml.parsers.DocumentBuilder;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
@@ -45,7 +43,6 @@ public class IndexingService {
     private static Object lock = new Object();
     private File indexesDirectory;
     private File imagesDirectory;
-    private DocumentBuilder documentBuilder;
 
     private ImageDao imageDao;
 
@@ -56,22 +53,15 @@ public class IndexingService {
 
     @Inject
     public IndexingService(
-            DocumentBuilder builder,
             @IndexesDirectory File indexesDirectory,
             @ImagesDirectory File imagesDirectory,
             ImageDao imageDao
     ) {
-        if (builder == null) throw new IllegalStateException("DocumentBuilder should not be null");
         if (indexesDirectory != null && !indexesDirectory.isDirectory())
             throw new IllegalArgumentException("The indexes File provided is not a directory.");
-        this.documentBuilder = builder;
         this.indexesDirectory = indexesDirectory;
         this.imagesDirectory = imagesDirectory;
         this.imageDao = imageDao;
-    }
-
-    public DocumentBuilder getDocumentBuilder() {
-        return documentBuilder;
     }
 
     public boolean indexImage(String imageName) throws IOException, ServiceException, DataAccessObjectException {
@@ -138,51 +128,35 @@ public class IndexingService {
     /**
      * Indexes all images using selected document builder.
      *
-     * @param images     paths of images to index.
-     * @param indexesDir directory where generated indexes are to be stored
      * @return true, if all images were indexed successfully
      * @throws IOException
      */
-    private boolean indexImages(List<String> images, File indexesDir) throws IOException {
+    private boolean indexImages(List<String> images, File indexesDirectory) throws IOException {
         boolean success = false;
 
-        IndexWriterConfig config = new IndexWriterConfig(Version.LUCENE_40, new WhitespaceAnalyzer(Version.LUCENE_40));
-        IndexWriter indexer = null;
-        Directory indexesDirectory = null;
         try {
-            // Initialise indexer with output location.
-            indexesDirectory = FSDirectory.open(indexesDir);
-            indexer = new IndexWriter(indexesDirectory, config);
-
+            GlobalDocumentBuilder globalDocumentBuilder = new GlobalDocumentBuilder(AutoColorCorrelogram.class);
+            globalDocumentBuilder.addExtractor(CEDD.class);
+            // Creating an Lucene IndexWriter
+            IndexWriter iw = LuceneUtils.createIndexWriter(indexesDirectory.getAbsolutePath(), false /*create or append*/, LuceneUtils.AnalyzerType.WhitespaceAnalyzer);
             for (Iterator<String> it = images.iterator(); it.hasNext(); ) {
                 String imageFilePath = it.next();
-                //load image
-                BufferedImage img = ImageIO.read(new FileInputStream(imageFilePath));
-                //create lucene document containing descriptor
-                Document document = this.getDocumentBuilder().createDocument(img, imageFilePath);
-                //index document
-                indexer.addDocument(document);
-
-            }
-
-            success = true;
-
-        } catch (LockObtainFailedException e) {
-            logger.error("Indexer. Lock ObtainFailedException. Will Unlock", e);
-            if (indexesDirectory != null) {
-                IndexWriter.unlock(indexesDirectory);
-            }
-        } catch (IOException e) {
-            throw e;
-        } finally {
-            if (indexer != null) {
+                logger.info("Indexing " + imageFilePath);
                 try {
-                    indexer.close();
-                } catch (IOException e) {
-                    IndexWriter.unlock(indexesDirectory);
+                    BufferedImage img = ImageIO.read(new FileInputStream(imageFilePath));
+                    Document document = globalDocumentBuilder.createDocument(img, imageFilePath);
+                    iw.addDocument(document);
+                } catch (Exception e) {
+                    logger.warn("Error reading image or indexing it. Image: " + imageFilePath);
+                    continue;
                 }
             }
-
+            // closing the IndexWriter
+            LuceneUtils.closeWriter(iw);
+        } catch (LockObtainFailedException e) {
+            logger.error("Indexer. Lock ObtainFailedException. Will Unlock", e);
+        } catch (IOException e) {
+            throw e;
         }
 
         return success;

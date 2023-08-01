@@ -52,26 +52,38 @@ public class ImageLinkingService {
      * @throws DataAccessObjectException
      */
     @Transactional(value = Transactional.TxType.REQUIRED)
-    public boolean linkImageWithFood(String foodName, String imageName) throws DataAccessObjectException, ServiceException {
+    public boolean linkImageWithFood(String foodName, String imageName) throws ServiceException {
         File imageFile = new File(imagesDirectory, imageName);
         if (!imageFile.exists()) {
             logger.info("Link request failed. " + imageFile.getAbsolutePath() + " does not exist.");
             throw new ServiceException(ErrorCodes.FILE_NOT_FOUND, imageFile.getAbsolutePath());
         }
 
-        //get id of food in food database
-        //getFoodId will create record if it doesnt already exist.
-        //likewise for imageId.
-        final FoodEntry food = getFoodByName(foodName);
-
-        if (getImageId(imageFile) == null) {
-            logger.warn("Image '"+imageName+"' not found in database");
-            throw new ServiceException(ErrorCodes.FILE_NOT_FOUND);
+        FoodEntry food;
+        try {
+            food = getFoodByName(foodName);
+            logger.info(String.format("Saved food '%s' with id '%d'", foodName, food.getFoodId()));
+        } catch (DataAccessObjectException e) {
+            logger.warn(String.format("Food '%s' does not exist in the database and can not be saved.", foodName), e);
+            throw new ServiceException(ErrorCodes.DB_INSERT_FAILED, "Failed to save food " + foodName, e);
         }
 
-        final boolean success = linkImageWithFood(imageName, food);
-        logger.info("Linker. ImageName: " + imageName + ", FoodId: " + food.getFoodId() + ", Success: " + success);
-        return success;
+        try {
+            if (getImageId(imageFile) == null) {
+                logger.warn("Image '" + imageName + "' not found in database");
+                throw new ServiceException(ErrorCodes.FILE_NOT_FOUND);
+            }
+        } catch (DataAccessObjectException e) {
+            logger.warn("Failed to find id for image " + imageFile, e);
+            throw new ServiceException(ErrorCodes.DB_SQL_EXCEPTION, "Failed to query database", e);
+        }
+
+        try {
+            return linkImageWithFood(imageName, food);
+        } catch (DataAccessObjectException e) {
+            logger.warn("Linker. ImageName: " + imageName + ", FoodId: " + food.getFoodId() + ", Error: " + false, e);
+            return false;
+        }
     }
 
     private FoodEntry getFoodByName(String foodName) throws DataAccessObjectException {
@@ -80,7 +92,6 @@ public class ImageLinkingService {
             food = new FoodEntry();
             food.setName(foodName);
             food.setFoodId(foodDAO.create(food));
-            logger.info(String.format("Saved food '%s' with id '%d'", foodName, food.getFoodId()));
         }
         return food;
     }

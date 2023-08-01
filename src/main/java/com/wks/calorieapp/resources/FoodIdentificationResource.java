@@ -27,7 +27,7 @@ public class FoodIdentificationResource {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Map<String, Float> get(
+    public Map<String, Double> get(
             @QueryParam("image_name") String imageName,
             @QueryParam("min_similarity") Float minSimilarity,
             @QueryParam("max_hits") Integer maxHits
@@ -43,8 +43,8 @@ public class FoodIdentificationResource {
             return foodIdentificationService
                     .getPossibleFoodsForImage(
                             imageName,
-                            minSimilarity == null ? 0f : minSimilarity,
-                            maxHits == null ? 0 : maxHits
+                            minSimilarity,
+                            maxHits
                     );
         } catch (IOException e) {
             logger.error("IO Exception encountered while finding similar image.", e);

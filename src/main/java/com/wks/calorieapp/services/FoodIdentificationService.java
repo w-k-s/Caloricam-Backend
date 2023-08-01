@@ -5,10 +5,11 @@ import com.wks.calorieapp.daos.ImageDao;
 import com.wks.calorieapp.entities.ImageEntry;
 import com.wks.calorieapp.factories.ImagesDirectory;
 import com.wks.calorieapp.factories.IndexesDirectory;
-import net.semanticmetadata.lire.DocumentBuilder;
-import net.semanticmetadata.lire.ImageSearchHits;
-import net.semanticmetadata.lire.ImageSearcher;
-import net.semanticmetadata.lire.ImageSearcherFactory;
+import net.semanticmetadata.lire.builders.DocumentBuilder;
+import net.semanticmetadata.lire.imageanalysis.features.global.AutoColorCorrelogram;
+import net.semanticmetadata.lire.searchers.GenericFastImageSearcher;
+import net.semanticmetadata.lire.searchers.ImageSearchHits;
+import net.semanticmetadata.lire.searchers.ImageSearcher;
 import org.apache.log4j.Logger;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
@@ -22,6 +23,7 @@ import javax.inject.Named;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -72,10 +74,10 @@ public class FoodIdentificationService {
      * @throws IOException
      * @throws DataAccessObjectException
      */
-    public Map<String, Float> getPossibleFoodsForImage(
+    public Map<String, Double> getPossibleFoodsForImage(
             final String imageName,
-            final float preferredMinimumSimilarity,
-            final int preferredMaxHits
+            final Float preferredMinimumSimilarity,
+            final Integer preferredMaxHits
     ) throws IOException, DataAccessObjectException, ServiceException {
         return getPossibleFoodsForImage(
                 new File(imagesDirectory, imageName),
@@ -92,16 +94,16 @@ public class FoodIdentificationService {
      * @throws IOException
      * @throws DataAccessObjectException
      */
-    public Map<String, Float> getPossibleFoodsForImage(
+    public Map<String, Double> getPossibleFoodsForImage(
             final File imageFile,
-            final float preferredMinimumSimilarity,
-            final int preferredMaxHits
+            final Float preferredMinimumSimilarity,
+            final Integer preferredMaxHits
     ) throws IOException, DataAccessObjectException, ServiceException {
 
-        final float actualMinSimilarity = Math.max(preferredMinimumSimilarity, minSimilarity);
-        final int actualMaxHits = Math.min(preferredMaxHits, maxHits);
+        final float actualMinSimilarity = preferredMinimumSimilarity == null ? minSimilarity : Math.max(preferredMinimumSimilarity, minSimilarity);
+        final int actualMaxHits = preferredMaxHits == null ? maxHits : Math.min(preferredMaxHits, maxHits);
 
-        Map<String, Float> foodNameSimilarityMap = new HashMap<String, Float>();
+        Map<String, Double> foodNameSimilarityMap = new HashMap<>();
 
         //find similar images
         if (!imageFile.exists()) {
@@ -109,14 +111,20 @@ public class FoodIdentificationService {
             throw new ServiceException(ErrorCodes.FILE_NOT_FOUND);
         }
 
-        Map<String, Float> imageSimilarityMap = this.findSimilarImages(imageFile.getAbsolutePath(), indexesDirectory.getAbsolutePath(), actualMaxHits);
+        Map<String, Double> imageSimilarityMap = this.findSimilarImages(imageFile.getAbsolutePath(), indexesDirectory.getAbsolutePath(), actualMaxHits);
 
         //get name of food in each similar image.
-        for (java.util.Map.Entry<String, Float> imageSimilarityEntry : imageSimilarityMap.entrySet()) {
+        for (java.util.Map.Entry<String, Double> imageSimilarityEntry : imageSimilarityMap.entrySet()) {
             String imageName = imageSimilarityEntry.getKey();
             String foodName = this.getFoodNameForImage(imageName);
-            float similarity = imageSimilarityEntry.getValue();
+            double similarity = imageSimilarityEntry.getValue();
 
+            logger.info(String.format("Food Identification. Request Image: '%s'. Similar Image: '%s', Food Name: '%s'. Similarity: '%f'",
+                    imageFile,
+                    imageName,
+                    foodName,
+                    similarity
+            ));
             if (foodName != null && !foodName.isEmpty() && (similarity >= actualMinSimilarity)) {
                 foodNameSimilarityMap.put(foodName, similarity);
             }
@@ -132,28 +140,27 @@ public class FoodIdentificationService {
      * @return Map of image name (key) and similarity index (value).
      * @throws IOException
      */
-    private Map<String, Float> findSimilarImages(String imageUri, String indexesDir, int maximumHits)
+    private Map<String, Double> findSimilarImages(String imageUri, String indexesDir, int maximumHits)
             throws IOException {
-
-
-        Map<String, Float> imageSimilarityMap = new HashMap<String, Float>();
-
         //load file into image.
         BufferedImage image = ImageIO.read(new File(imageUri));
+        logger.info("Successfully read image " + imageUri);
 
         //load indexes
-        IndexReader reader = DirectoryReader.open(FSDirectory.open(new File(indexesDir)));
+        IndexReader reader = DirectoryReader.open(FSDirectory.open(Paths.get(indexesDirectory.toURI())));
 
         //create searcher to compare auto color correlogram descriptors
-        ImageSearcher searcher = ImageSearcherFactory.createAutoColorCorrelogramImageSearcher(maximumHits);
+        ImageSearcher searcher = new GenericFastImageSearcher(maximumHits, AutoColorCorrelogram.class);
 
         //search for images similar to given image
+        logger.info("Searching matching images for for " + imageUri + " using " + searcher + ". Indexes Dir:  " + indexesDir);
         ImageSearchHits hits = searcher.search(image, reader);
 
-        int limit = Math.min(hits.length(), maximumHits);
 
-        for (int i = 0; i < limit; i++) {
-            String fileName = hits.doc(i).getValues(DocumentBuilder.FIELD_NAME_IDENTIFIER)[0];
+        Map<String, Double> imageSimilarityMap = new HashMap<>();
+
+        for (int i = 0; i < hits.length(); i++) {
+            String fileName = reader.document(hits.documentID(i)).getValues(DocumentBuilder.FIELD_NAME_IDENTIFIER)[0];
 
             fileName = fileName.substring(fileName.lastIndexOf(File.separator) + 1);
 
@@ -166,6 +173,9 @@ public class FoodIdentificationService {
     private String getFoodNameForImage(String imageName) throws DataAccessObjectException {
         ImageEntry imageDTO = imageDAO.find(imageName);
         if (imageDTO == null) {
+            return null;
+        }
+        if (imageDTO.getFood() == null){
             return null;
         }
         return imageDTO.getFood().getName();
