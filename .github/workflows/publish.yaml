@@ -99,13 +99,13 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: CalorieApp.war
-          path: CalorieApp.war
+          path: ./
 
       - name: Download swagger
         uses: actions/download-artifact@v3
         with:
           name: openapi.yaml
-          path: openapi.yaml
+          path: ./
 
       - name: Upload Artifacts to Release
         uses: actions/upload-release-asset@v1
@@ -113,7 +113,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: CalorieApp.war
+          asset_path: ./CalorieApp.war
           asset_name: CalorieApp.war
           asset_content_type: application/octet-stream
 
@@ -123,6 +123,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: openapi.yaml
+          asset_path: ./openapi.yaml
           asset_name: openapi.yaml
           asset_content_type: application/x-yaml
